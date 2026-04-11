@@ -1,32 +1,35 @@
 import Link from "next/link";
 import { units } from "../data/units";
+import BackgroundSlideshow from "../components/BackgroundSlideshow";
 
 export default function HomePage() {
   return (
-    <div className="mx-auto max-w-7xl px-6 pb-20 pt-6 lg:px-8">
-      <section className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
-        <div className="space-y-6">
+    <div className="relative overflow-hidden bg-black text-white">
+      <BackgroundSlideshow />
+      <div className="relative mx-auto max-w-7xl px-6 pb-20 pt-6 lg:px-8">
+        <section className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+          <div className="space-y-6">
           <span className="inline-flex rounded-full bg-terracotta/10 px-3 py-1 text-sm font-semibold text-terracotta">Direct Booking Save 10%</span>
-          <h1 className="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
+          <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">
             La Casa Oaxaca — Private bungalows and a garden retreat in San Felipe del Agua.
           </h1>
-          <p className="max-w-2xl text-lg leading-8 text-slate-700">
+          <p className="max-w-2xl text-lg leading-8 text-slate-200">
             Experience a calm, authentic stay with private verandas, fruit orchard views, stargazing amenities, and contactless direct booking.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/book" className="inline-flex items-center justify-center rounded-full bg-terracotta px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-200 transition hover:bg-[#b55e47]">
               Book Now
             </Link>
-            <Link href="/about" className="inline-flex items-center justify-center rounded-full border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50">
+            <Link href="/about" className="inline-flex items-center justify-center rounded-full border border-slate-300 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-50 hover:text-slate-900">
               About La Casa
             </Link>
           </div>
         </div>
             <div className="rounded-4xl bg-gradient-to-br from-terracotta/10 via-adobe to-sky p-10 text-white shadow-xl shadow-slate-200">
           <div className="space-y-4">
-            <p className="text-sm uppercase tracking-[0.24em] text-slate-700">Luxury retreat</p>
+            <p className="text-sm uppercase tracking-[0.24em] text-slate-200">Luxury retreat</p>
             <h2 className="text-3xl font-semibold">Garden, privacy, and authentic Oaxaca style</h2>
-            <p className="text-slate-700/90">Enjoy private units surrounded by mature fruit trees, and elegantly minimal architecture designed for peace and relaxation. A 15 minute drive from downown Oaxaca!</p>
+            <p className="text-slate-200/85">Enjoy private units surrounded by mature fruit trees, and elegantly minimal architecture designed for peace and relaxation. A 15 minute drive from downtown Oaxaca!</p>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="rounded-3xl bg-white/90 p-5 text-slate-900 shadow-sm">
                 <p className="text-xs font-semibold uppercase text-terracotta">Capacity</p>
@@ -81,6 +84,7 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+      </div>
     </div>
   );
 }

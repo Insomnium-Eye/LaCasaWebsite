@@ -5,11 +5,18 @@ import { useState } from "react";
 import { units, Unit } from "../data/units";
 import BackgroundSlideshow from "../components/BackgroundSlideshow";
 import UnitModal from "../components/UnitModal";
+import GalleryModal from "../components/GalleryModal";
+import ContactModal from "../components/ContactModal";
 import { useLanguage } from "../contexts/LanguageContext";
 
 export default function HomePage() {
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [galleryIndex, setGalleryIndex] = useState(0);
+  const [contactOpen, setContactOpen] = useState(false);
   const { t } = useLanguage();
+
+  const galleryImages = Array.from({ length: 21 }, (_, index) => `/imgs/OaxacaPicture_${index + 1}.jpg`);
 
   const features = [
     {
@@ -46,6 +53,23 @@ export default function HomePage() {
             <Link href="/about" className="inline-flex items-center justify-center rounded-full border border-slate-300 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-50 hover:text-slate-900">
               {t("home.aboutLaCasa")}
             </Link>
+            <button
+              type="button"
+              onClick={() => {
+                setGalleryIndex(0);
+                setGalleryOpen(true);
+              }}
+              className="inline-flex items-center justify-center rounded-full border border-slate-300 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-50 hover:text-slate-900"
+            >
+              {t("home.galleryButton")}
+            </button>
+            <button
+              type="button"
+              onClick={() => setContactOpen(true)}
+              className="inline-flex items-center justify-center rounded-full bg-slate-100 px-6 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-200"
+            >
+              {t("home.contactButton")}
+            </button>
           </div>
         </div>
             <div className="rounded-4xl bg-gradient-to-br from-[#3c2b1f]/95 via-[#71573f]/90 to-[#8d7155]/80 p-10 text-slate-100 shadow-xl shadow-black/30">
@@ -104,6 +128,16 @@ export default function HomePage() {
         </div>
       </section>
       <UnitModal unit={selectedUnit} onClose={() => setSelectedUnit(null)} />
+      {galleryOpen && (
+        <GalleryModal
+          images={galleryImages}
+          currentIndex={galleryIndex}
+          onClose={() => setGalleryOpen(false)}
+          onPrev={() => setGalleryIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length)}
+          onNext={() => setGalleryIndex((prev) => (prev + 1) % galleryImages.length)}
+        />
+      )}
+      <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} />
       </div>
     </div>
   );

@@ -21,12 +21,12 @@ export default function BackgroundSlideshow() {
         <div
           key={src}
           className={`absolute inset-0 bg-cover bg-center transition-opacity duration-[1200ms] ease-in-out ${
-            index === activeIndex ? "opacity-30" : "opacity-0"
+            index === activeIndex ? "opacity-100" : "opacity-0"
           }`}
           style={{ backgroundImage: `url(${src})` }}
         />
       ))}
-      <div className="absolute inset-0 bg-black/80" />
+      <div className="absolute inset-0 bg-black/30" />
     </div>
   );
 }

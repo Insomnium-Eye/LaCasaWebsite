@@ -1,41 +1,81 @@
+"use client";
+
+import { useLanguage } from '../../contexts/LanguageContext';
+import BackgroundSlideshow from '../../components/BackgroundSlideshow';
+
 export default function ContactPage() {
+  const { t } = useLanguage();
+
   return (
-    <div className="mx-auto max-w-6xl px-6 pb-20 pt-10 lg:px-8">
+    <div className="relative overflow-hidden bg-black text-white min-h-screen">
+      <BackgroundSlideshow />
+      <div className="relative mx-auto max-w-6xl px-6 pb-20 pt-10 lg:px-8">
       <div className="space-y-6">
-        <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Contact</p>
-        <h1 className="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">Get in touch with La Casa.</h1>
-        <p className="max-w-3xl text-lg leading-8 text-slate-700">
-          Send us your message or reservation request. You can also reach out directly via WhatsApp or email.
-        </p>
+        <p className="text-sm uppercase tracking-[0.24em] text-slate-300">{t('contact.heading')}</p>
+        <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">{t('contact.title')}</h1>
+        <p className="max-w-3xl text-lg leading-8 text-slate-200">{t('contact.description')}</p>
       </div>
       <div className="mt-12 grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
-        <div className="rounded-4xl border border-slate-200 bg-white p-8 shadow-sm">
-          <form className="space-y-6">
+        <div className="rounded-4xl border border-slate-700 bg-[#241a13]/90 p-8 shadow-sm shadow-black/10">
+          <form
+            name="contact"
+            method="POST"
+            data-netlify="true"
+            netlify-honeypot="bot-field"
+            className="space-y-6"
+          >
+            <input type="hidden" name="form-name" value="contact" />
+            <div style={{ display: 'none' }}>
+              <label>
+                Don't fill this out if you're human: <input name="bot-field" />
+              </label>
+            </div>
             <label className="block">
-              <span className="text-sm font-semibold text-slate-900">Name</span>
-              <input className="mt-2 w-full rounded-3xl border border-slate-300 bg-slate-50 p-4 text-slate-900 outline-none focus:border-garden focus:ring-2 focus:ring-garden/20" placeholder="Your name" />
+              <span className="text-sm font-semibold text-slate-900">{t('contact.formName')}</span>
+              <input
+                name="name"
+                className="mt-2 w-full rounded-3xl border border-slate-300 bg-slate-50 p-4 text-slate-900 outline-none focus:border-garden focus:ring-2 focus:ring-garden/20"
+                placeholder={t('contact.formNamePlaceholder')}
+                required
+              />
             </label>
             <label className="block">
-              <span className="text-sm font-semibold text-slate-900">Email</span>
-              <input className="mt-2 w-full rounded-3xl border border-slate-300 bg-slate-50 p-4 text-slate-900 outline-none focus:border-garden focus:ring-2 focus:ring-garden/20" placeholder="you@example.com" />
+              <span className="text-sm font-semibold text-slate-900">{t('contact.formEmail')}</span>
+              <input
+                name="email"
+                type="email"
+                className="mt-2 w-full rounded-3xl border border-slate-300 bg-slate-50 p-4 text-slate-900 outline-none focus:border-garden focus:ring-2 focus:ring-garden/20"
+                placeholder={t('contact.formEmailPlaceholder')}
+                required
+              />
             </label>
             <label className="block">
-              <span className="text-sm font-semibold text-slate-900">Message</span>
-              <textarea className="mt-2 w-full rounded-3xl border border-slate-300 bg-slate-50 p-4 text-slate-900 outline-none focus:border-garden focus:ring-2 focus:ring-garden/20" rows={5} placeholder="Tell us about your trip" />
+              <span className="text-sm font-semibold text-slate-900">{t('contact.formMessage')}</span>
+              <textarea
+                name="message"
+                className="mt-2 w-full rounded-3xl border border-slate-300 bg-slate-50 p-4 text-slate-900 outline-none focus:border-garden focus:ring-2 focus:ring-garden/20"
+                rows={5}
+                placeholder={t('contact.formMessagePlaceholder')}
+                required
+              />
             </label>
-            <button type="button" className="inline-flex items-center justify-center rounded-full bg-terracotta px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#b55e47]">
-              Send message
+            <button
+              type="submit"
+              className="inline-flex items-center justify-center rounded-full bg-terracotta px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#b55e47]"
+            >
+              {t('contact.formButton')}
             </button>
           </form>
         </div>
-        <div className="rounded-4xl border border-slate-200 bg-slate-50 p-8 shadow-sm">
+        <div className="rounded-4xl border border-slate-700 bg-[#241a13]/90 p-8 shadow-sm shadow-black/10">
           <div className="space-y-4">
-            <p className="text-lg font-semibold text-slate-900">Contact details</p>
-            <p className="text-slate-600">Email: hello@lacasaoaxaca.mx</p>
-            <p className="text-slate-600">WhatsApp: +52 951 123 4567</p>
-            <p className="text-slate-600">Location: San Felipe del Agua, Oaxaca, Mexico</p>
+            <p className="text-lg font-semibold text-white">{t('contact.detailsTitle')}</p>
+            <p className="text-slate-200">{t('contact.email')}</p>
+            <p className="text-slate-200">{t('contact.whatsapp')}</p>
+            <p className="text-slate-200">{t('contact.location')}</p>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

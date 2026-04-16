@@ -6,7 +6,11 @@ export type Unit = {
   capacity: number;
   bathroom: string;
   terrace: string;
-  rate: number;
+  nightlyRate: number;
+  weeklyRate: number;
+  monthlyRate: number;
+  displayImage?: string;
+  galleryImages?: string[];
 };
 
 export const units: Unit[] = [
@@ -18,7 +22,11 @@ export const units: Unit[] = [
     capacity: 2,
     bathroom: "En-suite bathroom",
     terrace: "Private veranda and garden area",
-    rate: 190
+    nightlyRate: 75,
+    weeklyRate: 450,
+    monthlyRate: 1575,
+    displayImage: "/imgs/OaxacaPicture_7.jpg",
+    galleryImages: ["/imgs/OaxacaPicture_8.jpg", "/imgs/OaxacaPicture_9.jpg"]
   },
   {
     slug: "bungalow-2",
@@ -28,7 +36,9 @@ export const units: Unit[] = [
     capacity: 2,
     bathroom: "En-suite bathroom",
     terrace: "Private veranda and garden area",
-    rate: 180
+    nightlyRate: 90,
+    weeklyRate: 500,
+    monthlyRate: 1575
   },
   {
     slug: "main-bedroom",
@@ -38,6 +48,22 @@ export const units: Unit[] = [
     capacity: 2,
     bathroom: "En-suite bathroom",
     terrace: "Shared terrace nearby",
-    rate: 155
+    nightlyRate: 75,
+    weeklyRate: 450,
+    monthlyRate: 1575
+  },
+  {
+    slug: "entire-house",
+    name: "Entire House",
+    type: "Full property rental",
+    summary: "Rent the entire beautiful property including all bungalows and the main residence (office and master bedroom remain locked).",
+    capacity: 6,
+    bathroom: "Multiple bathrooms",
+    terrace: "Multiple terraces and garden areas",
+    nightlyRate: 0,
+    weeklyRate: 1200,
+    monthlyRate: 2700,
+    displayImage: "/imgs/OaxacaPicture_1.jpg",
+    galleryImages: ["/imgs/OaxacaPicture_2.jpg", "/imgs/OaxacaPicture_3.jpg", "/imgs/OaxacaPicture_4.jpg"]
   }
 ];

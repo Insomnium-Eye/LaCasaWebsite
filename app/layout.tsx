@@ -4,7 +4,7 @@ import ClientLayout from "../components/ClientLayout";
 
 export const metadata: Metadata = {
   title: "La Casa Oaxaca | Direct Booking Boutique Retreat",
-  description: "Luxury direct-booking rental in San Felipe del Agua, Oaxaca with private bungalows and a 10% discount for direct reservations.",
+  description: "Luxury direct-booking rental in San Felipe del Agua, Oaxaca with private bungalows.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

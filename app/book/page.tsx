@@ -1,19 +1,22 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { units } from "../../data/units";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { formatPrice } from "../../lib/currency";
+import useUsdToMxn from "../../hooks/useUsdToMxn";
 import BackgroundSlideshow from "../../components/BackgroundSlideshow";
+import IdVerification from "../../components/IdVerification";
+import EscrowModal from "../../components/EscrowModal";
 
 const initialState = {
   name: "",
   email: "",
+  phone: "",
   guests: 2,
   unit: "bungalow-1",
   checkIn: "",
-  checkOut: "",
-  bookingPeriod: "nightly" as "nightly" | "weekly" | "monthly"
+  checkOut: ""
 };
 
 function parseDate(value: string) {
@@ -30,53 +33,54 @@ function daysBetween(start: string, end: string) {
 
 export default function BookPage() {
   const { t, language } = useLanguage();
+  const { convertToMxn, formatCurrency } = useUsdToMxn();
   const [form, setForm] = useState(initialState);
+  const [showIdVerification, setShowIdVerification] = useState(false);
+  const [idVerified, setIdVerified] = useState(false);
+  const [showEscrow, setShowEscrow] = useState(false);
   const nights = useMemo(() => daysBetween(form.checkIn, form.checkOut), [form.checkIn, form.checkOut]);
   const selectedUnit = units.find((unit) => unit.slug === form.unit) ?? units[0];
   
-  const calculateTotal = useMemo(() => {
-    if (!form.checkIn || !form.checkOut) return 0;
-    
-    const startDate = parseDate(form.checkIn);
-    const endDate = parseDate(form.checkOut);
-    if (!startDate || !endDate || endDate <= startDate) return 0;
-    
-    const diffTime = endDate.getTime() - startDate.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    switch (form.bookingPeriod) {
-      case 'nightly':
-        return diffDays * selectedUnit.nightlyRate;
-      case 'weekly':
-        return Math.ceil(diffDays / 7) * selectedUnit.weeklyRate;
-      case 'monthly':
-        return Math.ceil(diffDays / 30) * selectedUnit.monthlyRate;
-      default:
-        return 0;
-    }
-  }, [form.checkIn, form.checkOut, form.bookingPeriod, selectedUnit]);
+  const today = new Date().toISOString().split('T')[0];
   
-  const baseAmount = useMemo(() => {
-    if (!form.checkIn || !form.checkOut) return 0;
+  const calculatePricing = useMemo(() => {
+    if (!nights || selectedUnit.nightlyRate === 0) return { base: 0, discount: 0, subtotal: 0, iva: 0, ish: 0, total: 0 };
     
-    const startDate = parseDate(form.checkIn);
-    const endDate = parseDate(form.checkOut);
-    if (!startDate || !endDate || endDate <= startDate) return 0;
-    
-    const diffTime = endDate.getTime() - startDate.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    switch (form.bookingPeriod) {
-      case 'nightly':
-        return diffDays * selectedUnit.nightlyRate;
-      case 'weekly':
-        return Math.ceil(diffDays / 7) * selectedUnit.weeklyRate;
-      case 'monthly':
-        return Math.ceil(diffDays / 30) * selectedUnit.monthlyRate;
-      default:
-        return 0;
+    const base = nights * selectedUnit.nightlyRate;
+    let discount = 0;
+    if (nights >= 29) {
+      discount = base * 0.25; // 25% off for 29+ nights
+    } else if (nights >= 8) {
+      discount = base * 0.10; // 10% off for 8+ nights
     }
-  }, [form.checkIn, form.checkOut, form.bookingPeriod, selectedUnit]);
+    const subtotal = base - discount;
+    const iva = subtotal * 0.16; // 16% IVA
+    const ish = subtotal * 0.03; // 3% ISH
+    const total = subtotal + iva + ish;
+    
+    return { base, discount, subtotal, iva, ish, total };
+  }, [nights, selectedUnit.nightlyRate]);
+  
+  const handleRequestDetails = () => {
+    if (!form.name || (!form.email && !form.phone) || !form.checkIn || !form.checkOut || nights <= 0) {
+      alert(t('book.validationError'));
+      return;
+    }
+    setShowIdVerification(true);
+  };
+  
+  const handleIdVerificationComplete = (verified: boolean) => {
+    setIdVerified(verified);
+    setShowIdVerification(false);
+    if (verified) {
+      setShowEscrow(true);
+    }
+  };
+  
+  const handleEscrowComplete = () => {
+    setShowEscrow(false);
+    alert('Booking submitted! You will receive a confirmation once approved by the owner.');
+  };
 
   return (
     <div className="relative overflow-hidden bg-black text-white min-h-screen">
@@ -97,11 +101,13 @@ export default function BookPage() {
                 onChange={(event) => setForm({ ...form, name: event.target.value })}
                 className="mt-2 w-full rounded-3xl border border-slate-300 bg-slate-50 p-4 text-slate-900 outline-none focus:border-garden focus:ring-2 focus:ring-garden/20"
                 placeholder={t('book.name')}
+                required
               />
             </label>
             <label className="block">
               <span className="text-sm font-semibold text-slate-900">{t('book.email')}</span>
               <input
+                type="email"
                 value={form.email}
                 onChange={(event) => setForm({ ...form, email: event.target.value })}
                 className="mt-2 w-full rounded-3xl border border-slate-300 bg-slate-50 p-4 text-slate-900 outline-none focus:border-garden focus:ring-2 focus:ring-garden/20"
@@ -110,6 +116,16 @@ export default function BookPage() {
             </label>
           </div>
           <div className="grid gap-6 sm:grid-cols-2">
+            <label className="block">
+              <span className="text-sm font-semibold text-slate-900">{t('book.phone')}</span>
+              <input
+                type="tel"
+                value={form.phone}
+                onChange={(event) => setForm({ ...form, phone: event.target.value })}
+                className="mt-2 w-full rounded-3xl border border-slate-300 bg-slate-50 p-4 text-slate-900 outline-none focus:border-garden focus:ring-2 focus:ring-garden/20"
+                placeholder={t('book.phone')}
+              />
+            </label>
             <label className="block">
               <span className="text-sm font-semibold text-slate-900">{t('book.unit')}</span>
               <select
@@ -122,18 +138,6 @@ export default function BookPage() {
                     {t(`units.items.${unit.slug}.name`)}
                   </option>
                 ))}
-              </select>
-            </label>
-            <label className="block">
-              <span className="text-sm font-semibold text-slate-900">{t('book.bookingPeriod')}</span>
-              <select
-                value={form.bookingPeriod}
-                onChange={(event) => setForm({ ...form, bookingPeriod: event.target.value as "nightly" | "weekly" | "monthly" })}
-                className="mt-2 w-full rounded-3xl border border-slate-300 bg-slate-50 p-4 text-slate-900 outline-none focus:border-garden focus:ring-2 focus:ring-garden/20"
-              >
-                <option value="nightly">{`${t('book.periods.nightly')} (${formatPrice(selectedUnit.nightlyRate, language)}/${t('book.priceUnit.night')})`}</option>
-                <option value="weekly">{`${t('book.periods.weekly')} (${formatPrice(selectedUnit.weeklyRate, language)}/${t('book.priceUnit.week')})`}</option>
-                <option value="monthly">{`${t('book.periods.monthly')} (${formatPrice(selectedUnit.monthlyRate, language)}/${t('book.priceUnit.month')})`}</option>
               </select>
             </label>
           </div>
@@ -153,9 +157,11 @@ export default function BookPage() {
               <span className="text-sm font-semibold text-slate-900">{t('book.checkIn')}</span>
               <input
                 type="date"
+                min={today}
                 value={form.checkIn}
                 onChange={(event) => setForm({ ...form, checkIn: event.target.value })}
                 className="mt-2 w-full rounded-3xl border border-slate-300 bg-slate-50 p-4 text-slate-900 outline-none focus:border-garden focus:ring-2 focus:ring-garden/20"
+                required
               />
             </label>
           </div>
@@ -164,13 +170,15 @@ export default function BookPage() {
               <span className="text-sm font-semibold text-slate-900">{t('book.checkOut')}</span>
               <input
                 type="date"
+                min={form.checkIn || today}
                 value={form.checkOut}
                 onChange={(event) => setForm({ ...form, checkOut: event.target.value })}
                 className="mt-2 w-full rounded-3xl border border-slate-300 bg-slate-50 p-4 text-slate-900 outline-none focus:border-garden focus:ring-2 focus:ring-garden/20"
+                required
               />
             </label>
           </div>
-          <button type="button" className="inline-flex items-center justify-center rounded-full bg-garden px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#3c5a35]">
+          <button type="button" onClick={handleRequestDetails} className="inline-flex items-center justify-center rounded-full bg-garden px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#3c5a35]">
             {t('book.requestDetails')}
           </button>
         </form>
@@ -180,29 +188,24 @@ export default function BookPage() {
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-300">{t('book.rateSummary')}</p>
             <p className="mt-4 text-slate-200">{`${t(`units.items.${selectedUnit.slug}.name`)} · ${selectedUnit.capacity} ${t('book.guests')}`}</p>
             <div className="mt-6 space-y-3 text-slate-200">
-              {form.bookingPeriod === 'nightly' && (
+              {selectedUnit.nightlyRate > 0 && (
                 <>
                   <p>{`${t('book.nightlyRate')}: ${formatPrice(selectedUnit.nightlyRate, language)}`}</p>
                   <p>{`${t('book.nights')}: ${nights || 0}`}</p>
+                  <p>{`${t('book.baseAmount')}: ${formatPrice(calculatePricing.base, language)}`}</p>
+                  {calculatePricing.discount > 0 && (
+                    <p>{`${t('book.discount')}: -${formatPrice(calculatePricing.discount, language)}`}</p>
+                  )}
+                  <p>{`${t('book.subtotal')}: ${formatPrice(calculatePricing.subtotal, language)}`}</p>
+                  <p>{`IVA (16%): ${formatPrice(calculatePricing.iva, language)}`}</p>
+                  <p>{`ISH (3%): ${formatPrice(calculatePricing.ish, language)}`}</p>
                 </>
               )}
-              {form.bookingPeriod === 'weekly' && (
-                <>
-                  <p>{`${t('book.weeklyRate')}: ${formatPrice(selectedUnit.weeklyRate, language)}`}</p>
-                  <p>{`${t('book.weeks')}: ${nights ? Math.ceil(nights / 7) : 0}`}</p>
-                </>
-              )}
-              {form.bookingPeriod === 'monthly' && (
-                <>
-                  <p>{`${t('book.monthlyRate')}: ${formatPrice(selectedUnit.monthlyRate, language)}`}</p>
-                  <p>{`${t('book.months')}: ${nights ? Math.ceil(nights / 30) : 0}`}</p>
-                </>
-              )}
-              <p>{`${t('book.subtotal')}: ${formatPrice(baseAmount, language)}`}</p>
             </div>
             <div className="mt-6 rounded-3xl bg-garden px-5 py-4 text-white">
               <p className="text-sm uppercase tracking-[0.24em]">{t('book.estimatedTotal')}</p>
-              <p className="mt-2 text-3xl font-semibold">{formatPrice(calculateTotal, language)}</p>
+              <p className="mt-2 text-3xl font-semibold">{formatPrice(calculatePricing.total, language)}</p>
+              <p className="mt-1 text-sm">{formatCurrency(calculatePricing.total)}</p>
             </div>
           </div>
           <div className="rounded-4xl bg-[#1a0f0a]/90 p-6 shadow-sm shadow-black/10">
@@ -216,6 +219,20 @@ export default function BookPage() {
         </aside>
       </div>
       </div>
+      {showIdVerification && (
+        <IdVerification
+          onVerificationComplete={handleIdVerificationComplete}
+          onStatusChange={(status) => console.log('ID verification status:', status)}
+        />
+      )}
+      {showEscrow && (
+        <EscrowModal
+          total={calculatePricing.total}
+          nights={nights}
+          onClose={() => setShowEscrow(false)}
+          onPaymentComplete={handleEscrowComplete}
+        />
+      )}
     </div>
   );
 }

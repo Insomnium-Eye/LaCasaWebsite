@@ -23,8 +23,8 @@ export const units: Unit[] = [
     bathroom: "En-suite bathroom",
     terrace: "Private veranda and garden area",
     nightlyRate: 75,
-    weeklyRate: 450,
-    monthlyRate: 1575,
+    weeklyRate: 500,
+    monthlyRate: 1650,
     displayImage: "/imgs/OaxacaPicture_7.jpg",
     galleryImages: ["/imgs/OaxacaPicture_8.jpg", "/imgs/OaxacaPicture_9.jpg"]
   },
@@ -37,8 +37,8 @@ export const units: Unit[] = [
     bathroom: "En-suite bathroom",
     terrace: "Private veranda and garden area",
     nightlyRate: 90,
-    weeklyRate: 500,
-    monthlyRate: 1575
+    weeklyRate: 600,
+    monthlyRate: 1900
   },
   {
     slug: "main-bedroom",
@@ -49,8 +49,8 @@ export const units: Unit[] = [
     bathroom: "En-suite bathroom",
     terrace: "Shared terrace nearby",
     nightlyRate: 75,
-    weeklyRate: 450,
-    monthlyRate: 1575
+    weeklyRate: 500,
+    monthlyRate: 1650
   },
   {
     slug: "entire-house",
@@ -61,8 +61,8 @@ export const units: Unit[] = [
     bathroom: "Multiple bathrooms",
     terrace: "Multiple terraces and garden areas",
     nightlyRate: 0,
-    weeklyRate: 1200,
-    monthlyRate: 2700,
+    weeklyRate: 1700,
+    monthlyRate: 2600,
     displayImage: "/imgs/OaxacaPicture_1.jpg",
     galleryImages: ["/imgs/OaxacaPicture_2.jpg", "/imgs/OaxacaPicture_3.jpg", "/imgs/OaxacaPicture_4.jpg"]
   }

@@ -51,35 +51,9 @@ const IdVerification: React.FC<IdVerificationProps> = ({
 
     setIdFile(file);
     setError(null);
-    setStep('processing');
-    handleSubmitVerification();
-  };
-
-  // Submit verification (mock for now)
-  const handleSubmitVerification = async () => {
-    if (!idFile) {
-      setError('Please upload your ID before submitting');
-      return;
-    }
-
-    try {
-      setStep('processing');
-      onStatusChange?.('in-progress');
-      setError(null);
-
-      // Mock processing delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // For now, always succeed
-      setStep('success');
-      onStatusChange?.('verified');
-      onVerificationComplete?.(true);
-    } catch (err) {
-      setStep('error');
-      setError('Verification failed. Please try again.');
-      onStatusChange?.('failed');
-      onVerificationComplete?.(false);
-    }
+    setStep('success');
+    onStatusChange?.('verified');
+    onVerificationComplete?.(true);
   };
 
   return (

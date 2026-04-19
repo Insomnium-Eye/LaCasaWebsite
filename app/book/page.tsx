@@ -23,6 +23,14 @@ function parseDate(value: string) {
   return value ? new Date(value) : null;
 }
 
+function addDays(value: string, days: number) {
+  const date = parseDate(value);
+  if (!date) return '';
+  const next = new Date(date);
+  next.setDate(next.getDate() + days);
+  return next.toISOString().split('T')[0];
+}
+
 function daysBetween(start: string, end: string) {
   const startDate = parseDate(start);
   const endDate = parseDate(end);
@@ -42,7 +50,17 @@ export default function BookPage() {
   const selectedUnit = units.find((unit) => unit.slug === form.unit) ?? units[0];
   
   const today = new Date().toISOString().split('T')[0];
-  
+  const minNights = selectedUnit.slug === 'entire-house' ? 6 : 1;
+  const checkOutMinDate = selectedUnit.slug === 'entire-house' && form.checkIn ? addDays(form.checkIn, minNights) : (form.checkIn || today);
+
+  useEffect(() => {
+    if (selectedUnit.slug !== 'entire-house' || !form.checkIn || !form.checkOut) return;
+    const currentNights = daysBetween(form.checkIn, form.checkOut);
+    if (currentNights > 0 && currentNights < minNights) {
+      setForm((prev) => ({ ...prev, checkOut: addDays(prev.checkIn, minNights) }));
+    }
+  }, [form.checkIn, form.checkOut, selectedUnit.slug, minNights]);
+
   const calculatePricing = useMemo(() => {
     if (!nights || selectedUnit.nightlyRate === 0) return { base: 0, discount: 0, subtotal: 0, iva: 0, ish: 0, total: 0 };
     
@@ -64,6 +82,10 @@ export default function BookPage() {
   const handleRequestDetails = () => {
     if (!form.name || (!form.email && !form.phone) || !form.checkIn || !form.checkOut || nights <= 0) {
       alert(t('book.validationError'));
+      return;
+    }
+    if (selectedUnit.slug === 'entire-house' && nights < minNights) {
+      alert(t('book.entireHouseMinNightsError'));
       return;
     }
     setShowIdVerification(true);
@@ -170,7 +192,7 @@ export default function BookPage() {
               <span className="text-sm font-semibold text-slate-900">{t('book.checkOut')}</span>
               <input
                 type="date"
-                min={form.checkIn || today}
+                min={checkOutMinDate}
                 value={form.checkOut}
                 onChange={(event) => setForm({ ...form, checkOut: event.target.value })}
                 className="mt-2 w-full rounded-3xl border border-slate-300 bg-slate-50 p-4 text-slate-900 outline-none focus:border-garden focus:ring-2 focus:ring-garden/20"

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useLanguage } from '../../contexts/LanguageContext';
 import BackgroundSlideshow from '../../components/BackgroundSlideshow';
 
@@ -11,6 +12,9 @@ export default function AboutPage() {
   return (
     <div className="relative overflow-hidden bg-black text-white min-h-screen">
       <BackgroundSlideshow />
+      <Link href="/" className="absolute top-6 left-6 z-10 text-slate-300 hover:text-white transition">
+        {t('nav.backToHome')}
+      </Link>
       <div className="relative mx-auto max-w-6xl px-6 pb-20 pt-10 lg:px-8">
       <section className="grid gap-10 lg:grid-cols-[0.9fr_0.8fr] lg:items-center">
         <div className="space-y-6">

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import TransportationAddons from '@/components/TransportationAddons';
 import IdVerification from '@/components/IdVerification';
 import useUsdToMxn from '@/hooks/useUsdToMxn';
@@ -196,6 +197,9 @@ const BookingPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-green-50 py-8 px-4">
+      <Link href="/" className="inline-block mb-4 text-amber-700 hover:text-amber-900 transition">
+        ← Back to Home
+      </Link>
       {/* Header */}
       <div className="max-w-6xl mx-auto mb-12">
         <div className="text-center mb-4">

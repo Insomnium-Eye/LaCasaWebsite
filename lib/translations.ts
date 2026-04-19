@@ -9,7 +9,8 @@ export const translations = {
       gallery: "Gallery",
       faq: "FAQ",
       contact: "Contact",
-      bookDirect: "Book direct"
+      bookDirect: "Book direct",
+      backToHome: "← Back to Home"
     },
     home: {
       directBooking: "Direct Booking",
@@ -261,7 +262,8 @@ export const translations = {
       gallery: "Galería",
       faq: "Preguntas Frecuentes",
       contact: "Contacto",
-      bookDirect: "Reservar directo"
+      bookDirect: "Reservar directo",
+      backToHome: "← Volver al Inicio"
     },
     home: {
       directBooking: "Reserva Directa",

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import TransportationAddons from '@/components/TransportationAddons';
 import IdVerification from '@/components/IdVerification';
+import BackgroundSlideshow from '@/components/BackgroundSlideshow';
 import useUsdToMxn from '@/hooks/useUsdToMxn';
 
 interface Unit {
@@ -196,18 +197,20 @@ const BookingPage: React.FC = () => {
   const totalPrice = calculateTotalPrice();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-green-50 py-8 px-4">
-      <Link href="/" className="inline-block mb-4 text-amber-700 hover:text-amber-900 transition">
-        ← Back to Home
-      </Link>
-      {/* Header */}
-      <div className="max-w-6xl mx-auto mb-12">
-        <div className="text-center mb-4">
-          <h1 className="text-5xl font-bold text-amber-900 mb-2">🏡 La Casa Booking</h1>
-          <p className="text-xl text-amber-800">
-            Resort accommodation in San Felipe del Agua, Oaxaca
-          </p>
-        </div>
+    <div className="relative overflow-hidden bg-black text-white min-h-screen">
+      <BackgroundSlideshow />
+      <div className="relative mx-auto max-w-6xl px-4 py-8">
+        <Link href="/" className="inline-block mb-4 text-slate-300 hover:text-white transition">
+          ← Back to Home
+        </Link>
+        {/* Header */}
+        <div className="mb-12">
+          <div className="text-center mb-4">
+            <h1 className="text-5xl font-bold text-white mb-2">🏡 La Casa Booking</h1>
+            <p className="text-xl text-slate-300">
+              Resort accommodation in San Felipe del Agua, Oaxaca
+            </p>
+          </div>
 
         {/* Progress Steps */}
         <div className="flex items-center justify-center gap-2 md:gap-4 my-8 flex-wrap">
@@ -223,7 +226,7 @@ const BookingPage: React.FC = () => {
                 className={`flex items-center gap-1 px-3 py-2 rounded-lg font-semibold transition-all ${
                   visibleStep === step.id
                     ? 'bg-green-600 text-white'
-                    : 'bg-white text-amber-900 hover:bg-amber-100'
+                    : 'bg-slate-700 text-white hover:bg-slate-600'
                 }`}
               >
                 <span>{step.icon}</span>
@@ -609,6 +612,7 @@ const BookingPage: React.FC = () => {
           />
         </div>
       )}
+      </div>
     </div>
   );
 };

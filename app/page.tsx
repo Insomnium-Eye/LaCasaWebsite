@@ -37,6 +37,22 @@ export default function HomePage() {
   return (
     <div className="relative overflow-hidden bg-black text-white min-h-screen">
       <BackgroundSlideshow />
+      {/* Header */}
+      <header className="sticky top-0 z-30 border-b border-slate-700 bg-black/80 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-4 lg:px-8">
+          <Link href="/" className="text-lg font-semibold text-white">
+            La Casa Oaxaca
+          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/portal" className="rounded-full border border-slate-500 px-5 py-2 text-sm font-semibold text-slate-100 transition hover:bg-slate-900/50">
+              Already a guest? Sign in!
+            </Link>
+            <Link href="/book" className="rounded-full bg-garden px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#3c5a35]">
+              {t("nav.bookDirect")}
+            </Link>
+          </div>
+        </div>
+      </header>
       <div className="relative mx-auto max-w-7xl px-6 pb-20 pt-6 lg:px-8">
         <section className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
           <div className="space-y-6">

@@ -1,0 +1,53 @@
+'use client';
+
+import { GuestSession } from '@/types/guest-portal';
+
+interface GuestWelcomeBannerProps {
+  session: GuestSession | null;
+  onLogout: () => void;
+}
+
+const GuestWelcomeBanner = ({ session, onLogout }: GuestWelcomeBannerProps) => {
+  if (!session) return null;
+
+  const checkOutDate = new Date(session.checkOut);
+  const formattedCheckOut = checkOutDate.toLocaleDateString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+
+  return (
+    <div className="bg-gradient-to-r from-amber-700 to-orange-600 text-white p-6 shadow-lg rounded-lg">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        {/* Welcome Message */}
+        <div>
+          <h2 className="text-2xl font-bold mb-1">Welcome back, {session.guestName}! 👋</h2>
+          <div className="text-amber-50 space-y-1">
+            <p>
+              📅 <span className="font-semibold">{session.nightsRemaining} night(s)</span> remaining
+              {session.nightsRemaining === 1 ? ' (last night!)' : ''}
+            </p>
+            <p>
+              🏡 Checking out: <span className="font-semibold">{formattedCheckOut}</span>
+            </p>
+            <p>
+              🏠 Unit: <span className="font-semibold">{session.unitName}</span>
+            </p>
+          </div>
+        </div>
+
+        {/* Logout Button */}
+        <button
+          onClick={onLogout}
+          className="self-start md:self-center px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg font-medium transition-colors whitespace-nowrap"
+        >
+          Sign Out
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default GuestWelcomeBanner;

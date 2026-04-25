@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { GuestSession } from '@/types/guest-portal';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface TransportDestination {
   id: string;
@@ -16,6 +17,7 @@ interface TransportRequestFormProps {
 }
 
 const TransportRequestForm = ({ session }: TransportRequestFormProps) => {
+  const { t } = useLanguage();
   const [destinations, setDestinations] = useState<TransportDestination[]>([]);
   const [destination, setDestination] = useState('');
   const [customDestination, setCustomDestination] = useState('');
@@ -123,16 +125,16 @@ const TransportRequestForm = ({ session }: TransportRequestFormProps) => {
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-8 max-w-2xl mx-auto">
-      <h3 className="text-2xl font-bold text-gray-900 mb-2">🚗 Book Transportation</h3>
+      <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('portal.transportRequest.title')}</h3>
       <p className="text-gray-600 mb-6">
-        Arrange a driver to popular destinations or custom locations
+        {t('portal.transportRequest.description')}
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Destination */}
         <div>
           <label htmlFor="destination" className="block text-sm font-medium text-gray-700 mb-2">
-            Destination <span className="text-red-500">*</span>
+            {t('portal.transportRequest.destination')} <span className="text-red-500">*</span>
           </label>
           <select
             id="destination"
@@ -161,7 +163,7 @@ const TransportRequestForm = ({ session }: TransportRequestFormProps) => {
         {destination === 'custom' && (
           <div>
             <label htmlFor="customDest" className="block text-sm font-medium text-gray-700 mb-2">
-              Destination Address <span className="text-red-500">*</span>
+              {t('portal.transportRequest.destination')} <span className="text-red-500">*</span>
             </label>
             <input
               id="customDest"
@@ -179,7 +181,7 @@ const TransportRequestForm = ({ session }: TransportRequestFormProps) => {
         {/* Date/Time */}
         <div>
           <label htmlFor="datetime" className="block text-sm font-medium text-gray-700 mb-2">
-            Date & Time <span className="text-red-500">*</span>
+            {t('portal.transportRequest.date')} & {t('portal.transportRequest.time')} <span className="text-red-500">*</span>
           </label>
           <input
             id="datetime"
@@ -198,7 +200,7 @@ const TransportRequestForm = ({ session }: TransportRequestFormProps) => {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label htmlFor="passengers" className="block text-sm font-medium text-gray-700 mb-2">
-              Passengers <span className="text-red-500">*</span>
+              {t('portal.transportRequest.passengers')} <span className="text-red-500">*</span>
             </label>
             <select
               id="passengers"
@@ -273,7 +275,7 @@ const TransportRequestForm = ({ session }: TransportRequestFormProps) => {
         {success && (
           <div className="p-4 bg-green-50 border-l-4 border-green-500 rounded">
             <p className="text-sm text-green-700">
-              ✓ Transport booked! The property manager will confirm your ride.
+              ✓ {t('portal.transportRequest.success')}
             </p>
           </div>
         )}
@@ -287,10 +289,10 @@ const TransportRequestForm = ({ session }: TransportRequestFormProps) => {
           {loading ? (
             <div className="flex items-center justify-center gap-2">
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              <span>Booking...</span>
+              <span>{t('portal.transportRequest.submitting')}</span>
             </div>
           ) : (
-            'Book Transport'
+            t('portal.transportRequest.submit')
           )}
         </button>
       </form>

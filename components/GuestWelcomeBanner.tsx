@@ -1,6 +1,7 @@
 'use client';
 
 import { GuestSession } from '@/types/guest-portal';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface GuestWelcomeBannerProps {
   session: GuestSession | null;
@@ -8,10 +9,12 @@ interface GuestWelcomeBannerProps {
 }
 
 const GuestWelcomeBanner = ({ session, onLogout }: GuestWelcomeBannerProps) => {
+  const { t, language } = useLanguage();
+  
   if (!session) return null;
 
   const checkOutDate = new Date(session.checkOut);
-  const formattedCheckOut = checkOutDate.toLocaleDateString('en-US', {
+  const formattedCheckOut = checkOutDate.toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US', {
     weekday: 'short',
     month: 'short',
     day: 'numeric',
@@ -23,17 +26,17 @@ const GuestWelcomeBanner = ({ session, onLogout }: GuestWelcomeBannerProps) => {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         {/* Welcome Message */}
         <div>
-          <h2 className="text-2xl font-bold mb-1">Welcome back, {session.guestName}! 👋</h2>
+          <h2 className="text-2xl font-bold mb-1">{t('portal.welcomeBack').replace('{name}', session.guestName)}</h2>
           <div className="text-amber-50 space-y-1">
             <p>
-              📅 <span className="font-semibold">{session.nightsRemaining} night(s)</span> remaining
-              {session.nightsRemaining === 1 ? ' (last night!)' : ''}
+              📅 <span className="font-semibold">{session.nightsRemaining}</span> {t('portal.nightsRemaining')}
+              {session.nightsRemaining === 1 ? ` ${t('portal.lastNight')}` : ''}
             </p>
             <p>
-              🏡 Checking out: <span className="font-semibold">{formattedCheckOut}</span>
+              🏡 {t('portal.checkingOut')} <span className="font-semibold">{formattedCheckOut}</span>
             </p>
             <p>
-              🏠 Unit: <span className="font-semibold">{session.unitName}</span>
+              🏠 {t('portal.unit')} <span className="font-semibold">{session.unitName}</span>
             </p>
           </div>
         </div>
@@ -43,7 +46,7 @@ const GuestWelcomeBanner = ({ session, onLogout }: GuestWelcomeBannerProps) => {
           onClick={onLogout}
           className="self-start md:self-center px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg font-medium transition-colors whitespace-nowrap"
         >
-          Sign Out
+          {t('portal.signOut')}
         </button>
       </div>
     </div>

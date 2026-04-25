@@ -259,6 +259,86 @@ export const translations = {
       to: "to",
       paymentNotice: "Your payment information is secure and encrypted. This is a demo - no real charges will be processed.",
       securePaymentAlert: "Booking confirmed for {unit} from {checkIn} to {checkOut}. Total: ${total}"
+    },
+    portal: {
+      myPortal: "My Portal",
+      signIn: "Sign In",
+      signingIn: "Signing in...",
+      signOut: "Sign Out",
+      welcomeHome: "Welcome Home",
+      loginDescription: "Enter your email, phone, or digital key to access your stay",
+      identifier: "Email, Phone, or Digital Key",
+      enterIdentifier: "Enter your identifier",
+      identifierHint: "📧 Email • 📱 Phone (with country code) • 🔑 Digital Key",
+      loginError: "Login failed. Please try again.",
+      emptyIdentifierError: "Please enter your email, phone number, or digital key.",
+      welcomeBack: "Welcome back, {name}! 👋",
+      nightsRemaining: "night(s) remaining",
+      lastNight: "(last night!)",
+      checkingOut: "Checking out:",
+      unit: "Unit:",
+      cleaningRequest: {
+        title: "🧹 Schedule Cleaning",
+        description: "Request a room or bungalow cleaning on your preferred date",
+        cleaningDate: "Cleaning Date",
+        notes: "Notes",
+        submit: "Schedule Cleaning",
+        submitting: "Scheduling...",
+        success: "Cleaning scheduled successfully!",
+        availableBetween: "Available between {checkIn} and {checkOut}"
+      },
+      transportRequest: {
+        title: "🚗 Book Transportation",
+        description: "Arrange convenient rides to local attractions",
+        date: "Date",
+        time: "Time",
+        destination: "Destination",
+        passengers: "Number of Passengers",
+        submit: "Book Transport",
+        submitting: "Booking...",
+        success: "Transport booked successfully!"
+      },
+      extendStay: {
+        title: "📅 Extend Your Stay",
+        description: "Add additional nights to your reservation",
+        additionalNights: "Additional Nights",
+        newCheckOut: "New Check-out Date",
+        estimatedCost: "Estimated Additional Cost",
+        submit: "Request Extension",
+        submitting: "Requesting...",
+        success: "Extension request submitted!"
+      },
+      cancelReservation: {
+        title: "❌ Cancel Reservation",
+        description: "Initiate the cancellation of your stay",
+        reason: "Cancellation Reason",
+        notes: "Additional Notes",
+        submit: "Cancel Reservation",
+        submitting: "Cancelling...",
+        success: "Reservation cancelled",
+        confirmMessage: "Are you sure? This action cannot be undone."
+      },
+      leaveReview: {
+        title: "⭐ Leave a Review",
+        description: "Share your experience at La Casa Oaxaca",
+        rating: "Rating",
+        comment: "Your Review",
+        submit: "Submit Review",
+        submitting: "Submitting...",
+        success: "Thank you for your review!"
+      },
+      sections: {
+        cleaning: "Cleaning Request",
+        cleaningDesc: "Schedule a room cleaning",
+        transport: "Transport Request",
+        transportDesc: "Book transportation",
+        extend: "Extend Stay",
+        extendDesc: "Request additional nights",
+        cancel: "Cancel Reservation",
+        cancelDesc: "Initiate cancellation",
+        review: "Leave a Review",
+        reviewDesc: "Share your experience"
+      }
     }
   },
   es: {
@@ -521,6 +601,86 @@ export const translations = {
       to: "a",
       paymentNotice: "Tu información de pago está segura y cifrada. Esto es una demostración: no se procesarán cargos reales.",
       securePaymentAlert: "Reserva confirmada para {unit} del {checkIn} al {checkOut}. Total: ${total}"
+    },
+    portal: {
+      myPortal: "Mi Portal",
+      signIn: "Iniciar sesión",
+      signingIn: "Iniciando sesión...",
+      signOut: "Cerrar sesión",
+      welcomeHome: "Bienvenido",
+      loginDescription: "Ingresa tu correo, teléfono o clave digital para acceder a tu reserva",
+      identifier: "Correo, Teléfono o Clave Digital",
+      enterIdentifier: "Ingresa tu identificador",
+      identifierHint: "📧 Correo • 📱 Teléfono (con código de país) • 🔑 Clave Digital",
+      loginError: "Inicio de sesión fallido. Por favor intenta de nuevo.",
+      emptyIdentifierError: "Por favor ingresa tu correo, número de teléfono o clave digital.",
+      welcomeBack: "¡Bienvenido de nuevo, {name}! 👋",
+      nightsRemaining: "noche(s) restante(s)",
+      lastNight: "(¡última noche!)",
+      checkingOut: "Salida:",
+      unit: "Unidad:",
+      cleaningRequest: {
+        title: "🧹 Programar Limpieza",
+        description: "Solicita una limpieza de tu habitación o bungalow en tu fecha preferida",
+        cleaningDate: "Fecha de Limpieza",
+        notes: "Notas",
+        submit: "Programar Limpieza",
+        submitting: "Programando...",
+        success: "¡Limpieza programada exitosamente!",
+        availableBetween: "Disponible entre {checkIn} y {checkOut}"
+      },
+      transportRequest: {
+        title: "🚗 Reservar Transporte",
+        description: "Organiza viajes convenientes a atracciones locales",
+        date: "Fecha",
+        time: "Hora",
+        destination: "Destino",
+        passengers: "Número de Pasajeros",
+        submit: "Reservar Transporte",
+        submitting: "Reservando...",
+        success: "¡Transporte reservado exitosamente!"
+      },
+      extendStay: {
+        title: "📅 Extender tu Estadía",
+        description: "Añade noches adicionales a tu reserva",
+        additionalNights: "Noches Adicionales",
+        newCheckOut: "Nueva Fecha de Salida",
+        estimatedCost: "Costo Adicional Estimado",
+        submit: "Solicitar Extensión",
+        submitting: "Solicitando...",
+        success: "¡Solicitud de extensión enviada!"
+      },
+      cancelReservation: {
+        title: "❌ Cancelar Reserva",
+        description: "Inicia la cancelación de tu estadía",
+        reason: "Razón de Cancelación",
+        notes: "Notas Adicionales",
+        submit: "Cancelar Reserva",
+        submitting: "Cancelando...",
+        success: "Reserva cancelada",
+        confirmMessage: "¿Estás seguro? Esta acción no se puede deshacer."
+      },
+      leaveReview: {
+        title: "⭐ Dejar una Reseña",
+        description: "Comparte tu experiencia en La Casa Oaxaca",
+        rating: "Calificación",
+        comment: "Tu Reseña",
+        submit: "Enviar Reseña",
+        submitting: "Enviando...",
+        success: "¡Gracias por tu reseña!"
+      },
+      sections: {
+        cleaning: "Solicitud de Limpieza",
+        cleaningDesc: "Programar una limpieza",
+        transport: "Solicitud de Transporte",
+        transportDesc: "Reservar transporte",
+        extend: "Extender Estadía",
+        extendDesc: "Solicitar noches adicionales",
+        cancel: "Cancelar Reserva",
+        cancelDesc: "Iniciar cancelación",
+        review: "Dejar Reseña",
+        reviewDesc: "Comparte tu experiencia"
+      }
     }
   }
 };

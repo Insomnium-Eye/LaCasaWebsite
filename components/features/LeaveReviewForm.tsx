@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { GuestSession } from '@/types/guest-portal';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface LeaveReviewFormProps {
   session: GuestSession | null;
 }
 
 const LeaveReviewForm = ({ session }: LeaveReviewFormProps) => {
+  const { t } = useLanguage();
   const [stars, setStars] = useState(0);
   const [headline, setHeadline] = useState('');
   const [body, setBody] = useState('');
@@ -134,16 +136,16 @@ const LeaveReviewForm = ({ session }: LeaveReviewFormProps) => {
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-8 max-w-2xl mx-auto">
-      <h3 className="text-2xl font-bold text-gray-900 mb-2">⭐ Leave a Review</h3>
+      <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('portal.leaveReview.title')}</h3>
       <p className="text-gray-600 mb-6">
-        Share your experience! Your review helps other guests and guides us to improve.
+        {t('portal.leaveReview.description')}
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Star Rating */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-3">
-            How would you rate your stay? <span className="text-red-500">*</span>
+            {t('portal.leaveReview.rating')} <span className="text-red-500">*</span>
           </label>
           <div className="flex gap-3">
             {[1, 2, 3, 4, 5].map((rating) => (
@@ -183,7 +185,7 @@ const LeaveReviewForm = ({ session }: LeaveReviewFormProps) => {
         {/* Review Body */}
         <div>
           <label htmlFor="body" className="block text-sm font-medium text-gray-700 mb-2">
-            Your Review <span className="text-red-500">*</span>
+            {t('portal.leaveReview.comment')} <span className="text-red-500">*</span>
           </label>
           <textarea
             id="body"
@@ -284,10 +286,10 @@ const LeaveReviewForm = ({ session }: LeaveReviewFormProps) => {
           {loading ? (
             <div className="flex items-center justify-center gap-2">
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              <span>Submitting...</span>
+              <span>{t('portal.leaveReview.submitting')}</span>
             </div>
           ) : (
-            'Submit Review'
+            t('portal.leaveReview.submit')
           )}
         </button>
       </form>

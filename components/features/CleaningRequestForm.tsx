@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { GuestSession, CleaningRequest } from '@/types/guest-portal';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const CLEANING_FEE = parseFloat(process.env.NEXT_PUBLIC_CLEANING_FEE || '15');
 
@@ -10,6 +11,7 @@ interface CleaningRequestFormProps {
 }
 
 const CleaningRequestForm = ({ session }: CleaningRequestFormProps) => {
+  const { t, language } = useLanguage();
   const [date, setDate] = useState('');
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
@@ -49,7 +51,7 @@ const CleaningRequestForm = ({ session }: CleaningRequestFormProps) => {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Failed to schedule cleaning');
+        setError(data.error || t('portal.cleaningRequest.submit'));
         return;
       }
 
@@ -68,16 +70,16 @@ const CleaningRequestForm = ({ session }: CleaningRequestFormProps) => {
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-8 max-w-2xl mx-auto">
-      <h3 className="text-2xl font-bold text-gray-900 mb-2">🧹 Schedule Cleaning</h3>
+      <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('portal.cleaningRequest.title')}</h3>
       <p className="text-gray-600 mb-6">
-        Request a room or bungalow cleaning on your preferred date
+        {t('portal.cleaningRequest.description')}
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Date Picker */}
         <div>
           <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-2">
-            Cleaning Date <span className="text-red-500">*</span>
+            {t('portal.cleaningRequest.cleaningDate')} <span className="text-red-500">*</span>
           </label>
           <input
             id="date"
@@ -91,15 +93,16 @@ const CleaningRequestForm = ({ session }: CleaningRequestFormProps) => {
             className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-amber-600 transition-colors disabled:bg-gray-100"
           />
           <p className="mt-2 text-xs text-gray-500">
-            Available between {new Date(session.checkIn).toLocaleDateString()} and{' '}
-            {new Date(session.checkOut).toLocaleDateString()}
+            {t('portal.cleaningRequest.availableBetween')
+              .replace('{checkIn}', new Date(session.checkIn).toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US'))
+              .replace('{checkOut}', new Date(session.checkOut).toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US'))}
           </p>
         </div>
 
         {/* Notes */}
         <div>
           <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-2">
-            Special Instructions <span className="text-gray-400">(optional)</span>
+            {t('portal.cleaningRequest.notes')} <span className="text-gray-400">(optional)</span>
           </label>
           <textarea
             id="notes"
@@ -133,7 +136,7 @@ const CleaningRequestForm = ({ session }: CleaningRequestFormProps) => {
         {success && (
           <div className="p-4 bg-green-50 border-l-4 border-green-500 rounded">
             <p className="text-sm text-green-700">
-              ✓ Cleaning successfully scheduled! You will receive a confirmation email.
+              ✓ {t('portal.cleaningRequest.success')}
             </p>
           </div>
         )}
@@ -147,10 +150,10 @@ const CleaningRequestForm = ({ session }: CleaningRequestFormProps) => {
           {loading ? (
             <div className="flex items-center justify-center gap-2">
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              <span>Scheduling...</span>
+              <span>{t('portal.cleaningRequest.submitting')}</span>
             </div>
           ) : (
-            'Confirm Cleaning Request'
+            t('portal.cleaningRequest.submit')
           )}
         </button>
       </form>

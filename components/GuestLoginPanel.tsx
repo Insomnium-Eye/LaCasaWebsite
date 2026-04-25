@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface GuestLoginPanelProps {
   onLogin: (identifier: string) => Promise<boolean>;
@@ -9,6 +10,7 @@ interface GuestLoginPanelProps {
 }
 
 const GuestLoginPanel = ({ onLogin, loading, error }: GuestLoginPanelProps) => {
+  const { t } = useLanguage();
   const [identifier, setIdentifier] = useState('');
   const [localError, setLocalError] = useState<string | null>(null);
 
@@ -17,13 +19,13 @@ const GuestLoginPanel = ({ onLogin, loading, error }: GuestLoginPanelProps) => {
     setLocalError(null);
 
     if (!identifier.trim()) {
-      setLocalError('Please enter your email, phone number, or digital key.');
+      setLocalError(t('portal.emptyIdentifierError'));
       return;
     }
 
     const success = await onLogin(identifier);
     if (!success) {
-      setLocalError(error || 'Login failed. Please try again.');
+      setLocalError(error || t('portal.loginError'));
     }
   };
 
@@ -46,9 +48,9 @@ const GuestLoginPanel = ({ onLogin, loading, error }: GuestLoginPanelProps) => {
         <div className="bg-white rounded-lg shadow-2xl overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-amber-700 to-orange-600 p-8">
-            <h1 className="text-3xl font-bold text-white mb-2">Welcome Home</h1>
+            <h1 className="text-3xl font-bold text-white mb-2">{t('portal.welcomeHome')}</h1>
             <p className="text-amber-50 text-sm">
-              Enter your email, phone, or digital key to access your stay
+              {t('portal.loginDescription')}
             </p>
           </div>
 
@@ -57,19 +59,19 @@ const GuestLoginPanel = ({ onLogin, loading, error }: GuestLoginPanelProps) => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="identifier" className="block text-sm font-medium text-gray-700 mb-2">
-                  Email, Phone, or Digital Key
+                  {t('portal.identifier')}
                 </label>
                 <input
                   id="identifier"
                   type="text"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
-                  placeholder="Enter your identifier"
+                  placeholder={t('portal.enterIdentifier')}
                   disabled={loading}
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-amber-600 transition-colors disabled:bg-gray-100"
                 />
                 <p className="mt-2 text-xs text-gray-500">
-                  📧 Email • 📱 Phone (with country code) • 🔑 Digital Key
+                  {t('portal.identifierHint')}
                 </p>
               </div>
 
@@ -91,10 +93,10 @@ const GuestLoginPanel = ({ onLogin, loading, error }: GuestLoginPanelProps) => {
                 {loading ? (
                   <div className="flex items-center justify-center gap-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Signing in...</span>
+                    <span>{t('portal.signingIn')}</span>
                   </div>
                 ) : (
-                  'Sign In'
+                  t('portal.signIn')
                 )}
               </button>
             </form>

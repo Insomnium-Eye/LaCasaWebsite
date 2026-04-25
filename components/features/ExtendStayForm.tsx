@@ -2,12 +2,14 @@
 
 import { useState } from 'react';
 import { GuestSession } from '@/types/guest-portal';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ExtendStayFormProps {
   session: GuestSession | null;
 }
 
 const ExtendStayForm = ({ session }: ExtendStayFormProps) => {
+  const { t } = useLanguage();
   const [newCheckout, setNewCheckout] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -82,9 +84,9 @@ const ExtendStayForm = ({ session }: ExtendStayFormProps) => {
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-8 max-w-2xl mx-auto">
-      <h3 className="text-2xl font-bold text-gray-900 mb-2">📅 Extend Your Stay</h3>
+      <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('portal.extendStay.title')}</h3>
       <p className="text-gray-600 mb-6">
-        Request additional nights beyond your current checkout date
+        {t('portal.extendStay.description')}
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -104,7 +106,7 @@ const ExtendStayForm = ({ session }: ExtendStayFormProps) => {
         {/* New Checkout Date */}
         <div>
           <label htmlFor="newCheckout" className="block text-sm font-medium text-gray-700 mb-2">
-            New Checkout Date <span className="text-red-500">*</span>
+            {t('portal.extendStay.newCheckOut')} <span className="text-red-500">*</span>
           </label>
           <input
             id="newCheckout"
@@ -122,14 +124,14 @@ const ExtendStayForm = ({ session }: ExtendStayFormProps) => {
         {newCheckout && (
           <div className="bg-amber-50 border-l-4 border-amber-600 p-4 rounded space-y-2">
             <p className="text-sm text-gray-700">
-              <span className="font-semibold">Extra Nights:</span> {extraNights}
+              <span className="font-semibold">{t('portal.extendStay.additionalNights')}:</span> {extraNights}
             </p>
             <p className="text-sm text-gray-700">
               <span className="font-semibold">Nightly Rate:</span> ${session.nightlyRate.toFixed(2)} USD
             </p>
             <div className="pt-2 border-t border-amber-300">
               <p className="text-lg font-bold text-amber-900">
-                Estimated Cost: ${calculatedCost.toFixed(2)} USD
+                {t('portal.extendStay.estimatedCost')}: ${calculatedCost.toFixed(2)} USD
               </p>
             </div>
           </div>
@@ -138,8 +140,7 @@ const ExtendStayForm = ({ session }: ExtendStayFormProps) => {
         {/* Disclaimer */}
         <div className="bg-blue-50 border-l-4 border-blue-600 p-4 rounded">
           <p className="text-sm text-gray-700">
-            <span className="font-semibold">Note:</span> Extension is subject to availability.
-            We'll confirm within 24 hours.
+            <span className="font-semibold">Note:</span> Extension is subject to availability. We'll confirm within 24 hours.
           </p>
         </div>
 
@@ -167,10 +168,10 @@ const ExtendStayForm = ({ session }: ExtendStayFormProps) => {
           {loading ? (
             <div className="flex items-center justify-center gap-2">
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              <span>Requesting...</span>
+              <span>{t('portal.extendStay.submitting')}</span>
             </div>
           ) : (
-            'Request Extension'
+            t('portal.extendStay.submit')
           )}
         </button>
       </form>

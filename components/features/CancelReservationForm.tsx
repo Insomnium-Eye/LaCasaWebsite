@@ -2,12 +2,14 @@
 
 import { useState } from 'react';
 import { GuestSession, CANCELLATION_REASONS, CANCELLATION_POLICY } from '@/types/guest-portal';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface CancelReservationFormProps {
   session: GuestSession | null;
 }
 
 const CancelReservationForm = ({ session }: CancelReservationFormProps) => {
+  const { t } = useLanguage();
   const [reason, setReason] = useState('');
   const [explanation, setExplanation] = useState('');
   const [confirmationStep, setConfirmationStep] = useState(false);
@@ -69,9 +71,9 @@ const CancelReservationForm = ({ session }: CancelReservationFormProps) => {
   if (!confirmationStep) {
     return (
     <div className="bg-white rounded-lg shadow-lg p-8 max-w-2xl mx-auto">
-        <h3 className="text-2xl font-bold text-gray-900 mb-2">❌ Cancel Reservation</h3>
+        <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('portal.cancelReservation.title')}</h3>
         <p className="text-gray-600 mb-6">
-          We'll miss you! Please let us know why you're cancelling
+          {t('portal.cancelReservation.description')}
         </p>
 
         {/* Warning Banner */}
@@ -84,7 +86,7 @@ const CancelReservationForm = ({ session }: CancelReservationFormProps) => {
           {/* Reason */}
           <div>
             <label htmlFor="reason" className="block text-sm font-medium text-gray-700 mb-2">
-              Cancellation Reason <span className="text-red-500">*</span>
+              {t('portal.cancelReservation.reason')} <span className="text-red-500">*</span>
             </label>
             <select
               id="reason"
@@ -106,7 +108,7 @@ const CancelReservationForm = ({ session }: CancelReservationFormProps) => {
           {/* Additional Details */}
           <div>
             <label htmlFor="explanation" className="block text-sm font-medium text-gray-700 mb-2">
-              Additional Details <span className="text-gray-400">(optional)</span>
+              {t('portal.cancelReservation.notes')} <span className="text-gray-400">(optional)</span>
             </label>
             <textarea
               id="explanation"
@@ -132,7 +134,7 @@ const CancelReservationForm = ({ session }: CancelReservationFormProps) => {
             disabled={loading || !reason}
             className="w-full bg-gradient-to-r from-red-700 to-red-600 hover:from-red-800 hover:to-red-700 disabled:from-gray-400 disabled:to-gray-400 text-white font-bold py-3 px-4 rounded-lg transition-all duration-200"
           >
-            Request Cancellation
+            {t('portal.cancelReservation.submit')}
           </button>
         </form>
       </div>
@@ -142,7 +144,7 @@ const CancelReservationForm = ({ session }: CancelReservationFormProps) => {
   // Confirmation Step
   return (
     <div className="bg-white rounded-lg shadow-lg p-8 max-w-2xl mx-auto">
-      <h3 className="text-2xl font-bold text-gray-900 mb-4">⚠️ Confirm Cancellation</h3>
+      <h3 className="text-2xl font-bold text-gray-900 mb-4">⚠️ {t('portal.cancelReservation.confirmMessage')}</h3>
 
       {/* Warning */}
       <div className="bg-red-50 border-l-4 border-red-600 p-4 rounded mb-6">
@@ -194,10 +196,10 @@ const CancelReservationForm = ({ session }: CancelReservationFormProps) => {
           {loading ? (
             <div className="flex items-center justify-center gap-2">
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              <span>Processing...</span>
+              <span>{t('portal.cancelReservation.submitting')}</span>
             </div>
           ) : (
-            'Yes, Cancel Reservation'
+            t('portal.cancelReservation.submit')
           )}
         </button>
       </div>

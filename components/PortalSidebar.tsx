@@ -1,6 +1,7 @@
 'use client';
 
 import { PORTAL_SECTIONS, PortalSection } from '@/types/guest-portal';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface PortalSidebarProps {
   activeSection: PortalSection;
@@ -8,12 +9,14 @@ interface PortalSidebarProps {
 }
 
 const PortalSidebar = ({ activeSection, onSectionChange }: PortalSidebarProps) => {
+  const { t } = useLanguage();
+  
   const sections: Array<{ key: PortalSection; label: string; icon: string; description: string }> = [
-    { key: 'cleaning', ...PORTAL_SECTIONS.cleaning },
-    { key: 'transport', ...PORTAL_SECTIONS.transport },
-    { key: 'extend', ...PORTAL_SECTIONS.extend },
-    { key: 'cancel', ...PORTAL_SECTIONS.cancel },
-    { key: 'review', ...PORTAL_SECTIONS.review },
+    { key: 'cleaning', label: t('portal.sections.cleaning'), icon: '🧹', description: t('portal.sections.cleaningDesc') },
+    { key: 'transport', label: t('portal.sections.transport'), icon: '🚗', description: t('portal.sections.transportDesc') },
+    { key: 'extend', label: t('portal.sections.extend'), icon: '📅', description: t('portal.sections.extendDesc') },
+    { key: 'cancel', label: t('portal.sections.cancel'), icon: '❌', description: t('portal.sections.cancelDesc') },
+    { key: 'review', label: t('portal.sections.review'), icon: '⭐', description: t('portal.sections.reviewDesc') },
   ];
 
   return (
@@ -21,7 +24,7 @@ const PortalSidebar = ({ activeSection, onSectionChange }: PortalSidebarProps) =
       {/* Desktop Sidebar */}
       <div className="hidden md:flex flex-col w-64 bg-white rounded-lg shadow-lg overflow-hidden">
         <div className="bg-gradient-to-r from-amber-700 to-orange-600 p-4">
-          <h3 className="text-white font-bold text-lg">My Portal</h3>
+          <h3 className="text-white font-bold text-lg">{t('portal.myPortal')}</h3>
         </div>
 
         <nav className="flex-1 overflow-y-auto">

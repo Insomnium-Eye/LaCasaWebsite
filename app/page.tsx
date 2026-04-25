@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { units, Unit } from "../data/units";
 import BackgroundSlideshow from "../components/BackgroundSlideshow";
 import UnitModal from "../components/UnitModal";
 import GalleryModal from "../components/GalleryModal";
 import ContactModal from "../components/ContactModal";
+import DisclaimerModal from "../components/DisclaimerModal";
 import { useLanguage } from "../contexts/LanguageContext";
 import { formatPrice } from "../lib/currency";
 
@@ -15,7 +16,17 @@ export default function HomePage() {
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [galleryIndex, setGalleryIndex] = useState(0);
   const [contactOpen, setContactOpen] = useState(false);
+  const [disclaimerOpen, setDisclaimerOpen] = useState(false);
   const { t, language } = useLanguage();
+
+  // Show disclaimer modal on first visit
+  useEffect(() => {
+    const hasSeenDisclaimer = localStorage.getItem("hasSeenDisclaimer");
+    if (!hasSeenDisclaimer) {
+      setDisclaimerOpen(true);
+      localStorage.setItem("hasSeenDisclaimer", "true");
+    }
+  }, []);
 
   const galleryImages = Array.from({ length: 21 }, (_, index) => `/imgs/OaxacaPicture_${index + 1}.jpg`);
 
@@ -205,6 +216,7 @@ export default function HomePage() {
         />
       )}
       <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} />
+      <DisclaimerModal open={disclaimerOpen} onClose={() => setDisclaimerOpen(false)} />
       </div>
     </div>
   );

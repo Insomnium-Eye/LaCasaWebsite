@@ -103,6 +103,10 @@ const BookingPage: React.FC = () => {
     return total / selectedUnits.size;
   };
 
+  const formatUsdWhole = (amount: number): string => {
+    return `$${Math.floor(amount)}`;
+  };
+
   // Calculate total price
   const calculateTotalPrice = (): number => {
     const nights = calculateNights();
@@ -110,12 +114,12 @@ const BookingPage: React.FC = () => {
 
     const nightlyRate = getAverageNightlyRate();
     const discountRate = getDiscountRate();
-    const subtotal = nightlyRate * nights;
-    const discount = subtotal * discountRate;
+    const subtotal = Math.floor(nightlyRate * nights);
+    const discount = Math.floor(subtotal * discountRate);
     const afterDiscount = subtotal - discount;
     const withTransport = afterDiscount + transportationTotal;
 
-    return Math.round(withTransport * 100) / 100;
+    return Math.floor(withTransport);
   };
 
   // Handle unit selection
@@ -472,25 +476,25 @@ const BookingPage: React.FC = () => {
                 <div className="space-y-2 text-sm mb-4">
                   <div className="flex justify-between text-amber-800">
                     <span>Nightly Rate × {nights} Nights</span>
-                    <span>${(nightlyRate * nights).toFixed(2)}</span>
+                    <span>{formatUsdWhole(nightlyRate * nights)}</span>
                   </div>
 
                   {discountRate > 0 && (
                     <div className="flex justify-between text-green-700 font-semibold">
                       <span>Extended Stay Discount ({Math.round(discountRate * 100)}% off)</span>
-                      <span>−${discount.toFixed(2)}</span>
+                      <span>−{formatUsdWhole(discount)}</span>
                     </div>
                   )}
 
                   <div className="border-t border-amber-300 pt-2 flex justify-between font-semibold text-amber-900">
                     <span>Accommodation Subtotal</span>
-                    <span>${afterDiscount.toFixed(2)}</span>
+                    <span>{formatUsdWhole(afterDiscount)}</span>
                   </div>
 
                   {transportationTotal > 0 && (
                     <div className="flex justify-between text-amber-800">
                       <span>Transportation Add-ons</span>
-                      <span>${transportationTotal.toFixed(2)}</span>
+                      <span>{formatUsdWhole(transportationTotal)}</span>
                     </div>
                   )}
                 </div>
@@ -499,7 +503,7 @@ const BookingPage: React.FC = () => {
                   <div>
                     <p className="text-xs text-amber-700 mb-1">TOTAL</p>
                     <p className="text-2xl font-bold text-amber-900">
-                      ${totalPrice.toFixed(2)} USD
+                      {formatUsdWhole(totalPrice)} USD
                     </p>
                   </div>
                   <div className="text-right">
@@ -536,17 +540,17 @@ const BookingPage: React.FC = () => {
             <div className="space-y-3 text-sm mb-6">
               <div className="flex justify-between text-amber-800">
                 <span>Accommodation</span>
-                <span>${afterDiscount.toFixed(2)}</span>
+                <span>{formatUsdWhole(afterDiscount)}</span>
               </div>
               {transportationTotal > 0 && (
                 <div className="flex justify-between text-amber-800">
                   <span>Transportation</span>
-                  <span>${transportationTotal.toFixed(2)}</span>
+                  <span>{formatUsdWhole(transportationTotal)}</span>
                 </div>
               )}
               <div className="border-t border-amber-200 pt-3 flex justify-between font-bold text-lg text-amber-900">
                 <span>Total</span>
-                <span>${totalPrice.toFixed(2)}</span>
+                <span>{formatUsdWhole(totalPrice)}</span>
               </div>
               <div className="text-right text-sm text-amber-700">
                 ≈ {convertToMxn(totalPrice).toLocaleString('es-MX')} MXN

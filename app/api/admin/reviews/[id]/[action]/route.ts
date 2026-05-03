@@ -21,7 +21,7 @@ const verifyAdminAuth = (request: NextRequest): boolean => {
 // PATCH /api/admin/reviews/[id]/approve
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string; action: string } }
+  { params }: { params: Promise<{ id: string; action: string }> }
 ) {
   try {
     if (!verifyAdminAuth(request)) {
@@ -31,7 +31,7 @@ export async function PATCH(
       );
     }
 
-    const { id, action } = params;
+    const { id, action } = await params;
 
     if (!id || !action) {
       return NextResponse.json(

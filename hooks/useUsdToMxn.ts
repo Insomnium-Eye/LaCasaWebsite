@@ -17,20 +17,21 @@ const useUsdToMxn = () => {
     return `usd_mxn_rate_${today}`;
   };
 
-  // Round amount DOWN to nearest 10 MXN
-  const roundDownToNearest10 = (amount: number): number => {
-    return Math.floor(amount / 10) * 10;
+  // Round amount DOWN to nearest peso
+  const roundDownToNearestPeso = (amount: number): number => {
+    return Math.floor(amount);
   };
 
   // Convert USD to MXN
   const convertToMxn = (usdAmount: number): number => {
-    return roundDownToNearest10(usdAmount * rate);
+    return roundDownToNearestPeso(usdAmount * rate);
   };
 
   // Format currency for display
   const formatCurrency = (usdAmount: number): string => {
-    const mxnAmount = convertToMxn(usdAmount);
-    return `$${usdAmount} USD ≈ ${mxnAmount.toLocaleString('es-MX')} MXN`;
+    const roundedUsd = Math.round(usdAmount * 100) / 100;
+    const mxnAmount = convertToMxn(roundedUsd);
+    return `$${roundedUsd.toFixed(2)} USD ≈ ${mxnAmount.toLocaleString('es-MX')} MXN`;
   };
 
   // Fetch the current exchange rate

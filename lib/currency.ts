@@ -2,13 +2,13 @@
 const USD_TO_MXN_RATE = 20;
 
 /**
- * Converts a price from USD to MXN and rounds down to nearest 10
+ * Converts a price from USD to MXN and rounds down to the nearest peso
  * @param priceUSD - Price in US dollars
- * @returns Price in Mexican pesos, rounded down to nearest 10
+ * @returns Price in Mexican pesos, rounded down to the nearest peso
  */
 export function convertToMXN(priceUSD: number): number {
   const priceMXN = priceUSD * USD_TO_MXN_RATE;
-  return Math.floor(priceMXN / 10) * 10;
+  return Math.floor(priceMXN);
 }
 
 /**
@@ -18,9 +18,10 @@ export function convertToMXN(priceUSD: number): number {
  * @returns Formatted price string with appropriate currency symbol
  */
 export function formatPrice(priceUSD: number, language: 'en' | 'es'): string {
+  const roundedPrice = Math.round(priceUSD * 100) / 100; // Round to 2 decimal places
   if (language === 'es') {
-    const priceMXN = convertToMXN(priceUSD);
+    const priceMXN = convertToMXN(roundedPrice);
     return `$${priceMXN}`;
   }
-  return `$${priceUSD}`;
+  return `$${roundedPrice.toFixed(2)}`;
 }

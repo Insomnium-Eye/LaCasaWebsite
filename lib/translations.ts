@@ -511,6 +511,8 @@ export const translations = {
       rateSummary: "Resumen de tarifas",
       selectedUnitInfo: "{unit} · {capacity} huéspedes",
       nightlyRate: "Tarifa nocturna",
+      baseAmount: "Importe base",
+      discount: "Descuento",
       weeklyRate: "Tarifa semanal",
       monthlyRate: "Tarifa mensual",
       nights: "Noches",

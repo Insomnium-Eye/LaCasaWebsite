@@ -16,7 +16,7 @@ export default function BackgroundSlideshow() {
   }, []);
 
   return (
-    <div className="pointer-events-none absolute inset-0 bg-black">
+    <div className="pointer-events-none fixed inset-0 bg-black">
       {imageUrls.map((src, index) => (
         <div
           key={src}

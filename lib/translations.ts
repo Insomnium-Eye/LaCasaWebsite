@@ -12,6 +12,11 @@ export const translations = {
       bookDirect: "Book direct",
       backToHome: "← Back to Home"
     },
+    explore: {
+      label: "Around La Casa",
+      title: "Discover Oaxaca",
+      description: "La Casa Oaxaca is perfectly placed to explore one of Mexico's most culturally rich cities and its surrounding wonders — from ancient ruins to candlelit festivals.",
+    },
     home: {
       directBooking: "Direct Booking",
       title: "La Casa Oaxaca — Private bungalows and a garden retreat in San Felipe del Agua.",
@@ -379,6 +384,11 @@ export const translations = {
       contact: "Contacto",
       bookDirect: "Reservar directo",
       backToHome: "← Volver al Inicio"
+    },
+    explore: {
+      label: "Alrededor de La Casa",
+      title: "Descubre Oaxaca",
+      description: "La Casa Oaxaca está perfectamente ubicada para explorar una de las ciudades más ricas culturalmente de México y sus maravillas alrededor — desde ruinas antiguas hasta festivales con velas.",
     },
     home: {
       directBooking: "Reserva Directa",

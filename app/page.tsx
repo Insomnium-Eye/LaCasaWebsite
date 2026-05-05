@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { units, Unit } from "../data/units";
 import BackgroundSlideshow from "../components/BackgroundSlideshow";
 import UnitModal from "../components/UnitModal";
+import ThingsToDoSection from "../components/ThingsToDoSection";
 import GalleryModal from "../components/GalleryModal";
 import ContactModal from "../components/ContactModal";
 import DisclaimerModal from "../components/DisclaimerModal";
@@ -205,6 +206,7 @@ export default function HomePage() {
           </div>
         )}
       </section>
+      <ThingsToDoSection />
       <UnitModal unit={selectedUnit} onClose={() => setSelectedUnit(null)} />
       {galleryOpen && (
         <GalleryModal

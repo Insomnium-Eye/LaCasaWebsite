@@ -55,7 +55,9 @@ export default function BookPage() {
   
   const today = new Date().toISOString().split('T')[0];
   const minNights = selectedUnit.slug === 'entire-house' ? 7 : 1;
-  const checkOutMinDate = selectedUnit.slug === 'entire-house' && form.checkIn ? addDays(form.checkIn, minNights) : (form.checkIn || today);
+  const checkOutMinDate = form.checkIn
+    ? addDays(form.checkIn, selectedUnit.slug === 'entire-house' ? minNights : 1)
+    : today;
 
   useEffect(() => {
     if (selectedUnit.slug !== 'entire-house' || !form.checkIn || !form.checkOut) return;

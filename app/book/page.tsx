@@ -6,6 +6,9 @@ import { units } from "../../data/units";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { formatPrice } from "../../lib/currency";
 import useUsdToMxn from "../../hooks/useUsdToMxn";
+import { calculateDeposit } from "../../lib/depositCalculator";
+import { DEFAULT_DEPOSIT_POLICY, getSeasonType } from "../../lib/depositPolicy";
+import type { BookingDetails, DepositTiming } from "../../lib/deposit";
 import BackgroundSlideshow from "../../components/BackgroundSlideshow";
 import IdVerification from "../../components/IdVerification";
 import EscrowModal from "../../components/EscrowModal";
@@ -63,14 +66,17 @@ export default function BookPage() {
   }, [form.checkIn, form.checkOut, selectedUnit.slug, minNights]);
 
   const calculatePricing = useMemo(() => {
-    if (!nights || selectedUnit.nightlyRate === 0) return { base: 0, discount: 0, subtotal: 0, iva: 0, ish: 0, total: 0 };
-    
-    const base = nights * selectedUnit.nightlyRate;
+    const effectiveNightlyRate = selectedUnit.nightlyRate > 0
+      ? selectedUnit.nightlyRate
+      : selectedUnit.weeklyRate / 7;
+    if (!nights || effectiveNightlyRate === 0) return { base: 0, discount: 0, subtotal: 0, iva: 0, ish: 0, total: 0 };
+
+    const base = nights * effectiveNightlyRate;
     let discount = 0;
-    if (nights >= 29) {
-      discount = base * 0.25; // 25% off for 29+ nights
-    } else if (nights >= 8) {
-      discount = base * 0.10; // 10% off for 8+ nights
+    if (nights >= 28) {
+      discount = base * 0.25;
+    } else if (nights >= 7) {
+      discount = base * 0.10;
     }
     const subtotal = base - discount;
     const iva = subtotal * 0.16; // 16% IVA
@@ -79,7 +85,28 @@ export default function BookPage() {
     
     return { base, discount, subtotal, iva, ish, total };
   }, [nights, selectedUnit.nightlyRate]);
-  
+
+  const depositResult = useMemo(() => {
+    if (!nights || calculatePricing.total === 0) return null;
+    const effectiveNightlyRate = selectedUnit.nightlyRate > 0
+      ? selectedUnit.nightlyRate
+      : selectedUnit.weeklyRate / 7;
+    const booking: BookingDetails = {
+      nights,
+      baseNightlyRate: effectiveNightlyRate,
+      totalStayAmount: calculatePricing.total,
+      propertySlug: selectedUnit.slug,
+      seasonType: getSeasonType(form.checkIn),
+    };
+    return calculateDeposit(booking, DEFAULT_DEPOSIT_POLICY);
+  }, [nights, calculatePricing.total, selectedUnit, form.checkIn]);
+
+  const timingLabel = (timing: DepositTiming) => {
+    if (timing === 'upfront') return t('book.deposit.timing.upfront');
+    if (timing === 'at_checkin') return t('book.deposit.timing.at_checkin');
+    return t('book.deposit.timing.pre_authorization');
+  };
+
   const handleRequestDetails = () => {
     if (!form.name || (!form.email && !form.phone) || !form.checkIn || !form.checkOut || nights <= 0) {
       alert(t('book.validationError'));
@@ -121,7 +148,7 @@ export default function BookPage() {
         <form className="space-y-6 rounded-4xl border border-slate-200 bg-white p-8 shadow-sm">
           <div className="grid gap-6 sm:grid-cols-2">
             <label className="block">
-              <span className="text-sm font-semibold text-slate-900">{t('book.name')}</span>
+              <span className="text-sm font-semibold text-slate-900">{t('book.name')} <span className="text-red-500">*</span></span>
               <input
                 value={form.name}
                 onChange={(event) => setForm({ ...form, name: event.target.value })}
@@ -131,7 +158,7 @@ export default function BookPage() {
               />
             </label>
             <label className="block">
-              <span className="text-sm font-semibold text-slate-900">{t('book.email')}</span>
+              <span className="text-sm font-semibold text-slate-900">{t('book.email')} <span className="text-red-500">*</span></span>
               <input
                 type="email"
                 value={form.email}
@@ -143,7 +170,7 @@ export default function BookPage() {
           </div>
           <div className="grid gap-6 sm:grid-cols-2">
             <label className="block">
-              <span className="text-sm font-semibold text-slate-900">{t('book.phone')}</span>
+              <span className="text-sm font-semibold text-slate-900">{t('book.phone')} <span className="text-red-500">*</span></span>
               <input
                 type="tel"
                 value={form.phone}
@@ -167,6 +194,7 @@ export default function BookPage() {
               </select>
             </label>
           </div>
+          <p className="text-xs text-slate-500"><span className="text-red-500">*</span> {t('book.contactNote')}</p>
           <div className="grid gap-6 sm:grid-cols-2">
             <label className="block">
               <span className="text-sm font-semibold text-slate-900">{t('book.guests')}</span>
@@ -214,9 +242,9 @@ export default function BookPage() {
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-300">{t('book.rateSummary')}</p>
             <p className="mt-4 text-slate-200">{`${t(`units.items.${selectedUnit.slug}.name`)} · ${selectedUnit.capacity} ${t('book.guests')}`}</p>
             <div className="mt-6 space-y-3 text-slate-200">
-              {selectedUnit.nightlyRate > 0 && (
+              {(selectedUnit.nightlyRate > 0 || selectedUnit.weeklyRate > 0) && (
                 <>
-                  <p>{`${t('book.nightlyRate')}: ${formatPrice(selectedUnit.nightlyRate, language, rate)}`}</p>
+                  <p>{`${t('book.nightlyRate')}: ${formatPrice(selectedUnit.nightlyRate > 0 ? selectedUnit.nightlyRate : selectedUnit.weeklyRate / 7, language, rate)}`}</p>
                   <p>{`${t('book.nights')}: ${nights || 0}`}</p>
                   <p>{`${t('book.baseAmount')}: ${formatPrice(calculatePricing.base, language, rate)}`}</p>
                   {calculatePricing.discount > 0 && (
@@ -234,6 +262,48 @@ export default function BookPage() {
               <p className="mt-1 text-sm">{formatCurrency(calculatePricing.total)}</p>
             </div>
           </div>
+          {depositResult && (
+            <div className="rounded-4xl bg-[#1a0f0a]/90 p-6 shadow-sm shadow-black/10">
+              <div className="flex items-center justify-between">
+                <p className="text-sm uppercase tracking-[0.24em] text-slate-300">{t('book.deposit.title')}</p>
+                {depositResult.seasonType === 'peak' && (
+                  <span className="rounded-full bg-terracotta/20 px-2 py-0.5 text-xs font-semibold text-terracotta">
+                    {t('book.deposit.season.peak')}
+                  </span>
+                )}
+              </div>
+              <div className="mt-4 space-y-3 text-slate-300">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="font-semibold text-slate-100">{t('book.deposit.security')}</p>
+                    <p className="text-xs text-slate-400">{t('book.deposit.securityNote')} · {timingLabel(depositResult.securityDepositTiming)}</p>
+                  </div>
+                  <p className="shrink-0 font-semibold text-slate-100">{formatPrice(depositResult.securityDeposit, language, rate)}</p>
+                </div>
+                {depositResult.advanceDeposit > 0 && (
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="font-semibold text-slate-100">{t('book.deposit.advance')}</p>
+                      <p className="text-xs text-slate-400">{t('book.deposit.advanceNote')} · {timingLabel(depositResult.advanceDepositTiming)}</p>
+                    </div>
+                    <p className="shrink-0 font-semibold text-slate-100">{formatPrice(depositResult.advanceDeposit, language, rate)}</p>
+                  </div>
+                )}
+              </div>
+              <div className="mt-4 space-y-2 border-t border-slate-700 pt-4 text-sm">
+                {depositResult.advanceDeposit > 0 && (
+                  <div className="flex justify-between text-slate-300">
+                    <span>{t('book.deposit.remainingBalance')}</span>
+                    <span>{formatPrice(depositResult.remainingBalance, language, rate)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between font-semibold text-slate-100">
+                  <span>{t('book.deposit.totalDueNow')}</span>
+                  <span>{formatPrice(depositResult.totalDueUpfront, language, rate)}</span>
+                </div>
+              </div>
+            </div>
+          )}
           <div className="rounded-4xl bg-[#1a0f0a]/90 p-6 shadow-sm shadow-black/10">
             <p className="text-sm uppercase tracking-[0.24em] text-slate-300">{t('book.discountsTitle')}</p>
             <ul className="mt-4 space-y-3 text-slate-300">

@@ -33,7 +33,7 @@ export const translations = {
           description: "Mango, guava, avocado and lemon trees guests may enjoy."
         },
         {
-          title: "Private restrooms and living rooms",
+          title: "Private restrooms and bedrooms",
           description: "Comfortable private facilities and living areas for your stay."
         },
         {
@@ -162,6 +162,7 @@ export const translations = {
       name: "Name",
       email: "Email",
       phone: "Phone",
+      contactNote: "Please provide at least one: email or phone number.",
       unit: "Unit",
       guests: "Guests",
       checkIn: "Check-in",
@@ -184,8 +185,27 @@ export const translations = {
       note2: "Standard check-in after 3:00 PM.",
       note3: "Digital access code sent by email with reservation confirmation.",
       discountsTitle: "Stay discounts",
-      discount7nights: "10% off for stays of 8 nights or more.",
-      discount28nights: "25% off for stays of 29 nights or more.",
+      discount7nights: "10% off for stays of 7 nights or more.",
+      discount28nights: "25% off for stays of 28 nights or more.",
+      deposit: {
+        title: "Deposit Summary",
+        security: "Security Deposit",
+        securityNote: "refundable · held as guarantee",
+        advance: "Advance Deposit",
+        advanceNote: "credited toward your stay",
+        remainingBalance: "Remaining balance",
+        totalDueNow: "Total due now",
+        timing: {
+          upfront: "Due now",
+          at_checkin: "Due at check-in",
+          pre_authorization: "Pre-authorization hold",
+        },
+        season: {
+          peak: "Peak season ×1.25",
+          standard: "",
+          low: "",
+        },
+      },
       periods: {
         nightly: "Nightly",
         weekly: "Weekly",
@@ -206,23 +226,23 @@ export const translations = {
       checkAvailability: "Check availability",
       items: {
         "bungalow-1": {
-          name: "Bungalow 1",
+          name: "Sun of My Heart",
           type: "Private bungalow",
-          summary: "Cozy bungalow with en-suite bathroom, private veranda, and garden view.",
+          summary: "A space that radiates warmth and a homely atmosphere. With access to the garden, this bungalow was designed so that every ray of sunlight touches your heart and makes you feel truly at home.",
           bathroom: "En-suite bathroom",
-          terrace: "Private veranda and garden area"
+          terrace: "Private veranda with garden access"
         },
         "bungalow-2": {
-          name: "Bungalow 2",
+          name: "Magic Moon",
           type: "Private bungalow",
-          summary: "Bright retreat with direct garden access and comfortable indoor/outdoor living.",
+          summary: "A haven full of magic and love. Surrounded by flowers and trees, this space invites tranquility and reconnection with oneself. Comfortable and serene, here you will find the peace you seek — and in season, the lush mango tree will gift you its fresh fruit.",
           bathroom: "En-suite bathroom",
-          terrace: "Private veranda and garden area"
+          terrace: "Private veranda with garden access"
         },
         "main-bedroom": {
-          name: "Main Residence Bedroom",
+          name: "Blessed Land",
           type: "Bedroom inside main residence",
-          summary: "Relaxed room inside the main residence with private bathroom and authentic style.",
+          summary: "This bedroom was conceived for those who wish to reconnect with themselves. Its calm and harmonious design, along with the garden views, create the perfect setting to rest, reflect, and enjoy a peaceful moment with a cup of tea or coffee.",
           bathroom: "En-suite bathroom",
           terrace: "Shared courtyard access"
         },
@@ -381,7 +401,7 @@ export const translations = {
           description: "Mango, guayaba, aguacate y limones que los huéspedes pueden disfrutar."
         },
         {
-          title: "Baños y salas de estar privadas",
+          title: "Baños y habitaciones privadas",
           description: "Instalaciones privadas cómodas y áreas de estar para tu estadía."
         },
         {
@@ -509,6 +529,8 @@ export const translations = {
       description: "Selecciona tu unidad, elige fechas y observa tus ahorros de inmediato. Después de reservar, tu confirmación incluirá un código de acceso digital.",
       name: "Nombre",
       email: "Correo electrónico",
+      phone: "Teléfono",
+      contactNote: "Por favor proporciona al menos uno: correo electrónico o número de teléfono.",
       unit: "Unidad",
       bookingPeriod: "Período de reserva",
       guests: "Huéspedes",
@@ -534,8 +556,27 @@ export const translations = {
       note2: "Check-in estándar después de las 3:00 PM.",
       note3: "Código de acceso digital enviado por correo electrónico con la confirmación.",
       discountsTitle: "Descuentos por estadía",
-      discount7nights: "10% de descuento en estadías de 8 noches o más.",
-      discount28nights: "25% de descuento en estadías de 29 noches o más.",
+      discount7nights: "10% de descuento en estadías de 7 noches o más.",
+      discount28nights: "25% de descuento en estadías de 28 noches o más.",
+      deposit: {
+        title: "Resumen de Depósitos",
+        security: "Depósito de Seguridad",
+        securityNote: "reembolsable · retenido como garantía",
+        advance: "Depósito Anticipado",
+        advanceNote: "acreditado a tu estadía",
+        remainingBalance: "Saldo restante",
+        totalDueNow: "Total a pagar ahora",
+        timing: {
+          upfront: "A pagar ahora",
+          at_checkin: "A pagar al llegar",
+          pre_authorization: "Preautorización retenida",
+        },
+        season: {
+          peak: "Temporada alta ×1.25",
+          standard: "",
+          low: "",
+        },
+      },
       periods: {
         nightly: "Nocturna",
         weekly: "Semanal",
@@ -556,23 +597,23 @@ export const translations = {
       checkAvailability: "Ver disponibilidad",
       items: {
         "bungalow-1": {
-          name: "Bungalow 1",
+          name: "Sol de mi Corazón",
           type: "Bungalow privado",
-          summary: "Bungalow acogedor con baño privado, terraza privada y vista al jardín.",
+          summary: "Un espacio que irradia calidez y un ambiente familiar. Con acceso al jardín, este bungalow fue diseñado para que cada rayo de sol toque tu corazón y te haga sentir verdaderamente en casa.",
           bathroom: "Baño privado",
-          terrace: "Terraza privada y área de jardín"
+          terrace: "Terraza privada con acceso al jardín"
         },
         "bungalow-2": {
-          name: "Bungalow 2",
+          name: "Luna Mágica",
           type: "Bungalow privado",
-          summary: "Retiro luminoso con acceso directo al jardín y cómoda vida interior/exterior.",
+          summary: "Un refugio lleno de magia y amor. Rodeado de flores y árboles, este espacio invita a la tranquilidad y al reencuentro con uno mismo. Cómodo y sereno, aquí encontrarás la paz que buscas — y en temporada, el frondoso árbol de mangos te obsequiará sus frutos frescos.",
           bathroom: "Baño privado",
-          terrace: "Terraza privada y área de jardín"
+          terrace: "Terraza privada con acceso al jardín"
         },
         "main-bedroom": {
-          name: "Habitación principal",
+          name: "Tierra Bendita",
           type: "Habitación dentro de la residencia principal",
-          summary: "Habitación relajada dentro de la residencia principal con baño privado y estilo auténtico.",
+          summary: "Esta recámara fue concebida para quienes desean reconectar consigo mismos. Su diseño tranquilo y armonioso, junto con las vistas al jardín, crean el ambiente perfecto para descansar, reflexionar y disfrutar de un momento de calma con una taza de té o café.",
           bathroom: "Baño privado",
           terrace: "Acceso al patio compartido"
         },

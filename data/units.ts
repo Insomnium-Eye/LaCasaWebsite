@@ -21,7 +21,7 @@ export const units: Unit[] = [
     summary: "Cozy bungalow with en-suite bathroom, private veranda, and garden view.",
     capacity: 2,
     bathroom: "En-suite bathroom",
-    terrace: "Private veranda and garden area",
+    terrace: "Private veranda with garden access",
     nightlyRate: 75,
     weeklyRate: 500,
     monthlyRate: 1650,
@@ -35,7 +35,7 @@ export const units: Unit[] = [
     summary: "Bright retreat with direct garden access and comfortable indoor/outdoor living.",
     capacity: 2,
     bathroom: "En-suite bathroom",
-    terrace: "Private veranda and garden area",
+    terrace: "Private veranda with garden access",
     nightlyRate: 90,
     weeklyRate: 600,
     monthlyRate: 1900

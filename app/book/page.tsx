@@ -42,7 +42,7 @@ function daysBetween(start: string, end: string) {
 
 export default function BookPage() {
   const { t, language } = useLanguage();
-  const { convertToMxn, formatCurrency } = useUsdToMxn();
+  const { formatCurrency, rate } = useUsdToMxn();
   const [form, setForm] = useState(initialState);
   const [showIdVerification, setShowIdVerification] = useState(false);
   const [idVerified, setIdVerified] = useState(false);
@@ -51,7 +51,7 @@ export default function BookPage() {
   const selectedUnit = units.find((unit) => unit.slug === form.unit) ?? units[0];
   
   const today = new Date().toISOString().split('T')[0];
-  const minNights = selectedUnit.slug === 'entire-house' ? 6 : 1;
+  const minNights = selectedUnit.slug === 'entire-house' ? 7 : 1;
   const checkOutMinDate = selectedUnit.slug === 'entire-house' && form.checkIn ? addDays(form.checkIn, minNights) : (form.checkIn || today);
 
   useEffect(() => {
@@ -216,23 +216,30 @@ export default function BookPage() {
             <div className="mt-6 space-y-3 text-slate-200">
               {selectedUnit.nightlyRate > 0 && (
                 <>
-                  <p>{`${t('book.nightlyRate')}: ${formatPrice(selectedUnit.nightlyRate, language)}`}</p>
+                  <p>{`${t('book.nightlyRate')}: ${formatPrice(selectedUnit.nightlyRate, language, rate)}`}</p>
                   <p>{`${t('book.nights')}: ${nights || 0}`}</p>
-                  <p>{`${t('book.baseAmount')}: ${formatPrice(calculatePricing.base, language)}`}</p>
+                  <p>{`${t('book.baseAmount')}: ${formatPrice(calculatePricing.base, language, rate)}`}</p>
                   {calculatePricing.discount > 0 && (
-                    <p>{`${t('book.discount')}: -${formatPrice(calculatePricing.discount, language)}`}</p>
+                    <p>{`${t('book.discount')}: -${formatPrice(calculatePricing.discount, language, rate)}`}</p>
                   )}
-                  <p>{`${t('book.subtotal')}: ${formatPrice(calculatePricing.subtotal, language)}`}</p>
-                  <p>{`IVA (16%): ${formatPrice(calculatePricing.iva, language)}`}</p>
-                  <p>{`ISH (3%): ${formatPrice(calculatePricing.ish, language)}`}</p>
+                  <p>{`${t('book.subtotal')}: ${formatPrice(calculatePricing.subtotal, language, rate)}`}</p>
+                  <p>{`IVA (16%): ${formatPrice(calculatePricing.iva, language, rate)}`}</p>
+                  <p>{`ISH (3%): ${formatPrice(calculatePricing.ish, language, rate)}`}</p>
                 </>
               )}
             </div>
             <div className="mt-6 rounded-3xl bg-garden px-5 py-4 text-white">
               <p className="text-sm uppercase tracking-[0.24em]">{t('book.estimatedTotal')}</p>
-              <p className="mt-2 text-3xl font-semibold">{formatPrice(calculatePricing.total, language)}</p>
+              <p className="mt-2 text-3xl font-semibold">{formatPrice(calculatePricing.total, language, rate)}</p>
               <p className="mt-1 text-sm">{formatCurrency(calculatePricing.total)}</p>
             </div>
+          </div>
+          <div className="rounded-4xl bg-[#1a0f0a]/90 p-6 shadow-sm shadow-black/10">
+            <p className="text-sm uppercase tracking-[0.24em] text-slate-300">{t('book.discountsTitle')}</p>
+            <ul className="mt-4 space-y-3 text-slate-300">
+              <li>🏷️ {t('book.discount7nights')}</li>
+              <li>🏷️ {t('book.discount28nights')}</li>
+            </ul>
           </div>
           <div className="rounded-4xl bg-[#1a0f0a]/90 p-6 shadow-sm shadow-black/10">
             <p className="text-sm uppercase tracking-[0.24em] text-slate-300">{t('book.bookingNotes')}</p>

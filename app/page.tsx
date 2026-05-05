@@ -133,8 +133,8 @@ export default function HomePage() {
       <section className="mt-24">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-sm uppercase tracking-[0.2em] text-slate-500">{t("home.availableUnits")}</p>
-            <h2 className="mt-2 text-3xl font-semibold text-slate-900">{t("home.chooseStay")}</h2>
+            <p className="text-sm uppercase tracking-[0.2em] text-slate-300 [text-shadow:0_1px_3px_rgba(0,0,0,0.7),0_2px_8px_rgba(0,0,0,0.5)]">{t("home.availableUnits")}</p>
+            <h2 className="mt-2 text-3xl font-semibold text-white [text-shadow:0_1px_4px_rgba(0,0,0,0.8),0_3px_10px_rgba(0,0,0,0.5)]">{t("home.chooseStay")}</h2>
           </div>
           <Link href="/units" className="text-sm font-semibold text-terracotta hover:text-[#a95b48]">{t("home.seeAllUnits")}</Link>
         </div>
@@ -209,10 +209,8 @@ export default function HomePage() {
       {galleryOpen && (
         <GalleryModal
           images={galleryImages}
-          currentIndex={galleryIndex}
+          initialIndex={galleryIndex}
           onClose={() => setGalleryOpen(false)}
-          onPrev={() => setGalleryIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length)}
-          onNext={() => setGalleryIndex((prev) => (prev + 1) % galleryImages.length)}
         />
       )}
       <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} />

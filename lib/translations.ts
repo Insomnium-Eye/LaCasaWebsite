@@ -85,7 +85,7 @@ export const translations = {
       highlightsTitle: "Why guests choose us",
       highlights: [
         "Direct booking with personalized service.",
-        "Private parking, contactless digital locks, and mosquito-safe sleeping areas.",
+        "Private parking, contactless digital locks, and mosquito-protected sleeping areas with bed nets surrounding every bed.",
         "Authentic garden living with nearby cultural attractions."
       ],
       features: [
@@ -93,8 +93,9 @@ export const translations = {
         { title: "Fruit orchard", description: "Avocado, guava, mango, and lemon trees that frame the property." },
         { title: "Quiet and private", description: "Two bungalows plus a main-bedroom option with separate entrances." },
         { title: "Easy access", description: "Minutes from the city center and all Oaxaca attractions." },
-        { title: "Shared kitchen", description: "Traditional kitchen available for guests to prepare their own meals and connect with others." },
-        { title: "Future jacuzzi", description: "We're planning to install a luxurious jacuzzi for ultimate relaxation and wellness." },
+        { title: "In-unit kitchen appliances", description: "Each bungalow and room includes a private mini-fridge and electric oven for your convenience." },
+        { title: "Future pool", description: "We're planning to install a refreshing pool for guests to enjoy during their stay." },
+        { title: "Ozone water filtration", description: "An ozone water filtering system provides clean, purified drinking water throughout the property." },
         { title: "Local transportation service", description: "Arrange convenient rides to the Airport, Zócalo, Monte Albán, and other tourist hotspots for a small fee." }
       ]
     },
@@ -106,7 +107,9 @@ export const translations = {
         "Mature fruit orchards with mango, guava, avocado and lemon",
         "Stargazing bathtub with retractable roof",
         "Indoor/outdoor fish fountain and landscaped terraces",
-        "Comprehensive mosquito control with nets and traps",
+        "Mosquito bed nets surrounding every bed in each unit",
+        "Mosquito Dunks BCI treatment in water storage for year-round prevention",
+        "Ozone water filtering system for clean, purified drinking water",
         "Private parking for up to 7 vehicles",
         "Rainwater harvesting with dual cistern system",
         "Security cameras and electrified perimeter fence",
@@ -136,7 +139,7 @@ export const translations = {
         { question: "How do I book directly?", answer: "Use the booking page to select dates, unit, and guest details." },
         { question: "What is your cancellation policy?", answer: "Cancellations are accepted up to 7 days before arrival for a full refund. Please contact us for any changes." },
         { question: "Is transport available?", answer: "We can help arrange transportation to the Zócalo, Monte Albán, and other local destinations for an extra service fee." },
-        { question: "Are there mosquito protections?", answer: "Yes. Each unit is equipped with bed nets, Bti solutions, and traps to keep your stay comfortable." }
+        { question: "Are there mosquito protections?", answer: "Yes. Each unit has mosquito bed nets surrounding every bed, and our water storage is treated with Mosquito Dunks BCI for year-round prevention." }
       ]
     },
     gallery: {
@@ -165,7 +168,7 @@ export const translations = {
       checkOut: "Check-out",
       requestDetails: "Request booking details",
       validationError: "Please fill in all required fields and ensure check-out is after check-in.",
-      entireHouseMinNightsError: "Entire house bookings must be at least 6 nights.",
+      entireHouseMinNightsError: "Entire house bookings must be at least 7 nights (one full week).",
       rateSummary: "Rate summary",
       selectedUnitInfo: "{unit} · {capacity} guests",
       nightlyRate: "Nightly rate",
@@ -180,6 +183,9 @@ export const translations = {
       note1: "Direct reservations ensure the best rates.",
       note2: "Standard check-in after 3:00 PM.",
       note3: "Digital access code sent by email with reservation confirmation.",
+      discountsTitle: "Stay discounts",
+      discount7nights: "10% off for stays of 8 nights or more.",
+      discount28nights: "25% off for stays of 29 nights or more.",
       periods: {
         nightly: "Nightly",
         weekly: "Weekly",
@@ -427,7 +433,7 @@ export const translations = {
       highlightsTitle: "Por qué los huéspedes nos eligen",
       highlights: [
         "Reserva directa con servicio personalizado.",
-        "Estacionamiento privado, cerraduras digitales sin contacto y áreas de descanso protegidas de mosquitos.",
+        "Estacionamiento privado, cerraduras digitales sin contacto y áreas de descanso protegidas con mosquiteros alrededor de cada cama.",
         "Vida auténtica en el jardín con atracciones culturales cercanas."
       ],
       features: [
@@ -435,8 +441,9 @@ export const translations = {
         { title: "Huerto de frutas", description: "Árboles de aguacate, guayaba, mango y limón que rodean la propiedad." },
         { title: "Tranquilo y privado", description: "Dos bungalows más una opción de habitación principal con entradas separadas." },
         { title: "Fácil acceso", description: "Minutos al centro de la ciudad y todas las atracciones de Oaxaca." },
-        { title: "Cocina compartida", description: "Cocina tradicional disponible para que los huéspedes preparen sus propias comidas y se conecten con otros." },
-        { title: "Jacuzzi futuro", description: "Planeamos instalar un lujoso jacuzzi para la máxima relajación y bienestar." },
+        { title: "Electrodomésticos en cada unidad", description: "Cada bungalow y habitación incluye minirefrigerador privado y estufa eléctrico para tu comodidad." },
+        { title: "Piscina futura", description: "Planeamos instalar una refrescante piscina para que los huéspedes la disfruten durante su estadía." },
+        { title: "Filtración de agua por ozono", description: "Un sistema de filtración de agua por ozono proporciona agua potable limpia y purificada en toda la propiedad." },
         { title: "Servicio de transporte local", description: "Organiza paseos convenientes al Aeropuerto, Zócalo, Monte Albán y otros puntos turísticos por un pequeño costo." }
       ]
     },
@@ -448,7 +455,9 @@ export const translations = {
         "Huertos maduros con mango, guayaba, aguacate y limón",
         "Tina para observar las estrellas con techo retráctil",
         "Fuente de peces interior/exterior y terrazas ajardinadas",
-        "Control completo de mosquitos con mosquiteros y trampas",
+        "Mosquiteros alrededor de cada cama en todas las unidades",
+        "Tratamiento Mosquito Dunks BCI en almacenamiento de agua para prevención todo el año",
+        "Sistema de filtración de agua por ozono para agua potable limpia y purificada",
         "Estacionamiento privado para hasta 7 vehículos",
         "Recolección de agua de lluvia con sistema de doble cisterna",
         "Cámaras de seguridad y cerca perimetral electrificada",
@@ -478,7 +487,7 @@ export const translations = {
         { question: "¿Cómo hago una reserva directa?", answer: "Usa la página de reservas para seleccionar fechas, unidad y número de huéspedes." },
         { question: "¿Cuál es su política de cancelación?", answer: "Las cancelaciones se aceptan hasta 7 días antes de la llegada para un reembolso completo. Por favor contáctanos para cualquier cambio." },
         { question: "¿Hay transporte disponible?", answer: "Podemos ayudar a organizar transporte al Zócalo, Monte Albán y otros destinos locales por un costo extra." },
-        { question: "¿Hay protección contra mosquitos?", answer: "Sí. Cada unidad cuenta con mosquiteros, soluciones Bti y trampas para mantener tu estadía cómoda." }
+        { question: "¿Hay protección contra mosquitos?", answer: "Sí. Cada unidad tiene mosquiteros alrededor de cada cama, y el almacenamiento de agua se trata con Mosquito Dunks BCI para prevención todo el año." }
       ]
     },
     gallery: {
@@ -507,7 +516,7 @@ export const translations = {
       checkOut: "Salida",
       requestDetails: "Solicitar detalles de reserva",
       validationError: "Por favor complete todos los campos requeridos y asegúrese de que la salida sea después de la entrada.",
-      entireHouseMinNightsError: "Las reservas de la casa completa deben ser de al menos 6 noches.",
+      entireHouseMinNightsError: "Las reservas de la casa completa deben ser de al menos 7 noches (una semana completa).",
       rateSummary: "Resumen de tarifas",
       selectedUnitInfo: "{unit} · {capacity} huéspedes",
       nightlyRate: "Tarifa nocturna",
@@ -524,6 +533,9 @@ export const translations = {
       note1: "Las reservas directas garantizan las mejores tarifas.",
       note2: "Check-in estándar después de las 3:00 PM.",
       note3: "Código de acceso digital enviado por correo electrónico con la confirmación.",
+      discountsTitle: "Descuentos por estadía",
+      discount7nights: "10% de descuento en estadías de 8 noches o más.",
+      discount28nights: "25% de descuento en estadías de 29 noches o más.",
       periods: {
         nightly: "Nocturna",
         weekly: "Semanal",

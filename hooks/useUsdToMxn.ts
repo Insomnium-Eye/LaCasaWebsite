@@ -31,7 +31,7 @@ const useUsdToMxn = () => {
   const formatCurrency = (usdAmount: number): string => {
     const roundedUsd = Math.round(usdAmount * 100) / 100;
     const mxnAmount = convertToMxn(roundedUsd);
-    return `$${roundedUsd.toFixed(2)} USD ≈ ${mxnAmount.toLocaleString('es-MX')} MXN`;
+    return `$${roundedUsd.toFixed(2)} USD ≈ $${mxnAmount.toLocaleString('es-MX')} MXN`;
   };
 
   // Fetch the current exchange rate

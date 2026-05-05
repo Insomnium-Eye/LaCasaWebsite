@@ -509,7 +509,7 @@ const BookingPage: React.FC = () => {
                   <div className="text-right">
                     <p className="text-xs text-amber-700 mb-1">≈ MXN</p>
                     <p className="text-2xl font-bold text-amber-900">
-                      {convertToMxn(totalPrice).toLocaleString('es-MX')}
+                      ${convertToMxn(totalPrice).toLocaleString('es-MX')}
                     </p>
                   </div>
                 </div>

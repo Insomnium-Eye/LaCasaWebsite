@@ -21,13 +21,14 @@ export async function POST(request: Request) {
 
     if (error) {
       console.error('[Resend error]', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: error.message, detail: error }, { status: 500 });
     }
 
     console.log('[Resend success]', data);
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error('[Contact route error]', err);
-    return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[Contact route error]', msg);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

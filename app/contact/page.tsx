@@ -10,12 +10,14 @@ export default function ContactPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
+  const [verified, setVerified] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!verified) return;
     setSubmitting(true);
     setError('');
 
@@ -100,12 +102,23 @@ export default function ContactPage() {
                     required
                   />
                 </label>
+                {/* Captcha */}
+                <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-slate-700 bg-slate-800/40 px-4 py-3 text-sm text-slate-300 transition hover:border-slate-500">
+                  <input
+                    type="checkbox"
+                    checked={verified}
+                    onChange={(e) => setVerified(e.target.checked)}
+                    className="h-4 w-4 cursor-pointer accent-terracotta"
+                  />
+                  <span>{t('contact.captchaLabel')}</span>
+                </label>
+
                 {error && (
                   <p className="text-sm text-red-400">{error}</p>
                 )}
                 <button
                   type="submit"
-                  disabled={submitting}
+                  disabled={submitting || !verified}
                   className="inline-flex items-center justify-center rounded-full bg-terracotta px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#b55e47] disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {submitting ? t('contact.sending') : t('contact.formButton')}

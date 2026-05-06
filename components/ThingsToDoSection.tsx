@@ -7,7 +7,7 @@ export default function ThingsToDoSection() {
   const { t, language } = useLanguage();
 
   return (
-    <section className="mt-24">
+    <section id="discover-oaxaca" className="mt-24">
       {/* Hero heading */}
       <div className="space-y-4">
         <p className="text-sm uppercase tracking-[0.24em] text-slate-400 [text-shadow:0_1px_3px_rgba(0,0,0,0.7)]">

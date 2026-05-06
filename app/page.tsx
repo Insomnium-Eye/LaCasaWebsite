@@ -56,6 +56,13 @@ export default function HomePage() {
             La Casa Oaxaca
           </Link>
           <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => document.getElementById('discover-oaxaca')?.scrollIntoView({ behavior: 'smooth' })}
+              className="hidden rounded-full border border-slate-600 px-5 py-2 text-sm font-semibold text-slate-300 transition hover:border-slate-400 hover:text-white sm:inline-flex"
+            >
+              {t("explore.title")}
+            </button>
             <Link href="/portal" className="rounded-full border border-slate-500 px-5 py-2 text-sm font-semibold text-slate-100 transition hover:bg-slate-900/50">
               Already a guest? Sign in!
             </Link>

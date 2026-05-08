@@ -131,7 +131,6 @@ export default function BookPage() {
   
   const handleEscrowComplete = () => {
     setShowEscrow(false);
-    alert('Booking submitted! You will receive a confirmation once approved by the owner.');
   };
 
   return (
@@ -334,6 +333,19 @@ export default function BookPage() {
         <EscrowModal
           total={calculatePricing.total}
           nights={nights}
+          bookingData={{
+            name: form.name,
+            email: form.email,
+            phone: form.phone,
+            unitSlug: selectedUnit.slug,
+            unitName: t(`units.items.${selectedUnit.slug}.name`),
+            checkIn: form.checkIn,
+            checkOut: form.checkOut,
+            nights,
+            guests: form.guests,
+            totalUsd: calculatePricing.total,
+            depositUsd: depositResult?.totalDueUpfront ?? calculatePricing.total * 0.3,
+          }}
           onClose={() => setShowEscrow(false)}
           onPaymentComplete={handleEscrowComplete}
         />

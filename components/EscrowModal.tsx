@@ -101,7 +101,7 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl p-8 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+      <div className="bg-white rounded-2xl p-8 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl text-gray-900">
 
         {/* Test mode banner */}
         <div className="mb-5 rounded-lg bg-amber-50 border border-amber-200 px-4 py-2.5 text-sm text-amber-800 font-medium">
@@ -131,7 +131,7 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
             <select
               value={paymentMethod}
               onChange={(e) => setPaymentMethod(e.target.value as 'card' | 'spei')}
-              className="w-full border border-gray-300 rounded-lg p-3 text-sm"
+              className="w-full border border-gray-300 rounded-lg p-3 text-sm text-gray-900 bg-white"
             >
               <option value="card">Credit / Debit Card</option>
               <option value="spei">SPEI Transfer (Mexico)</option>
@@ -146,7 +146,7 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
                   type="text"
                   value={cardNumber}
                   onChange={(e) => setCardNumber(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg p-3 text-sm"
+                  className="w-full border border-gray-300 rounded-lg p-3 text-sm text-gray-900 bg-white"
                   placeholder="4242 4242 4242 4242"
                 />
               </div>
@@ -157,7 +157,7 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
                     type="text"
                     value={expiry}
                     onChange={(e) => setExpiry(e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg p-3 text-sm"
+                    className="w-full border border-gray-300 rounded-lg p-3 text-sm text-gray-900 bg-white"
                     placeholder="MM/YY"
                   />
                 </div>
@@ -167,7 +167,7 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
                     type="text"
                     value={cvv}
                     onChange={(e) => setCvv(e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg p-3 text-sm"
+                    className="w-full border border-gray-300 rounded-lg p-3 text-sm text-gray-900 bg-white"
                     placeholder="123"
                   />
                 </div>
@@ -178,7 +178,7 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
                   type="text"
                   value={cardholderName}
                   onChange={(e) => setCardholderName(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg p-3 text-sm"
+                  className="w-full border border-gray-300 rounded-lg p-3 text-sm text-gray-900 bg-white"
                   placeholder="Full name on card"
                 />
               </div>

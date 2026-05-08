@@ -43,6 +43,26 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
   const [expiry, setExpiry] = useState('');
   const [cvv, setCvv] = useState('');
   const [cardholderName, setCardholderName] = useState('');
+
+  function handleCardNumber(raw: string) {
+    const digits = raw.replace(/\D/g, '').slice(0, 16);
+    setCardNumber(digits.replace(/(.{4})/g, '$1 ').trim());
+  }
+
+  function handleExpiry(raw: string) {
+    const digits = raw.replace(/\D/g, '').slice(0, 4);
+    if (digits.length >= 3) {
+      setExpiry(`${digits.slice(0, 2)}/${digits.slice(2)}`);
+    } else if (raw.endsWith('/') && digits.length === 2) {
+      setExpiry(`${digits}/`);
+    } else {
+      setExpiry(digits);
+    }
+  }
+
+  function handleCvv(raw: string) {
+    setCvv(raw.replace(/\D/g, '').slice(0, 4));
+  }
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -144,9 +164,11 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
                 <label className="block text-sm font-semibold text-gray-900 mb-1">Card Number</label>
                 <input
                   type="text"
+                  inputMode="numeric"
                   value={cardNumber}
-                  onChange={(e) => setCardNumber(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg p-3 text-sm text-gray-900 bg-white"
+                  onChange={(e) => handleCardNumber(e.target.value)}
+                  maxLength={19}
+                  className="w-full border border-gray-300 rounded-lg p-3 text-sm text-gray-900 bg-white tracking-widest"
                   placeholder="4242 4242 4242 4242"
                 />
               </div>
@@ -155,8 +177,10 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
                   <label className="block text-sm font-semibold text-gray-900 mb-1">Expiry</label>
                   <input
                     type="text"
+                    inputMode="numeric"
                     value={expiry}
-                    onChange={(e) => setExpiry(e.target.value)}
+                    onChange={(e) => handleExpiry(e.target.value)}
+                    maxLength={5}
                     className="w-full border border-gray-300 rounded-lg p-3 text-sm text-gray-900 bg-white"
                     placeholder="MM/YY"
                   />
@@ -165,8 +189,10 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
                   <label className="block text-sm font-semibold text-gray-900 mb-1">CVV</label>
                   <input
                     type="text"
+                    inputMode="numeric"
                     value={cvv}
-                    onChange={(e) => setCvv(e.target.value)}
+                    onChange={(e) => handleCvv(e.target.value)}
+                    maxLength={4}
                     className="w-full border border-gray-300 rounded-lg p-3 text-sm text-gray-900 bg-white"
                     placeholder="123"
                   />
@@ -177,7 +203,8 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
                 <input
                   type="text"
                   value={cardholderName}
-                  onChange={(e) => setCardholderName(e.target.value)}
+                  onChange={(e) => setCardholderName(e.target.value.slice(0, 50))}
+                  maxLength={50}
                   className="w-full border border-gray-300 rounded-lg p-3 text-sm text-gray-900 bg-white"
                   placeholder="Full name on card"
                 />

@@ -1,7 +1,7 @@
 import type { DepositPolicy, SeasonType } from './deposit';
 
 export const DEFAULT_DEPOSIT_POLICY: DepositPolicy = {
-  shortStayDeposit: 300,        // < 7 nights
+  shortStayDeposit: 100,        // < 7 nights
   mediumStayDeposit: 500,       // 7–27 nights
   longStayDepositMonths: 1,     // 28+ nights: 1 × effective monthly rate
   minDeposit: 100,

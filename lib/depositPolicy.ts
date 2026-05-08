@@ -4,7 +4,7 @@ export const DEFAULT_DEPOSIT_POLICY: DepositPolicy = {
   shortStayDeposit: 300,        // < 7 nights
   mediumStayDeposit: 500,       // 7–27 nights
   longStayDepositMonths: 1,     // 28+ nights: 1 × effective monthly rate
-  minDeposit: 200,
+  minDeposit: 100,
   maxDeposit: 2000,
   peakSeasonMultiplier: 1.25,
   advanceDepositEnabled: true,

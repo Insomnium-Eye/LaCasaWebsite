@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
       .select()
       .single();
 
-    if (bookingError) throw bookingError;
+    if (bookingError) throw new Error(bookingError.message ?? JSON.stringify(bookingError));
 
     // 2. Create reservation record for portal access
     const [firstName, ...rest] = name.trim().split(' ');
@@ -138,7 +138,10 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
+    const msg =
+      error instanceof Error ? error.message :
+      typeof error === 'object' && error !== null ? JSON.stringify(error) :
+      String(error);
     console.error('[Book API error]', msg);
     return NextResponse.json({ error: msg }, { status: 500 });
   }

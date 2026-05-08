@@ -95,7 +95,8 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || 'Booking failed. Please try again.');
+        const errMsg = typeof data.error === 'string' ? data.error : JSON.stringify(data.error);
+        setError(errMsg || 'Booking failed. Please try again.');
         setSubmitting(false);
         return;
       }

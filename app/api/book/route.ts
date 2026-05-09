@@ -1,11 +1,69 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminSupabaseClient } from '@/lib/supabase-helpers';
 import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 function generateLockCode(): string {
   return String(Math.floor(1000 + Math.random() * 9000));
+}
+
+async function saveToSupabase(data: {
+  name: string; email: string; phone: string;
+  unitSlug: string; unitName: string;
+  checkIn: string; checkOut: string;
+  nights: number; guests: number;
+  totalUsd: number; depositUsd: number;
+  lockCode: string;
+}) {
+  const { createAdminSupabaseClient } = await import('@/lib/supabase-helpers');
+  const supabase = createAdminSupabaseClient();
+
+  const { data: booking, error: bookingError } = await supabase
+    .from('bookings')
+    .insert([{
+      guest_name: data.name,
+      email: data.email || null,
+      phone: data.phone || null,
+      unit_slug: data.unitSlug,
+      unit_name: data.unitName,
+      check_in: data.checkIn,
+      check_out: data.checkOut,
+      nights: data.nights,
+      guests: data.guests || 1,
+      total_usd: data.totalUsd || 0,
+      deposit_usd: data.depositUsd || 0,
+      lock_code: data.lockCode,
+      status: 'confirmed',
+    }])
+    .select()
+    .single();
+
+  if (bookingError) throw new Error(bookingError.message);
+
+  const [firstName, ...rest] = data.name.trim().split(' ');
+  const nightlyRate = data.nights > 0 ? data.totalUsd / data.nights : 0;
+
+  const { error: reservationError } = await supabase
+    .from('reservations')
+    .insert([{
+      guest_first_name: firstName,
+      guest_last_name: rest.join(' ') || '',
+      email: data.email || '',
+      phone: data.phone || null,
+      digital_key: data.lockCode,
+      unit_id: data.unitSlug,
+      unit_name: data.unitName,
+      check_in: data.checkIn,
+      check_out: data.checkOut,
+      nightly_rate: parseFloat(nightlyRate.toFixed(2)),
+      status: 'confirmed',
+    }]);
+
+  if (reservationError) {
+    console.warn('[Booking] Reservation creation error:', reservationError.message);
+  }
+
+  return booking.id as string;
 }
 
 export async function POST(request: NextRequest) {
@@ -22,62 +80,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      return NextResponse.json({ error: 'Missing Supabase credentials — set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel env vars' }, { status: 500 });
-    }
-
-    const supabase = createAdminSupabaseClient();
     const lockCode = generateLockCode();
+    const [firstName] = name.trim().split(' ');
 
-    // 1. Create booking record
-    const { data: booking, error: bookingError } = await supabase
-      .from('bookings')
-      .insert([{
-        guest_name: name,
-        email: email || null,
-        phone: phone || null,
-        unit_slug: unitSlug,
-        unit_name: unitName,
-        check_in: checkIn,
-        check_out: checkOut,
-        nights,
-        guests: guests || 1,
-        total_usd: totalUsd || 0,
-        deposit_usd: depositUsd || 0,
-        lock_code: lockCode,
-        status: 'confirmed',
-      }])
-      .select()
-      .single();
-
-    if (bookingError) throw new Error(bookingError.message ?? JSON.stringify(bookingError));
-
-    // 2. Create reservation record for portal access
-    const [firstName, ...rest] = name.trim().split(' ');
-    const lastName = rest.join(' ') || '';
-    const nightlyRate = nights > 0 ? (totalUsd / nights) : 0;
-
-    const { error: reservationError } = await supabase
-      .from('reservations')
-      .insert([{
-        guest_first_name: firstName,
-        guest_last_name: lastName,
-        email: email || '',
-        phone: phone || null,
-        digital_key: lockCode,
-        unit_id: unitSlug,
-        unit_name: unitName,
-        check_in: checkIn,
-        check_out: checkOut,
-        nightly_rate: parseFloat(nightlyRate.toFixed(2)),
-        status: 'confirmed',
-      }]);
-
-    if (reservationError) {
-      console.error('[Booking] Reservation creation error:', reservationError);
+    // Try to save to Supabase — non-fatal if it fails (paused project, missing creds, etc.)
+    let bookingId = `offline-${Date.now()}`;
+    try {
+      bookingId = await saveToSupabase({
+        name, email, phone, unitSlug, unitName,
+        checkIn, checkOut, nights, guests,
+        totalUsd, depositUsd, lockCode,
+      });
+    } catch (dbErr) {
+      const dbMsg = dbErr instanceof Error ? dbErr.message : String(dbErr);
+      console.warn('[Booking] DB save skipped (Supabase unavailable):', dbMsg);
     }
 
-    // 3. Send guest confirmation email
+    // Send guest confirmation email
     if (email && process.env.RESEND_API_KEY) {
       await resend.emails.send({
         from: 'La Casa Oaxaca <onboarding@resend.dev>',
@@ -89,29 +108,25 @@ export async function POST(request: NextRequest) {
             <h2 style="color: #8d4a3f;">Your stay is confirmed!</h2>
             <p>Hi ${firstName},</p>
             <p>Your booking at <strong>${unitName}, La Casa Oaxaca</strong> is confirmed.</p>
-
             <table style="width:100%; border-collapse:collapse; margin: 20px 0;">
               <tr><td style="padding:8px; color:#555;">Check-in</td><td style="padding:8px; font-weight:bold;">${checkIn}</td></tr>
               <tr style="background:#f9f9f9;"><td style="padding:8px; color:#555;">Check-out</td><td style="padding:8px; font-weight:bold;">${checkOut}</td></tr>
               <tr><td style="padding:8px; color:#555;">Nights</td><td style="padding:8px; font-weight:bold;">${nights}</td></tr>
               <tr style="background:#f9f9f9;"><td style="padding:8px; color:#555;">Guests</td><td style="padding:8px; font-weight:bold;">${guests}</td></tr>
             </table>
-
             <div style="background:#fdf3f0; border-left:4px solid #8d4a3f; padding:20px; margin:24px 0; border-radius:8px;">
               <p style="margin:0 0 8px; font-size:14px; color:#8d4a3f; text-transform:uppercase; letter-spacing:0.1em;">🔑 Your Lock Code</p>
               <p style="margin:0; font-size:3rem; font-weight:bold; letter-spacing:0.4em; color:#1a1008;">${lockCode}</p>
               <p style="margin:8px 0 0; font-size:13px; color:#666;">Use this code to unlock your unit door. Keep it safe.</p>
             </div>
-
-            <p>You can also use this code — or your email/phone — to access the <a href="https://oaxaca-rental.com/portal" style="color:#8d4a3f;">Guest Portal</a> for cleaning requests, transport, and more.</p>
-
+            <p>You can also use this code — or your email/phone — to access the <a href="https://oaxaca-rental.com/portal" style="color:#8d4a3f;">Guest Portal</a>.</p>
             <p style="color:#888; font-size:13px; margin-top:32px;">Questions? Reply to this email or message us on WhatsApp.<br>— La Casa Oaxaca</p>
           </div>
         `,
       });
     }
 
-    // 4. Notify admin
+    // Notify admin
     if (process.env.RESEND_API_KEY) {
       await resend.emails.send({
         from: 'La Casa Oaxaca <onboarding@resend.dev>',
@@ -135,11 +150,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({
-      success: true,
-      bookingId: booking.id,
-      lockCode,
-    });
+    return NextResponse.json({ success: true, bookingId, lockCode });
 
   } catch (error) {
     const msg =

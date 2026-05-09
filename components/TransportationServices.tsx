@@ -28,8 +28,8 @@ const destinations: Destination[] = [
   {
     id: 'elllano',
     name: 'El Llano (Parque Juárez)',
-    priceMin: 10,
-    priceMax: 10,
+    priceMin: 7,
+    priceMax: 7,
     duration: '10–20 min',
     description: 'Peaceful park offering scenic walks and cultural events.',
     icon: '🌳',
@@ -37,8 +37,8 @@ const destinations: Destination[] = [
   {
     id: 'zocalo',
     name: 'Zócalo (Historic Main Square)',
-    priceMin: 10,
-    priceMax: 10,
+    priceMin: 7,
+    priceMax: 7,
     duration: '12–25 min',
     description: 'Heart of Oaxaca city – shops, cafés, and cultural landmarks.',
     icon: '🏛️',
@@ -55,8 +55,8 @@ const destinations: Destination[] = [
   {
     id: 'adobusStation',
     name: 'ADO Bus Station',
-    priceMin: 20,
-    priceMax: 20,
+    priceMin: 7,
+    priceMax: 7,
     duration: '15–25 min',
     description: 'Main intercity bus terminal for departures to other Mexican destinations.',
     icon: '🚌',
@@ -73,8 +73,8 @@ const destinations: Destination[] = [
   {
     id: 'arbolTule',
     name: 'Árbol del Tule (Tree of Tule)',
-    priceMin: 50,
-    priceMax: 50,
+    priceMin: 10,
+    priceMax: 10,
     duration: '20–35 min',
     description: 'Historic colonial town with the world\'s widest tree – a natural wonder.',
     icon: '🌲',

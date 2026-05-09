@@ -87,6 +87,20 @@ export default function GalleryModal({ images, initialIndex = 0, onClose }: Gall
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 900px"
                 />
+                {/* Left tap zone */}
+                <button
+                  type="button"
+                  aria-label="Previous image"
+                  onClick={() => setActiveIndex((p) => (p - 1 + images.length) % images.length)}
+                  className="absolute inset-y-0 left-0 w-1/2 cursor-w-resize focus:outline-none sm:hidden"
+                />
+                {/* Right tap zone */}
+                <button
+                  type="button"
+                  aria-label="Next image"
+                  onClick={() => setActiveIndex((p) => (p + 1) % images.length)}
+                  className="absolute inset-y-0 right-0 w-1/2 cursor-e-resize focus:outline-none sm:hidden"
+                />
               </div>
             </div>
             <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

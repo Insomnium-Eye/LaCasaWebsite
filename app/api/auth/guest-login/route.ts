@@ -10,84 +10,88 @@ import {
 } from '@/lib/guest-auth';
 
 const RATE_LIMIT_MAP = new Map<string, number[]>();
-const RATE_LIMIT_ATTEMPTS = parseInt(
-  process.env.RATE_LIMIT_ATTEMPTS || '10'
-);
-const RATE_LIMIT_WINDOW_MS = 
-  (parseInt(process.env.RATE_LIMIT_WINDOW_MINUTES || '15')) * 60 * 1000;
+const RATE_LIMIT_ATTEMPTS = parseInt(process.env.RATE_LIMIT_ATTEMPTS || '10');
+const RATE_LIMIT_WINDOW_MS =
+  parseInt(process.env.RATE_LIMIT_WINDOW_MINUTES || '15') * 60 * 1000;
 
-const checkRateLimit = (ip: string): boolean => {
+function checkRateLimit(ip: string): boolean {
   const now = Date.now();
-  const attempts = RATE_LIMIT_MAP.get(ip) || [];
-
-  // Remove old attempts outside the window
-  const recentAttempts = attempts.filter((time) => now - time < RATE_LIMIT_WINDOW_MS);
-
-  if (recentAttempts.length >= RATE_LIMIT_ATTEMPTS) {
-    return false; // Rate limited
-  }
-
-  recentAttempts.push(now);
-  RATE_LIMIT_MAP.set(ip, recentAttempts);
-
-  return true; // Not rate limited
-};
+  const recent = (RATE_LIMIT_MAP.get(ip) || []).filter(
+    (t) => now - t < RATE_LIMIT_WINDOW_MS
+  );
+  if (recent.length >= RATE_LIMIT_ATTEMPTS) return false;
+  recent.push(now);
+  RATE_LIMIT_MAP.set(ip, recent);
+  return true;
+}
 
 export async function POST(request: NextRequest) {
+  const ip =
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
+
+  if (!checkRateLimit(ip)) {
+    return NextResponse.json(
+      { success: false, error: 'Too many attempts. Please try again later.' },
+      { status: 429 }
+    );
+  }
+
   try {
     const { identifier } = await request.json();
 
-    if (!identifier || typeof identifier !== 'string') {
+    if (!identifier || typeof identifier !== 'string' || !identifier.trim()) {
       return NextResponse.json(
-        {
-          success: false,
-          error: 'Please provide an email, phone number, or digital key.',
-        },
+        { success: false, error: 'Please provide an email, phone number, or lock code.' },
         { status: 400 }
       );
     }
 
-    // Generate JWT with mock data for any input
+    const type = detectIdentifierType(identifier.trim());
+    const normalized = normalizeIdentifier(identifier.trim(), type);
+
+    let reservation = null;
+    try {
+      reservation = await findReservationByIdentifier(normalized, type);
+
+      // For phone, also try the raw trimmed value in case it was stored without normalization
+      if (!reservation && type === 'phone' && normalized !== identifier.trim()) {
+        reservation = await findReservationByIdentifier(identifier.trim(), type);
+      }
+    } catch (dbErr) {
+      const msg = dbErr instanceof Error ? dbErr.message : String(dbErr);
+      console.error('[Guest login] DB error:', msg);
+      return NextResponse.json(
+        { success: false, error: 'Unable to reach the reservation system. Please try again shortly.' },
+        { status: 503 }
+      );
+    }
+
+    if (!reservation) {
+      return NextResponse.json(
+        { success: false, error: 'No confirmed reservation found for that identifier.' },
+        { status: 401 }
+      );
+    }
+
     const token = generateGuestJWT({
-      reservationId: `res_${Date.now()}`,
-      guestName: 'Guest',
-      email: identifier,
-      phone: identifier,
-      unitName: 'Bungalow',
-      checkIn: new Date().toISOString().split('T')[0],
-      checkOut: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      nightsRemaining: 7,
-      nightlyRate: 150,
+      reservationId: reservation.id,
+      guestName: reservation.guest_first_name,
+      email: reservation.email,
+      phone: reservation.phone,
+      unitName: reservation.unit_name,
+      checkIn: reservation.check_in,
+      checkOut: reservation.check_out,
+      nightsRemaining: 0, // recalculated client-side via session
+      nightlyRate: reservation.nightly_rate,
     });
 
-    // Create mock session
-    const session = {
-      token,
-      reservationId: `res_${Date.now()}`,
-      guestName: 'Guest',
-      email: identifier,
-      phone: identifier,
-      unitName: 'Bungalow',
-      checkIn: new Date().toISOString().split('T')[0],
-      checkOut: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      nightsRemaining: 7,
-      nightlyRate: 150,
-    };
+    const session = createGuestSession(reservation, token);
 
-    return NextResponse.json(
-      {
-        success: true,
-        data: session,
-      },
-      { status: 200 }
-    );
+    return NextResponse.json({ success: true, data: session }, { status: 200 });
   } catch (error) {
-    console.error('Guest login error:', error);
+    console.error('[Guest login] Unexpected error:', error);
     return NextResponse.json(
-      {
-        success: false,
-        error: 'An error occurred during login. Please try again.',
-      },
+      { success: false, error: 'An unexpected error occurred. Please try again.' },
       { status: 500 }
     );
   }

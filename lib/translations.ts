@@ -198,6 +198,15 @@ export const translations = {
       discountsTitle: "Stay discounts",
       discount7nights: "10% off for stays of 7 nights or more.",
       discount28nights: "25% off for stays of 28 nights or more.",
+      rulesTitle: "House Rules",
+      rule: {
+        noSmoking: "No smoking anywhere on the property.",
+        noParties: "No parties or large gatherings.",
+        extraGuest: "Additional overnight guests must be reported to the host in advance.",
+        extraGuestFee: "Fee for each additional overnight guest:",
+        beRespectful: "Be respectful of the hosts, other guests, wildlife, and their space.",
+        camera: "There is a security camera at the front gate.",
+      },
       deposit: {
         title: "Deposit Summary",
         security: "Security Deposit",
@@ -580,6 +589,15 @@ export const translations = {
       discountsTitle: "Descuentos por estadía",
       discount7nights: "10% de descuento en estadías de 7 noches o más.",
       discount28nights: "25% de descuento en estadías de 28 noches o más.",
+      rulesTitle: "Reglas de la Casa",
+      rule: {
+        noSmoking: "No se permite fumar en ninguna parte de la propiedad.",
+        noParties: "No se permiten fiestas ni reuniones numerosas.",
+        extraGuest: "Los huéspedes adicionales que se queden a dormir deben informarse al anfitrión con anticipación.",
+        extraGuestFee: "Cargo por cada huésped adicional que se quede a dormir:",
+        beRespectful: "Sé respetuoso con los anfitriones, otros huéspedes, la fauna y sus espacios.",
+        camera: "Hay una cámara de seguridad en la puerta principal.",
+      },
       deposit: {
         title: "Resumen de Depósitos",
         security: "Depósito de Seguridad",

@@ -313,6 +313,25 @@ export default function BookPage() {
             </ul>
           </div>
           <div className="rounded-4xl bg-[#1a0f0a]/90 p-6 shadow-sm shadow-black/10">
+            <p className="text-sm uppercase tracking-[0.24em] text-slate-300">{t('book.rulesTitle')}</p>
+            <ul className="mt-4 space-y-3 text-slate-200 text-sm">
+              <li className="flex gap-2"><span>🚭</span><span>{t('book.rule.noSmoking')}</span></li>
+              <li className="flex gap-2"><span>🎉</span><span>{t('book.rule.noParties')}</span></li>
+              <li className="flex gap-2">
+                <span>👥</span>
+                <span>
+                  {t('book.rule.extraGuest')}{' '}
+                  <span className="font-semibold text-amber-300">
+                    {t('book.rule.extraGuestFee')} $1,000 MXN{' '}
+                    (~${rate > 0 ? (1000 / rate).toFixed(0) : '49'} USD)
+                  </span>
+                </span>
+              </li>
+              <li className="flex gap-2"><span>🌿</span><span>{t('book.rule.beRespectful')}</span></li>
+              <li className="flex gap-2"><span>📷</span><span>{t('book.rule.camera')}</span></li>
+            </ul>
+          </div>
+          <div className="rounded-4xl bg-[#1a0f0a]/90 p-6 shadow-sm shadow-black/10">
             <p className="text-sm uppercase tracking-[0.24em] text-slate-300">{t('book.bookingNotes')}</p>
             <ul className="mt-4 space-y-3 text-slate-300">
               <li>{t('book.note1')}</li>

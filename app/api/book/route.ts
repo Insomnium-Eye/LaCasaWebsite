@@ -85,15 +85,18 @@ export async function POST(request: NextRequest) {
 
     // Try to save to Supabase — non-fatal if it fails (paused project, missing creds, etc.)
     let bookingId = `offline-${Date.now()}`;
+    let dbSaved = false;
+    let dbError: string | undefined;
     try {
       bookingId = await saveToSupabase({
         name, email, phone, unitSlug, unitName,
         checkIn, checkOut, nights, guests,
         totalUsd, depositUsd, lockCode,
       });
+      dbSaved = true;
     } catch (dbErr) {
-      const dbMsg = dbErr instanceof Error ? dbErr.message : String(dbErr);
-      console.warn('[Booking] DB save skipped (Supabase unavailable):', dbMsg);
+      dbError = dbErr instanceof Error ? dbErr.message : String(dbErr);
+      console.warn('[Booking] DB save skipped:', dbError);
     }
 
     // Send guest confirmation email
@@ -150,7 +153,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({ success: true, bookingId, lockCode });
+    return NextResponse.json({ success: true, bookingId, lockCode, dbSaved, dbError });
 
   } catch (error) {
     const msg =

@@ -9,17 +9,37 @@ interface GuestLoginPanelProps {
   error: string | null;
 }
 
+function getFormatError(value: string): string | null {
+  const v = value.trim();
+  if (!v) return null;
+  if (/^\d{4}$/.test(v)) return null; // 4-digit lock code
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return null; // email
+  const digits = v.replace(/\D/g, '');
+  if (digits.length >= 7 && digits.length <= 15 && /^\+?[\d\s\-(). ]+$/.test(v)) return null; // phone
+  return 'Enter a 4-digit lock code, email address, or phone number.';
+}
+
 const GuestLoginPanel = ({ onLogin, loading, error }: GuestLoginPanelProps) => {
   const { t } = useLanguage();
   const [identifier, setIdentifier] = useState('');
   const [localError, setLocalError] = useState<string | null>(null);
+  const [touched, setTouched] = useState(false);
+
+  const formatError = touched ? getFormatError(identifier) : null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLocalError(null);
+    setTouched(true);
 
     if (!identifier.trim()) {
       setLocalError(t('portal.emptyIdentifierError'));
+      return;
+    }
+
+    const fmt = getFormatError(identifier);
+    if (fmt) {
+      setLocalError(fmt);
       return;
     }
 
@@ -65,18 +85,26 @@ const GuestLoginPanel = ({ onLogin, loading, error }: GuestLoginPanelProps) => {
                   id="identifier"
                   type="text"
                   value={identifier}
-                  onChange={(e) => setIdentifier(e.target.value)}
+                  onChange={(e) => { setIdentifier(e.target.value); setLocalError(null); }}
+                  onBlur={() => setTouched(true)}
                   placeholder={t('portal.enterIdentifier')}
                   disabled={loading}
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-amber-600 transition-colors disabled:bg-gray-100"
+                  className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors disabled:bg-gray-100 ${
+                    formatError ? 'border-red-400 focus:border-red-500' : 'border-gray-300 focus:border-amber-600'
+                  }`}
                 />
                 <p className="mt-2 text-xs text-gray-500">
                   {t('portal.identifierHint')}
                 </p>
               </div>
 
+              {/* Format hint shown while typing */}
+              {formatError && !localError && (
+                <p className="text-xs text-red-500 -mt-1">{formatError}</p>
+              )}
+
               {/* Error Message */}
-              {(localError || error) && (
+              {(localError || (!formatError && error)) && (
                 <div className="p-4 bg-red-50 border-l-4 border-red-500 rounded">
                   <p className="text-sm text-red-700">
                     {localError || error}

@@ -46,16 +46,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const type = detectIdentifierType(identifier.trim());
-    const normalized = normalizeIdentifier(identifier.trim(), type);
+    const trimmed = identifier.trim();
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed);
+    const isLockCode = /^\d{4}$/.test(trimmed);
+    const phoneDigits = trimmed.replace(/\D/g, '');
+    const isPhone = !isLockCode && phoneDigits.length >= 7 && phoneDigits.length <= 15
+      && /^\+?[\d\s\-(). ]+$/.test(trimmed);
+
+    if (!isEmail && !isLockCode && !isPhone) {
+      return NextResponse.json(
+        { success: false, error: 'Please enter a valid 4-digit lock code, email address, or phone number.' },
+        { status: 400 }
+      );
+    }
+
+    const type = detectIdentifierType(trimmed);
+    const normalized = normalizeIdentifier(trimmed, type);
 
     let reservation = null;
     try {
       reservation = await findReservationByIdentifier(normalized, type);
 
       // For phone, also try the raw trimmed value in case it was stored without normalization
-      if (!reservation && type === 'phone' && normalized !== identifier.trim()) {
-        reservation = await findReservationByIdentifier(identifier.trim(), type);
+      if (!reservation && type === 'phone' && normalized !== trimmed) {
+        reservation = await findReservationByIdentifier(trimmed, type);
       }
     } catch (dbErr) {
       const msg = dbErr instanceof Error ? dbErr.message : String(dbErr);

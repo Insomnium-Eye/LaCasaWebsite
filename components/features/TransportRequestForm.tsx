@@ -15,12 +15,12 @@ interface Destination {
 
 const DESTINATIONS: Destination[] = [
   { id: 'airport',          emoji: '✈️',  name: 'Airport – Xoxocotlán International (OAX)',                priceUsd: 50,  duration: '15–25 min' },
-  { id: 'el_llano',         emoji: '🌳',  name: 'El Llano (Parque Juárez)',                                priceUsd: 7,   duration: '10–20 min' },
-  { id: 'zocalo',           emoji: '🏛️',  name: 'Zócalo (Historic Main Square)',                           priceUsd: 7,   duration: '12–25 min' },
+  { id: 'el_llano',         emoji: '🌳',  name: 'El Llano (Parque Juárez)',                                priceUsd: 7.32,  duration: '10–20 min' },
+  { id: 'zocalo',           emoji: '🏛️',  name: 'Zócalo (Historic Main Square)',                           priceUsd: 7.32,  duration: '12–25 min' },
   { id: 'monte_alban',      emoji: '🗿',  name: 'Monte Albán (Archaeological Site)',                       priceUsd: 80,  duration: '20–35 min' },
-  { id: 'ado_station',      emoji: '🚌',  name: 'ADO Bus Station',                                         priceUsd: 7,   duration: '15–25 min' },
+  { id: 'ado_station',      emoji: '🚌',  name: 'ADO Bus Station',                                         priceUsd: 7.32,  duration: '15–25 min' },
   { id: 'hierve_el_agua',   emoji: '💧',  name: 'Hierve el Agua (Petrified Waterfalls)',                   priceUsd: 200, duration: '1.5–2.5 hrs · full-day recommended' },
-  { id: 'arbol_tule',       emoji: '🌲',  name: 'Árbol del Tule (Tree of Tule)',                           priceUsd: 10,  duration: '20–35 min' },
+  { id: 'arbol_tule',       emoji: '🌲',  name: 'Árbol del Tule (Tree of Tule)',                           priceUsd: 10.74, duration: '20–35 min' },
   { id: 'mitla',            emoji: '🏺',  name: 'Mitla (Archaeological Site)',                             priceUsd: 110, duration: '50–75 min' },
   { id: 'teotitlan',        emoji: '🧶',  name: 'Teotitlán del Valle (Textile Village)',                   priceUsd: 90,  duration: '45–60 min' },
   { id: 'artisan_villages', emoji: '🎨',  name: 'San Bartolo Coyotepec / San Martín Tilcajete (Artisan Villages)', priceUsd: 65, duration: '25–40 min' },

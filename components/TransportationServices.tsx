@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { convertToMXN } from '@/lib/currency';
+import useUsdToMxn from '@/hooks/useUsdToMxn';
 import TransportQuoteModal from './TransportQuoteModal';
 
 interface Destination {
@@ -28,8 +28,8 @@ const destinations: Destination[] = [
   {
     id: 'elllano',
     name: 'El Llano (Parque Juárez)',
-    priceMin: 7,
-    priceMax: 7,
+    priceMin: 7.32,
+    priceMax: 7.32,
     duration: '10–20 min',
     description: 'Peaceful park offering scenic walks and cultural events.',
     icon: '🌳',
@@ -37,8 +37,8 @@ const destinations: Destination[] = [
   {
     id: 'zocalo',
     name: 'Zócalo (Historic Main Square)',
-    priceMin: 7,
-    priceMax: 7,
+    priceMin: 7.32,
+    priceMax: 7.32,
     duration: '12–25 min',
     description: 'Heart of Oaxaca city – shops, cafés, and cultural landmarks.',
     icon: '🏛️',
@@ -55,8 +55,8 @@ const destinations: Destination[] = [
   {
     id: 'adobusStation',
     name: 'ADO Bus Station',
-    priceMin: 7,
-    priceMax: 7,
+    priceMin: 7.32,
+    priceMax: 7.32,
     duration: '15–25 min',
     description: 'Main intercity bus terminal for departures to other Mexican destinations.',
     icon: '🚌',
@@ -73,8 +73,8 @@ const destinations: Destination[] = [
   {
     id: 'arbolTule',
     name: 'Árbol del Tule (Tree of Tule)',
-    priceMin: 10,
-    priceMax: 10,
+    priceMin: 10.74,
+    priceMax: 10.74,
     duration: '20–35 min',
     description: 'Historic colonial town with the world\'s widest tree – a natural wonder.',
     icon: '🌲',
@@ -108,28 +108,27 @@ const destinations: Destination[] = [
   },
 ];
 
+function floorToTen(mxn: number): number {
+  return Math.floor(mxn / 10) * 10;
+}
+
 export default function TransportationServices() {
   const { t, language } = useLanguage();
+  const { rate } = useUsdToMxn();
   const [quoteModalOpen, setQuoteModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
 
-  // Helper function to get price with currency symbol
   const getPrice = (priceUSD: number) => {
     if (language === 'es') {
-      return `$${convertToMXN(priceUSD)}`;
+      return `$${floorToTen(priceUSD * rate).toLocaleString('es-MX')} MXN`;
     }
     return `$${priceUSD.toFixed(2)}`;
   };
 
-  // Helper function to get price range with currency symbol
   const getPriceRange = (priceMin: number, priceMax: number) => {
-    if (priceMin === priceMax) {
-      return getPrice(priceMin);
-    }
+    if (priceMin === priceMax) return getPrice(priceMin);
     if (language === 'es') {
-      const minMXN = convertToMXN(priceMin);
-      const maxMXN = convertToMXN(priceMax);
-      return `$${minMXN} – $${maxMXN}`;
+      return `$${floorToTen(priceMin * rate).toLocaleString('es-MX')} – $${floorToTen(priceMax * rate).toLocaleString('es-MX')} MXN`;
     }
     return `$${priceMin.toFixed(2)} – $${priceMax.toFixed(2)}`;
   };

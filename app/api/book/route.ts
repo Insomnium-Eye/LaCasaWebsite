@@ -15,52 +15,32 @@ async function saveToSupabase(data: {
   totalUsd: number; depositUsd: number;
   lockCode: string;
 }) {
-  const { createAdminSupabaseClient } = await import('@/lib/supabase-helpers');
-  const supabase = createAdminSupabaseClient();
+  const { getSql } = await import('@/lib/db');
+  const sql = getSql();
 
-  const { data: booking, error: bookingError } = await supabase
-    .from('bookings')
-    .insert([{
-      guest_name: data.name,
-      email: data.email || null,
-      phone: data.phone || null,
-      unit_slug: data.unitSlug,
-      unit_name: data.unitName,
-      check_in: data.checkIn,
-      check_out: data.checkOut,
-      nights: data.nights,
-      guests: data.guests || 1,
-      total_usd: data.totalUsd || 0,
-      deposit_usd: data.depositUsd || 0,
-      lock_code: data.lockCode,
-      status: 'confirmed',
-    }])
-    .select()
-    .single();
-
-  if (bookingError) throw new Error(bookingError.message);
+  const [booking] = await sql<{ id: string }[]>`
+    INSERT INTO bookings
+      (guest_name, email, phone, unit_slug, unit_name, check_in, check_out, nights, guests, total_usd, deposit_usd, lock_code, status)
+    VALUES
+      (${data.name}, ${data.email || null}, ${data.phone || null},
+       ${data.unitSlug}, ${data.unitName}, ${data.checkIn}, ${data.checkOut},
+       ${data.nights}, ${data.guests || 1}, ${data.totalUsd || 0}, ${data.depositUsd || 0},
+       ${data.lockCode}, 'confirmed')
+    RETURNING id`;
 
   const [firstName, ...rest] = data.name.trim().split(' ');
   const nightlyRate = data.nights > 0 ? data.totalUsd / data.nights : 0;
 
-  const { error: reservationError } = await supabase
-    .from('reservations')
-    .insert([{
-      guest_first_name: firstName,
-      guest_last_name: rest.join(' ') || '',
-      email: data.email || '',
-      phone: data.phone || null,
-      digital_key: data.lockCode,
-      unit_id: data.unitSlug,
-      unit_name: data.unitName,
-      check_in: data.checkIn,
-      check_out: data.checkOut,
-      nightly_rate: parseFloat(nightlyRate.toFixed(2)),
-      status: 'confirmed',
-    }]);
-
-  if (reservationError) {
-    console.warn('[Booking] Reservation creation error:', reservationError.message);
+  try {
+    await sql`
+      INSERT INTO reservations
+        (guest_first_name, guest_last_name, email, phone, digital_key, unit_id, unit_name, check_in, check_out, nightly_rate, status)
+      VALUES
+        (${firstName}, ${rest.join(' ') || ''}, ${data.email || ''}, ${data.phone || null},
+         ${data.lockCode}, ${data.unitSlug}, ${data.unitName}, ${data.checkIn}, ${data.checkOut},
+         ${parseFloat(nightlyRate.toFixed(2))}, 'confirmed')`;
+  } catch (err) {
+    console.warn('[Booking] Reservation insert error:', err instanceof Error ? err.message : err);
   }
 
   return booking.id as string;

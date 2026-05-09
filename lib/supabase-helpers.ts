@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import { getSql } from './db';
 import {
   Reservation,
   GuestSession,
@@ -10,113 +10,61 @@ import {
   ReviewImage,
 } from '@/types/guest-portal';
 
-// Server-side admin client (uses service role key)
-export const createAdminSupabaseClient = () => {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!url || !serviceRoleKey) {
-    throw new Error('Missing Supabase credentials');
-  }
-
-  return createClient(url, serviceRoleKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
-};
-
-// Client-side client (uses anon key)
-export const createSupabaseClient = () => {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!url || !anonKey) {
-    throw new Error('Missing Supabase credentials');
-  }
-
-  return createClient(url, anonKey);
-};
-
 // ============ RESERVATION QUERIES ============
 
 export const findReservationByIdentifier = async (
   identifier: string,
   type: 'email' | 'phone' | 'digital_key'
 ): Promise<Reservation | null> => {
-  const supabase = createAdminSupabaseClient();
+  const sql = getSql();
+  let rows: Reservation[];
 
-  const { data, error } = await supabase
-    .from('reservations')
-    .select('*')
-    .eq(type, identifier)
-    .eq('status', 'confirmed')
-    .single();
-
-  if (error) {
-    if (error.code === 'PGRST116') {
-      // No rows found
-      return null;
-    }
-    throw error;
+  if (type === 'email') {
+    rows = await sql<Reservation[]>`
+      SELECT * FROM reservations WHERE email = ${identifier} AND status = 'confirmed' LIMIT 1`;
+  } else if (type === 'phone') {
+    rows = await sql<Reservation[]>`
+      SELECT * FROM reservations WHERE phone = ${identifier} AND status = 'confirmed' LIMIT 1`;
+  } else {
+    rows = await sql<Reservation[]>`
+      SELECT * FROM reservations WHERE digital_key = ${identifier} AND status = 'confirmed' LIMIT 1`;
   }
 
-  return data as Reservation;
+  return rows[0] ?? null;
 };
 
 export const getReservationById = async (
   reservationId: string
 ): Promise<Reservation | null> => {
-  const supabase = createAdminSupabaseClient();
-
-  const { data, error } = await supabase
-    .from('reservations')
-    .select('*')
-    .eq('id', reservationId)
-    .single();
-
-  if (error) {
-    if (error.code === 'PGRST116') {
-      return null;
-    }
-    throw error;
-  }
-
-  return data as Reservation;
+  const sql = getSql();
+  const rows = await sql<Reservation[]>`
+    SELECT * FROM reservations WHERE id = ${reservationId} LIMIT 1`;
+  return rows[0] ?? null;
 };
 
 export const calculateNightsRemaining = (reservation: Reservation): number => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-
   const checkOut = new Date(reservation.check_out);
   checkOut.setHours(0, 0, 0, 0);
-
-  const daysRemaining = Math.ceil(
-    (checkOut.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
-  );
-
-  return Math.max(0, daysRemaining);
+  return Math.max(0, Math.ceil((checkOut.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)));
 };
 
 export const createGuestSession = (
   reservation: Reservation,
   token: string
-): GuestSession => {
-  return {
-    reservationId: reservation.id,
-    guestName: reservation.guest_first_name,
-    email: reservation.email,
-    phone: reservation.phone,
-    unitName: reservation.unit_name,
-    checkIn: reservation.check_in,
-    checkOut: reservation.check_out,
-    nightsRemaining: calculateNightsRemaining(reservation),
-    nightlyRate: reservation.nightly_rate,
-    token,
-  };
-};
+): GuestSession => ({
+  reservationId: reservation.id,
+  guestName: reservation.guest_first_name,
+  email: reservation.email,
+  phone: reservation.phone,
+  unitName: reservation.unit_name,
+  checkIn: reservation.check_in,
+  checkOut: reservation.check_out,
+  nightsRemaining: calculateNightsRemaining(reservation),
+  nightlyRate: reservation.nightly_rate,
+  token,
+});
 
 // ============ CLEANING REQUESTS ============
 
@@ -125,42 +73,22 @@ export const createCleaningRequest = async (
   date: string,
   notes?: string
 ): Promise<CleaningRequest> => {
-  const supabase = createAdminSupabaseClient();
+  const sql = getSql();
   const fee = parseFloat(process.env.NEXT_PUBLIC_CLEANING_FEE || '15');
-
-  const { data, error } = await supabase
-    .from('cleaning_requests')
-    .insert([
-      {
-        reservation_id: reservationId,
-        scheduled_date: date,
-        notes: notes || null,
-        fee,
-        status: 'pending',
-      },
-    ])
-    .select()
-    .single();
-
-  if (error) throw error;
-
-  return data as CleaningRequest;
+  const [row] = await sql<CleaningRequest[]>`
+    INSERT INTO cleaning_requests (reservation_id, scheduled_date, notes, fee, status)
+    VALUES (${reservationId}, ${date}, ${notes ?? null}, ${fee}, 'pending')
+    RETURNING *`;
+  return row;
 };
 
 export const getCleaningRequests = async (
   reservationId: string
 ): Promise<CleaningRequest[]> => {
-  const supabase = createAdminSupabaseClient();
-
-  const { data, error } = await supabase
-    .from('cleaning_requests')
-    .select('*')
-    .eq('reservation_id', reservationId)
-    .order('scheduled_date', { ascending: false });
-
-  if (error) throw error;
-
-  return (data || []) as CleaningRequest[];
+  const sql = getSql();
+  return sql<CleaningRequest[]>`
+    SELECT * FROM cleaning_requests WHERE reservation_id = ${reservationId}
+    ORDER BY scheduled_date DESC`;
 };
 
 // ============ TRANSPORT REQUESTS ============
@@ -175,59 +103,29 @@ export const createTransportRequest = async (
   price: number,
   notes?: string
 ): Promise<TransportRequest> => {
-  const supabase = createAdminSupabaseClient();
-
-  const { data, error } = await supabase
-    .from('transport_requests')
-    .insert([
-      {
-        reservation_id: reservationId,
-        destination,
-        custom_destination: customDestination || null,
-        scheduled_at: datetime,
-        passengers,
-        round_trip: roundTrip,
-        price,
-        notes: notes || null,
-        status: 'pending',
-      },
-    ])
-    .select()
-    .single();
-
-  if (error) throw error;
-
-  return data as TransportRequest;
+  const sql = getSql();
+  const [row] = await sql<TransportRequest[]>`
+    INSERT INTO transport_requests
+      (reservation_id, destination, custom_destination, scheduled_at, passengers, round_trip, price, notes, status)
+    VALUES
+      (${reservationId}, ${destination}, ${customDestination ?? null}, ${datetime},
+       ${passengers}, ${roundTrip}, ${price}, ${notes ?? null}, 'pending')
+    RETURNING *`;
+  return row;
 };
 
 export const getTransportDestinations = async () => {
-  const supabase = createAdminSupabaseClient();
-
-  const { data, error } = await supabase
-    .from('transport_destinations')
-    .select('*')
-    .eq('is_active', true)
-    .order('name');
-
-  if (error) throw error;
-
-  return (data || []) as any[];
+  const sql = getSql();
+  return sql`SELECT * FROM transport_destinations WHERE is_active = true ORDER BY name`;
 };
 
 export const getTransportRequests = async (
   reservationId: string
 ): Promise<TransportRequest[]> => {
-  const supabase = createAdminSupabaseClient();
-
-  const { data, error } = await supabase
-    .from('transport_requests')
-    .select('*')
-    .eq('reservation_id', reservationId)
-    .order('scheduled_at', { ascending: false });
-
-  if (error) throw error;
-
-  return (data || []) as TransportRequest[];
+  const sql = getSql();
+  return sql<TransportRequest[]>`
+    SELECT * FROM transport_requests WHERE reservation_id = ${reservationId}
+    ORDER BY scheduled_at DESC`;
 };
 
 // ============ STAY EXTENSIONS ============
@@ -238,41 +136,21 @@ export const createStayExtension = async (
   extraNights: number,
   estimatedCost: number
 ): Promise<StayExtension> => {
-  const supabase = createAdminSupabaseClient();
-
-  const { data, error } = await supabase
-    .from('stay_extensions')
-    .insert([
-      {
-        reservation_id: reservationId,
-        requested_checkout: requestedCheckout,
-        extra_nights: extraNights,
-        estimated_cost: estimatedCost,
-        status: 'pending',
-      },
-    ])
-    .select()
-    .single();
-
-  if (error) throw error;
-
-  return data as StayExtension;
+  const sql = getSql();
+  const [row] = await sql<StayExtension[]>`
+    INSERT INTO stay_extensions (reservation_id, requested_checkout, extra_nights, estimated_cost, status)
+    VALUES (${reservationId}, ${requestedCheckout}, ${extraNights}, ${estimatedCost}, 'pending')
+    RETURNING *`;
+  return row;
 };
 
 export const getStayExtensions = async (
   reservationId: string
 ): Promise<StayExtension[]> => {
-  const supabase = createAdminSupabaseClient();
-
-  const { data, error } = await supabase
-    .from('stay_extensions')
-    .select('*')
-    .eq('reservation_id', reservationId)
-    .order('created_at', { ascending: false });
-
-  if (error) throw error;
-
-  return (data || []) as StayExtension[];
+  const sql = getSql();
+  return sql<StayExtension[]>`
+    SELECT * FROM stay_extensions WHERE reservation_id = ${reservationId}
+    ORDER BY created_at DESC`;
 };
 
 // ============ CANCELLATIONS ============
@@ -282,40 +160,21 @@ export const createCancellationRequest = async (
   reason: string,
   explanation?: string
 ): Promise<CancellationRequest> => {
-  const supabase = createAdminSupabaseClient();
-
-  const { data, error } = await supabase
-    .from('cancellation_requests')
-    .insert([
-      {
-        reservation_id: reservationId,
-        reason,
-        explanation: explanation || null,
-        status: 'pending',
-      },
-    ])
-    .select()
-    .single();
-
-  if (error) throw error;
-
-  return data as CancellationRequest;
+  const sql = getSql();
+  const [row] = await sql<CancellationRequest[]>`
+    INSERT INTO cancellation_requests (reservation_id, reason, explanation, status)
+    VALUES (${reservationId}, ${reason}, ${explanation ?? null}, 'pending')
+    RETURNING *`;
+  return row;
 };
 
 export const getCancellationRequests = async (
   reservationId: string
 ): Promise<CancellationRequest[]> => {
-  const supabase = createAdminSupabaseClient();
-
-  const { data, error } = await supabase
-    .from('cancellation_requests')
-    .select('*')
-    .eq('reservation_id', reservationId)
-    .order('created_at', { ascending: false });
-
-  if (error) throw error;
-
-  return (data || []) as CancellationRequest[];
+  const sql = getSql();
+  return sql<CancellationRequest[]>`
+    SELECT * FROM cancellation_requests WHERE reservation_id = ${reservationId}
+    ORDER BY created_at DESC`;
 };
 
 // ============ REVIEWS ============
@@ -327,141 +186,68 @@ export const createReview = async (
   body: string,
   anonymous: boolean
 ): Promise<Review> => {
-  const supabase = createAdminSupabaseClient();
-
-  const { data, error } = await supabase
-    .from('reviews')
-    .insert([
-      {
-        reservation_id: reservationId,
-        stars,
-        headline,
-        body,
-        anonymous,
-        status: 'pending',
-      },
-    ])
-    .select()
-    .single();
-
-  if (error) throw error;
-
-  return { ...data, images: [] } as Review;
+  const sql = getSql();
+  const [row] = await sql<Review[]>`
+    INSERT INTO reviews (reservation_id, stars, headline, body, anonymous, status)
+    VALUES (${reservationId}, ${stars}, ${headline}, ${body}, ${anonymous}, 'pending')
+    RETURNING *`;
+  return { ...row, images: [] };
 };
 
 export const addReviewImage = async (
   reviewId: string,
   imageUrl: string
 ): Promise<ReviewImage> => {
-  const supabase = createAdminSupabaseClient();
+  const sql = getSql();
+  const [row] = await sql<ReviewImage[]>`
+    INSERT INTO review_images (review_id, url) VALUES (${reviewId}, ${imageUrl}) RETURNING *`;
+  return row;
+};
 
-  const { data, error } = await supabase
-    .from('review_images')
-    .insert([{ review_id: reviewId, url: imageUrl }])
-    .select()
-    .single();
-
-  if (error) throw error;
-
-  return data as ReviewImage;
+const attachImages = async (reviews: Review[]): Promise<Review[]> => {
+  const sql = getSql();
+  return Promise.all(
+    reviews.map(async (review) => {
+      const images = await sql<ReviewImage[]>`
+        SELECT * FROM review_images WHERE review_id = ${review.id}`;
+      return { ...review, images };
+    })
+  );
 };
 
 export const getPendingReviews = async (limit = 50): Promise<Review[]> => {
-  const supabase = createAdminSupabaseClient();
-
-  const { data: reviews, error: reviewsError } = await supabase
-    .from('reviews')
-    .select('*')
-    .eq('status', 'pending')
-    .order('created_at', { ascending: false })
-    .limit(limit);
-
-  if (reviewsError) throw reviewsError;
-
-  // Fetch images for each review
-  const reviewsWithImages = await Promise.all(
-    (reviews || []).map(async (review) => {
-      const { data: images } = await supabase
-        .from('review_images')
-        .select('*')
-        .eq('review_id', review.id);
-
-      return {
-        ...review,
-        images: (images || []) as ReviewImage[],
-      };
-    })
-  );
-
-  return reviewsWithImages as Review[];
+  const sql = getSql();
+  const rows = await sql<Review[]>`
+    SELECT * FROM reviews WHERE status = 'pending' ORDER BY created_at DESC LIMIT ${limit}`;
+  return attachImages(rows);
 };
 
 export const getApprovedReviews = async (limit = 20): Promise<Review[]> => {
-  const supabase = createAdminSupabaseClient();
-
-  const { data: reviews, error: reviewsError } = await supabase
-    .from('reviews')
-    .select('*')
-    .eq('status', 'approved')
-    .order('created_at', { ascending: false })
-    .limit(limit);
-
-  if (reviewsError) throw reviewsError;
-
-  // Fetch images for each review
-  const reviewsWithImages = await Promise.all(
-    (reviews || []).map(async (review) => {
-      const { data: images } = await supabase
-        .from('review_images')
-        .select('*')
-        .eq('review_id', review.id);
-
-      return {
-        ...review,
-        images: (images || []) as ReviewImage[],
-      };
-    })
-  );
-
-  return reviewsWithImages as Review[];
+  const sql = getSql();
+  const rows = await sql<Review[]>`
+    SELECT * FROM reviews WHERE status = 'approved' ORDER BY created_at DESC LIMIT ${limit}`;
+  return attachImages(rows);
 };
 
 export const approveReview = async (reviewId: string): Promise<Review> => {
-  const supabase = createAdminSupabaseClient();
-
-  const { data, error } = await supabase
-    .from('reviews')
-    .update({ status: 'approved', reviewed_at: new Date().toISOString() })
-    .eq('id', reviewId)
-    .select()
-    .single();
-
-  if (error) throw error;
-
-  const { data: images } = await supabase
-    .from('review_images')
-    .select('*')
-    .eq('review_id', reviewId);
-
-  return { ...data, images: images || [] } as Review;
+  const sql = getSql();
+  const [row] = await sql<Review[]>`
+    UPDATE reviews SET status = 'approved', reviewed_at = now()
+    WHERE id = ${reviewId} RETURNING *`;
+  const images = await sql<ReviewImage[]>`SELECT * FROM review_images WHERE review_id = ${reviewId}`;
+  return { ...row, images };
 };
 
 export const rejectReview = async (reviewId: string): Promise<Review> => {
-  const supabase = createAdminSupabaseClient();
+  const sql = getSql();
+  const [row] = await sql<Review[]>`
+    UPDATE reviews SET status = 'rejected', reviewed_at = now()
+    WHERE id = ${reviewId} RETURNING *`;
+  const images = await sql<ReviewImage[]>`SELECT * FROM review_images WHERE review_id = ${reviewId}`;
+  return { ...row, images };
+};
 
-  const { data, error } = await supabase
-    .from('reviews')
-    .update({ status: 'rejected', reviewed_at: new Date().toISOString() })
-    .eq('id', reviewId)
-    .select()
-    .single();
-
-  if (error) throw error;
-
-  const { data: images } = await supabase
-    .from('review_images')
-    .select('*')
-    .eq('review_id', reviewId);
-
-  return { ...data, images: images || [] } as Review;
+// Keep for backward compatibility — no longer used for auth
+export const createAdminSupabaseClient = () => {
+  throw new Error('createAdminSupabaseClient is deprecated — use getSql() from lib/db instead');
 };

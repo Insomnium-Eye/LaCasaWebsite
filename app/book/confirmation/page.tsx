@@ -4,9 +4,11 @@ import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import Link from 'next/link';
 import BackgroundSlideshow from '../../../components/BackgroundSlideshow';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 function ConfirmationContent() {
   const params = useSearchParams();
+  const { t } = useLanguage();
 
   const code    = params.get('code') ?? '????';
   const name    = params.get('name') ?? 'Guest';
@@ -29,16 +31,16 @@ function ConfirmationContent() {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-garden/20 text-4xl mb-2">
             ✅
           </div>
-          <h1 className="text-4xl font-semibold tracking-tight text-white">Booking Confirmed!</h1>
+          <h1 className="text-4xl font-semibold tracking-tight text-white">{t('book.confirmation.title')}</h1>
           <p className="text-lg text-slate-300">
-            Welcome, {firstName}. Your stay at La Casa Oaxaca is all set.
+            {t('book.confirmation.welcomePrefix')} {firstName}. {t('book.confirmation.welcomeSuffix')}
           </p>
         </div>
 
         {/* Lock Code */}
         <div className="rounded-3xl border-2 border-terracotta/60 bg-[#3d1a12]/80 p-8 text-center mb-6 shadow-lg shadow-terracotta/10">
           <p className="text-sm font-semibold uppercase tracking-[0.24em] text-terracotta mb-4">
-            🔑 Your Lock Code
+            🔑 {t('book.confirmation.lockCodeTitle')}
           </p>
           <div className="flex items-center justify-center gap-3 my-4">
             {code.split('').map((digit, i) => (
@@ -51,30 +53,30 @@ function ConfirmationContent() {
             ))}
           </div>
           <p className="text-sm text-slate-400 mt-4">
-            Enter this code on the keypad to unlock your unit door.
+            {t('book.confirmation.lockCodeEnter')}
           </p>
           <p className="text-xs text-slate-500 mt-1">
-            You can also use it — along with your email or phone — to sign into the Guest Portal.
+            {t('book.confirmation.lockCodePortalHint')}
           </p>
         </div>
 
         {/* Booking Summary */}
         <div className="rounded-3xl border border-slate-700 bg-[#241a13]/90 p-6 mb-6 space-y-3">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-300 mb-4">
-            Booking Summary
+            {t('book.confirmation.summaryTitle')}
           </p>
           <div className="grid grid-cols-2 gap-y-3 text-sm">
-            <span className="text-slate-400">Property</span>
+            <span className="text-slate-400">{t('book.confirmation.property')}</span>
             <span className="text-slate-100 font-medium">{unit}</span>
-            <span className="text-slate-400">Check-in</span>
+            <span className="text-slate-400">{t('book.confirmation.checkIn')}</span>
             <span className="text-slate-100 font-medium">{checkin}</span>
-            <span className="text-slate-400">Check-out</span>
+            <span className="text-slate-400">{t('book.confirmation.checkOut')}</span>
             <span className="text-slate-100 font-medium">{checkout}</span>
-            <span className="text-slate-400">Nights</span>
+            <span className="text-slate-400">{t('book.confirmation.nights')}</span>
             <span className="text-slate-100 font-medium">{nights}</span>
-            <span className="text-slate-400">Guests</span>
+            <span className="text-slate-400">{t('book.confirmation.guests')}</span>
             <span className="text-slate-100 font-medium">{guests}</span>
-            <span className="text-slate-400 font-semibold pt-2 border-t border-slate-700">Total</span>
+            <span className="text-slate-400 font-semibold pt-2 border-t border-slate-700">{t('book.confirmation.total')}</span>
             <span className="text-slate-100 font-semibold pt-2 border-t border-slate-700">${parseFloat(total).toFixed(2)} USD</span>
           </div>
         </div>
@@ -82,32 +84,33 @@ function ConfirmationContent() {
         {/* Portal CTA */}
         <div className="rounded-3xl border border-slate-700 bg-[#241a13]/90 p-6 mb-8 space-y-3">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-300">
-            🏠 Guest Portal
+            🏠 {t('book.confirmation.portalTitle')}
           </p>
           <p className="text-slate-300 text-sm">
-            Use the guest portal to request cleaning, book transport, extend your stay, and more.
+            {t('book.confirmation.portalDesc')}
           </p>
           <p className="text-xs text-slate-500">
-            Login with your <span className="text-slate-300">email</span>, <span className="text-slate-300">phone number</span>, or <span className="text-slate-300">lock code ({code})</span>.
+            {t('book.confirmation.portalLoginHintPrefix')}{' '}
+            (<span className="text-slate-300">{code}</span>).
           </p>
           <Link
             href="/portal"
             className="mt-2 inline-flex items-center justify-center rounded-full bg-terracotta px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#b55e47]"
           >
-            Open Guest Portal →
+            {t('book.confirmation.openPortal')}
           </Link>
         </div>
 
         {/* Navigation */}
         <div className="text-center">
           <Link href="/" className="text-sm text-slate-400 hover:text-slate-200 transition">
-            ← Back to home
+            {t('book.confirmation.backHome')}
           </Link>
         </div>
 
         {/* Test mode note */}
         <p className="text-center text-xs text-slate-600 mt-8">
-          🧪 Test mode — this is a simulated booking. No real payment was charged.
+          🧪 {t('book.confirmation.testMode')}
         </p>
       </div>
     </div>

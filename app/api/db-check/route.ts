@@ -22,10 +22,13 @@ export async function GET() {
       body: text.slice(0, 300),
     });
   } catch (err) {
+    const cause = (err as any)?.cause;
     return NextResponse.json({
       url,
       keyPrefix: key.slice(0, 12) + '...',
       error: err instanceof Error ? err.message : String(err),
+      cause: cause ? String(cause) : undefined,
+      causeCode: cause?.code ?? undefined,
     }, { status: 500 });
   }
 }

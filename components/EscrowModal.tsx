@@ -43,6 +43,8 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
   const [expiry, setExpiry] = useState('');
   const [cvv, setCvv] = useState('');
   const [cardholderName, setCardholderName] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   function handleCardNumber(raw: string) {
     const digits = raw.replace(/\D/g, '').slice(0, 16);
@@ -63,8 +65,6 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
   function handleCvv(raw: string) {
     setCvv(raw.replace(/\D/g, '').slice(0, 4));
   }
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState('');
 
   const deposit = nights < 7 ? total : nights < 28 ? total * 0.5 : Math.max(total / nights, 75) * 7;
 
@@ -96,7 +96,7 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
 
       if (!res.ok) {
         const errMsg = typeof data.error === 'string' ? data.error : JSON.stringify(data.error);
-        setError(errMsg || 'Booking failed. Please try again.');
+        setError(errMsg || t('book.payment.errorBooking'));
         setSubmitting(false);
         return;
       }
@@ -115,7 +115,7 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
 
       router.push(`/book/confirmation?${params.toString()}`);
     } catch (err) {
-      setError('Network error. Please try again.');
+      setError(t('book.payment.errorNetwork'));
       setSubmitting(false);
     }
   };
@@ -126,20 +126,20 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
 
         {/* Test mode banner */}
         <div className="mb-5 rounded-lg bg-amber-50 border border-amber-200 px-4 py-2.5 text-sm text-amber-800 font-medium">
-          🧪 Test mode — no real payment will be processed
+          🧪 {t('book.payment.testModeBanner')}
         </div>
 
-        <h2 className="text-2xl font-bold text-gray-900 mb-1">Confirm Booking</h2>
-        <p className="text-gray-500 text-sm mb-6">
-          Payment is held in escrow until your stay is confirmed.
-        </p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-1">{t('book.payment.title')}</h2>
+        <p className="text-gray-500 text-sm mb-6">{t('book.payment.subtitle')}</p>
 
         {/* Summary */}
         <div className="bg-gray-50 rounded-xl p-4 mb-6 space-y-1.5">
           <p className="font-semibold text-gray-900">{bookingData.unitName}</p>
-          <p className="text-sm text-gray-600">{bookingData.checkIn} → {bookingData.checkOut} · {nights} night{nights !== 1 ? 's' : ''}</p>
+          <p className="text-sm text-gray-600">
+            {bookingData.checkIn} → {bookingData.checkOut} · {nights} {nights !== 1 ? t('book.payment.nights') : t('book.payment.night')}
+          </p>
           <div className="flex justify-between pt-1 border-t border-gray-200 mt-2">
-            <span className="text-sm text-gray-600">Deposit due now</span>
+            <span className="text-sm text-gray-600">{t('book.payment.depositDueNow')}</span>
             <span className="font-semibold text-gray-900">{formatPrice(deposit, language)}</span>
           </div>
           <p className="text-xs text-gray-400">{formatCurrency(deposit)}</p>
@@ -148,21 +148,21 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Payment method */}
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">Payment Method</label>
+            <label className="block text-sm font-semibold text-gray-900 mb-2">{t('book.payment.paymentMethod')}</label>
             <select
               value={paymentMethod}
               onChange={(e) => setPaymentMethod(e.target.value as 'card' | 'spei')}
               className="w-full border border-gray-300 rounded-lg p-3 text-sm text-gray-900 bg-white"
             >
-              <option value="card">Credit / Debit Card</option>
-              <option value="spei">SPEI Transfer (Mexico)</option>
+              <option value="card">{t('book.payment.creditCard')}</option>
+              <option value="spei">{t('book.payment.spei')}</option>
             </select>
           </div>
 
           {paymentMethod === 'card' && (
             <>
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-1">Card Number</label>
+                <label className="block text-sm font-semibold text-gray-900 mb-1">{t('book.payment.cardNumber')}</label>
                 <input
                   type="text"
                   inputMode="numeric"
@@ -175,7 +175,7 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-1">Expiry</label>
+                  <label className="block text-sm font-semibold text-gray-900 mb-1">{t('book.payment.expiry')}</label>
                   <input
                     type="text"
                     inputMode="numeric"
@@ -187,7 +187,7 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-1">CVV</label>
+                  <label className="block text-sm font-semibold text-gray-900 mb-1">{t('book.payment.cvv')}</label>
                   <input
                     type="text"
                     inputMode="numeric"
@@ -200,14 +200,14 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-1">Cardholder Name</label>
+                <label className="block text-sm font-semibold text-gray-900 mb-1">{t('book.payment.cardholderName')}</label>
                 <input
                   type="text"
                   value={cardholderName}
                   onChange={(e) => setCardholderName(e.target.value.slice(0, 50))}
                   maxLength={50}
                   className="w-full border border-gray-300 rounded-lg p-3 text-sm text-gray-900 bg-white"
-                  placeholder="Full name on card"
+                  placeholder={t('book.payment.cardholderPlaceholder')}
                 />
               </div>
             </>
@@ -215,7 +215,7 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
 
           {paymentMethod === 'spei' && (
             <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg text-sm text-blue-800">
-              SPEI transfer details will be sent to your email after confirmation.
+              {t('book.payment.speiNotice')}
             </div>
           )}
 
@@ -230,7 +230,7 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
               disabled={submitting}
               className="flex-1 border border-gray-300 text-gray-700 font-semibold py-3 px-4 rounded-lg hover:bg-gray-50 transition disabled:opacity-50"
             >
-              Cancel
+              {t('book.payment.cancel')}
             </button>
             <button
               type="submit"
@@ -240,10 +240,10 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
               {submitting ? (
                 <span className="flex items-center justify-center gap-2">
                   <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Processing…
+                  {t('book.payment.processing')}
                 </span>
               ) : (
-                `Pay ${formatPrice(deposit, language)}`
+                `${t('book.payment.payButton')} ${formatPrice(deposit, language)}`
               )}
             </button>
           </div>

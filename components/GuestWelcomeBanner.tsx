@@ -15,9 +15,18 @@ const GuestWelcomeBanner = ({ session, onLogout, onTransportRequest }: GuestWelc
   if (!session) return null;
 
   const locale = language === 'es' ? 'es-MX' : 'en-US';
-  const unitDisplayName = session.unitSlug
-    ? t(`units.items.${session.unitSlug}.name`)
-    : unitDisplayName;
+
+  // Resolve slug from session field (new logins) or by matching stored English name (cached sessions)
+  const SLUG_BY_EN_NAME: Record<string, string> = {
+    'Sun of My Heart': 'bungalow-1',
+    'Magic Moon': 'bungalow-2',
+    'Blessed Land': 'main-bedroom',
+    'Entire House': 'entire-house',
+  };
+  const resolvedSlug = session.unitSlug ?? SLUG_BY_EN_NAME[session.unitName];
+  const unitDisplayName = resolvedSlug
+    ? t(`units.items.${resolvedSlug}.name`)
+    : session.unitName;
 
   // Normalize to YYYY-MM-DD regardless of whether DB returned a full ISO string or a plain date
   const normDate = (iso: string) => iso.slice(0, 10);

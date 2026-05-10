@@ -20,6 +20,30 @@ const LeaveReviewForm = ({ session }: LeaveReviewFormProps) => {
 
   if (!session) return null;
 
+  const today = new Date().toISOString().slice(0, 10);
+  const isLocked = today < session.checkOut;
+
+  if (isLocked) {
+    const locale = session.unitName ? undefined : 'en-US';
+    const checkOutFormatted = new Date(session.checkOut + 'T12:00:00').toLocaleDateString(
+      locale,
+      { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }
+    );
+    return (
+      <div className="bg-white rounded-lg shadow-lg p-8 max-w-2xl mx-auto text-center">
+        <div className="text-5xl mb-4">🔒</div>
+        <h3 className="text-xl font-bold text-gray-900 mb-2">{t('portal.leaveReview.title')}</h3>
+        <p className="text-gray-500 text-sm">
+          {t('portal.leaveReview.lockedUntil') || 'This section will be available after your checkout on'}{' '}
+          <span className="font-semibold text-gray-700">{checkOutFormatted}</span>.
+        </p>
+        <p className="text-gray-400 text-xs mt-3">
+          We look forward to hearing about your stay!
+        </p>
+      </div>
+    );
+  }
+
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
 

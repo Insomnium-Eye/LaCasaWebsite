@@ -35,11 +35,16 @@ const GuestPortal = () => {
       <PortalSidebar
         activeSection={activeSection}
         onSectionChange={handleSectionChange}
+        session={session}
       />
 
       {/* Content Area with Welcome Banner */}
       <div className="flex-1 overflow-y-auto flex flex-col gap-6">
-        <GuestWelcomeBanner session={session} onLogout={logout} />
+        <GuestWelcomeBanner
+          session={session}
+          onLogout={logout}
+          onTransportRequest={() => handleSectionChange('transport')}
+        />
         
         <div
           className={`transition-all duration-300 transform ${

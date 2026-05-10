@@ -1,22 +1,34 @@
 'use client';
 
-import { PORTAL_SECTIONS, PortalSection } from '@/types/guest-portal';
+import { PORTAL_SECTIONS, PortalSection, GuestSession } from '@/types/guest-portal';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface PortalSidebarProps {
   activeSection: PortalSection;
   onSectionChange: (section: PortalSection) => void;
+  session?: GuestSession | null;
 }
 
-const PortalSidebar = ({ activeSection, onSectionChange }: PortalSidebarProps) => {
-  const { t } = useLanguage();
-  
-  const sections: Array<{ key: PortalSection; label: string; icon: string; description: string }> = [
+const PortalSidebar = ({ activeSection, onSectionChange, session }: PortalSidebarProps) => {
+  const { t, language } = useLanguage();
+
+  const today = new Date().toISOString().slice(0, 10);
+  const isReviewLocked = session ? today < session.checkOut : false;
+
+  const sections: Array<{ key: PortalSection; label: string; icon: string; description: string; locked?: boolean }> = [
     { key: 'cleaning', label: t('portal.sections.cleaning'), icon: '🧹', description: t('portal.sections.cleaningDesc') },
     { key: 'transport', label: t('portal.sections.transport'), icon: '🚗', description: t('portal.sections.transportDesc') },
     { key: 'extend', label: t('portal.sections.extend'), icon: '📅', description: t('portal.sections.extendDesc') },
     { key: 'cancel', label: t('portal.sections.cancel'), icon: '❌', description: t('portal.sections.cancelDesc') },
-    { key: 'review', label: t('portal.sections.review'), icon: '⭐', description: t('portal.sections.reviewDesc') },
+    {
+      key: 'review',
+      label: t('portal.sections.review'),
+      icon: '⭐',
+      description: isReviewLocked
+        ? (language === 'es' ? 'Disponible tras el check-out' : 'Available after checkout')
+        : t('portal.sections.reviewDesc'),
+      locked: isReviewLocked,
+    },
   ];
 
   return (
@@ -31,15 +43,18 @@ const PortalSidebar = ({ activeSection, onSectionChange }: PortalSidebarProps) =
           {sections.map((section) => (
             <button
               key={section.key}
-              onClick={() => onSectionChange(section.key)}
+              onClick={() => !section.locked && onSectionChange(section.key)}
+              disabled={section.locked}
               className={`w-full text-left px-6 py-4 border-l-4 transition-all duration-200 ${
-                activeSection === section.key
+                section.locked
+                  ? 'border-transparent text-gray-400 cursor-not-allowed opacity-60'
+                  : activeSection === section.key
                   ? 'bg-amber-50 border-amber-700 text-amber-900'
                   : 'border-transparent text-gray-700 hover:bg-gray-50'
               }`}
             >
               <div className="flex items-center gap-3">
-                <span className="text-2xl">{section.icon}</span>
+                <span className="text-2xl">{section.locked ? '🔒' : section.icon}</span>
                 <div className="flex-1">
                   <p className="font-semibold">{section.label}</p>
                   <p className="text-xs text-gray-500">{section.description}</p>
@@ -56,14 +71,17 @@ const PortalSidebar = ({ activeSection, onSectionChange }: PortalSidebarProps) =
           {sections.map((section) => (
             <button
               key={section.key}
-              onClick={() => onSectionChange(section.key)}
+              onClick={() => !section.locked && onSectionChange(section.key)}
+              disabled={section.locked}
               className={`flex-shrink-0 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                activeSection === section.key
+                section.locked
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-60'
+                  : activeSection === section.key
                   ? 'bg-amber-700 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              <span>{section.icon}</span> {section.label}
+              <span>{section.locked ? '🔒' : section.icon}</span> {section.label}
             </button>
           ))}
         </div>

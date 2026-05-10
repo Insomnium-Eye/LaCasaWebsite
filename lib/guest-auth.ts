@@ -40,6 +40,11 @@ export const detectIdentifierType = (
     return 'email';
   }
 
+  // Check if 4-digit lock code (must come before phone — 4 digits also match phone regex)
+  if (/^\d{4}$/.test(stripped)) {
+    return 'digital_key';
+  }
+
   // Check if phone (E.164 format: +1234567890 or just digits)
   if (/^\+?[1-9]\d{1,14}$/.test(stripped.replace(/\D/g, ''))) {
     return 'phone';

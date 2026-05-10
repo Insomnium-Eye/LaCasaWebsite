@@ -10,6 +10,7 @@ export interface GuestSession {
   email: string;
   phone?: string;
   unitName: string;
+  unitSlug?: string;
   checkIn: string; // ISO date
   checkOut: string; // ISO date
   nightsRemaining: number;

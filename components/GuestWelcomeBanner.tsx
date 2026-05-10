@@ -15,6 +15,9 @@ const GuestWelcomeBanner = ({ session, onLogout, onTransportRequest }: GuestWelc
   if (!session) return null;
 
   const locale = language === 'es' ? 'es-MX' : 'en-US';
+  const unitDisplayName = session.unitSlug
+    ? t(`units.items.${session.unitSlug}.name`)
+    : unitDisplayName;
 
   // Normalize to YYYY-MM-DD regardless of whether DB returned a full ISO string or a plain date
   const normDate = (iso: string) => iso.slice(0, 10);
@@ -52,7 +55,7 @@ const GuestWelcomeBanner = ({ session, onLogout, onTransportRequest }: GuestWelc
                 🌙 {language === 'es'
                   ? `Tienes reservadas ${totalNights} noches en`
                   : `You are booked for ${totalNights} nights at`}{' '}
-                <span className="font-semibold">{session.unitName}</span>
+                <span className="font-semibold">{unitDisplayName}</span>
               </p>
               <p>
                 🏁 {language === 'es' ? 'Check-out:' : 'Check-out:'}{' '}
@@ -72,7 +75,7 @@ const GuestWelcomeBanner = ({ session, onLogout, onTransportRequest }: GuestWelc
                 🏡 {t('portal.checkingOut')} <span className="font-semibold">{fmt(session.checkOut)}</span>
               </p>
               <p>
-                🏠 {t('portal.unit')} <span className="font-semibold">{session.unitName}</span>
+                🏠 {t('portal.unit')} <span className="font-semibold">{unitDisplayName}</span>
               </p>
             </div>
           )}

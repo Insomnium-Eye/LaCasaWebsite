@@ -59,6 +59,7 @@ export const createGuestSession = (
   email: reservation.email,
   phone: reservation.phone,
   unitName: reservation.unit_name,
+  unitSlug: reservation.unit_id,
   checkIn: reservation.check_in,
   checkOut: reservation.check_out,
   nightsRemaining: calculateNightsRemaining(reservation),

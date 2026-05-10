@@ -15,16 +15,20 @@ const GuestWelcomeBanner = ({ session, onLogout, onTransportRequest }: GuestWelc
   if (!session) return null;
 
   const locale = language === 'es' ? 'es-MX' : 'en-US';
+
+  // Normalize to YYYY-MM-DD regardless of whether DB returned a full ISO string or a plain date
+  const normDate = (iso: string) => iso.slice(0, 10);
   const today = new Date().toISOString().slice(0, 10);
-  const isPreArrival = today < session.checkIn;
-  const isCheckedOut = today >= session.checkOut;
+  const isPreArrival = today < normDate(session.checkIn);
+  const isCheckedOut = today >= normDate(session.checkOut);
 
   const totalNights = Math.round(
-    (new Date(session.checkOut).getTime() - new Date(session.checkIn).getTime()) / 86400000
+    (new Date(normDate(session.checkOut)).getTime() - new Date(normDate(session.checkIn)).getTime()) / 86400000
   );
 
+  // Use noon UTC to avoid any date shifting across timezones
   const fmt = (iso: string) =>
-    new Date(iso + 'T12:00:00').toLocaleDateString(locale, {
+    new Date(normDate(iso) + 'T12:00:00Z').toLocaleDateString(locale, {
       weekday: 'short', month: 'short', day: 'numeric', year: 'numeric',
     });
 

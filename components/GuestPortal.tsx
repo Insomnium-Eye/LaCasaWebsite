@@ -12,17 +12,30 @@ import ExtendStayForm from './features/ExtendStayForm';
 import CancelReservationForm from './features/CancelReservationForm';
 import LeaveReviewForm from './features/LeaveReviewForm';
 
+interface TransportPrefill {
+  destinationId: string;
+  date: string; // YYYY-MM-DD
+}
+
 const GuestPortal = () => {
   const { session, loading, error, login, logout, isAuthenticated } = useGuestAuth();
-  const [activeSection, setActiveSection] = useState<PortalSection>('cleaning');
+  const [activeSection, setActiveSection] = useState<PortalSection>('transport');
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [transportPrefill, setTransportPrefill] = useState<TransportPrefill | null>(null);
 
   const handleSectionChange = (section: PortalSection) => {
     setIsTransitioning(true);
     setTimeout(() => {
       setActiveSection(section);
       setIsTransitioning(false);
-    }, 150); // Match animation duration
+    }, 150);
+  };
+
+  const handleAirportCTA = () => {
+    if (session) {
+      setTransportPrefill({ destinationId: 'airport', date: session.checkIn.slice(0, 10) });
+    }
+    handleSectionChange('transport');
   };
 
   if (!isAuthenticated) {
@@ -43,9 +56,9 @@ const GuestPortal = () => {
         <GuestWelcomeBanner
           session={session}
           onLogout={logout}
-          onTransportRequest={() => handleSectionChange('transport')}
+          onTransportRequest={handleAirportCTA}
         />
-        
+
         <div
           className={`transition-all duration-300 transform ${
             isTransitioning
@@ -54,7 +67,13 @@ const GuestPortal = () => {
           }`}
         >
           {activeSection === 'cleaning' && <CleaningRequestForm session={session} />}
-          {activeSection === 'transport' && <TransportRequestForm session={session} />}
+          {activeSection === 'transport' && (
+            <TransportRequestForm
+              session={session}
+              prefill={transportPrefill}
+              onPrefillConsumed={() => setTransportPrefill(null)}
+            />
+          )}
           {activeSection === 'extend' && <ExtendStayForm session={session} />}
           {activeSection === 'cancel' && <CancelReservationForm session={session} />}
           {activeSection === 'review' && <LeaveReviewForm session={session} />}

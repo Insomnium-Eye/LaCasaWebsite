@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { GuestSession } from '@/types/guest-portal';
 import { useLanguage } from '@/contexts/LanguageContext';
 import useUsdToMxn from '@/hooks/useUsdToMxn';
@@ -33,14 +33,25 @@ function floorToTen(mxn: number): number {
 
 interface TransportRequestFormProps {
   session: GuestSession | null;
+  prefill?: { destinationId: string; date: string } | null;
+  onPrefillConsumed?: () => void;
 }
 
-const TransportRequestForm = ({ session }: TransportRequestFormProps) => {
+const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: TransportRequestFormProps) => {
   const { t, language } = useLanguage();
   const { rate } = useUsdToMxn();
 
   const [destinationId, setDestinationId] = useState('');
   const [datetime, setDatetime] = useState('');
+
+  useEffect(() => {
+    if (prefill) {
+      setDestinationId(prefill.destinationId);
+      // Pre-fill date with 09:00 default — user only needs to adjust the time
+      setDatetime(prefill.date + 'T09:00');
+      onPrefillConsumed?.();
+    }
+  }, [prefill]);
   const [passengers, setPassengers] = useState(1);
   const [roundTrip, setRoundTrip] = useState(false);
   const [notes, setNotes] = useState('');

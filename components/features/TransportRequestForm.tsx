@@ -8,22 +8,22 @@ import useUsdToMxn from '@/hooks/useUsdToMxn';
 interface Destination {
   id: string;
   emoji: string;
-  name: string;
+  name: { en: string; es: string };
   priceUsd: number;
-  duration: string;
+  duration: { en: string; es: string };
 }
 
 const DESTINATIONS: Destination[] = [
-  { id: 'airport',          emoji: '✈️',  name: 'Airport – Xoxocotlán International (OAX)',                priceUsd: 50,  duration: '15–25 min' },
-  { id: 'el_llano',         emoji: '🌳',  name: 'El Llano (Parque Juárez)',                                priceUsd: 7.32,  duration: '10–20 min' },
-  { id: 'zocalo',           emoji: '🏛️',  name: 'Zócalo (Historic Main Square)',                           priceUsd: 7.32,  duration: '12–25 min' },
-  { id: 'monte_alban',      emoji: '🗿',  name: 'Monte Albán (Archaeological Site)',                       priceUsd: 80,  duration: '20–35 min' },
-  { id: 'ado_station',      emoji: '🚌',  name: 'ADO Bus Station',                                         priceUsd: 7.32,  duration: '15–25 min' },
-  { id: 'hierve_el_agua',   emoji: '💧',  name: 'Hierve el Agua (Petrified Waterfalls)',                   priceUsd: 200, duration: '1.5–2.5 hrs · full-day recommended' },
-  { id: 'arbol_tule',       emoji: '🌲',  name: 'Árbol del Tule (Tree of Tule)',                           priceUsd: 10.74, duration: '20–35 min' },
-  { id: 'mitla',            emoji: '🏺',  name: 'Mitla (Archaeological Site)',                             priceUsd: 110, duration: '50–75 min' },
-  { id: 'teotitlan',        emoji: '🧶',  name: 'Teotitlán del Valle (Textile Village)',                   priceUsd: 90,  duration: '45–60 min' },
-  { id: 'artisan_villages', emoji: '🎨',  name: 'San Bartolo Coyotepec / San Martín Tilcajete (Artisan Villages)', priceUsd: 65, duration: '25–40 min' },
+  { id: 'airport',          emoji: '✈️',  name: { en: 'Airport – Xoxocotlán International (OAX)',                    es: 'Aeropuerto – Internacional Xoxocotlán (OAX)' },                    priceUsd: 50,    duration: { en: '15–25 min',                          es: '15–25 min' } },
+  { id: 'el_llano',         emoji: '🌳',  name: { en: 'El Llano (Parque Juárez)',                                     es: 'El Llano (Parque Juárez)' },                                       priceUsd: 7.32,  duration: { en: '10–20 min',                          es: '10–20 min' } },
+  { id: 'zocalo',           emoji: '🏛️',  name: { en: 'Zócalo (Historic Main Square)',                                es: 'Zócalo (Plaza Principal Histórica)' },                              priceUsd: 7.32,  duration: { en: '12–25 min',                          es: '12–25 min' } },
+  { id: 'monte_alban',      emoji: '🗿',  name: { en: 'Monte Albán (Archaeological Site)',                            es: 'Monte Albán (Zona Arqueológica)' },                                 priceUsd: 80,    duration: { en: '20–35 min',                          es: '20–35 min' } },
+  { id: 'ado_station',      emoji: '🚌',  name: { en: 'ADO Bus Station',                                             es: 'Central de Autobuses ADO' },                                        priceUsd: 7.32,  duration: { en: '15–25 min',                          es: '15–25 min' } },
+  { id: 'hierve_el_agua',   emoji: '💧',  name: { en: 'Hierve el Agua (Petrified Waterfalls)',                        es: 'Hierve el Agua (Cascadas Petrificadas)' },                          priceUsd: 200,   duration: { en: '1.5–2.5 hrs · full-day recommended', es: '1.5–2.5 hrs · se recomienda día completo' } },
+  { id: 'arbol_tule',       emoji: '🌲',  name: { en: 'Árbol del Tule (Tree of Tule)',                                es: 'Árbol del Tule' },                                                  priceUsd: 10.74, duration: { en: '20–35 min',                          es: '20–35 min' } },
+  { id: 'mitla',            emoji: '🏺',  name: { en: 'Mitla (Archaeological Site)',                                  es: 'Mitla (Zona Arqueológica)' },                                       priceUsd: 110,   duration: { en: '50–75 min',                          es: '50–75 min' } },
+  { id: 'teotitlan',        emoji: '🧶',  name: { en: 'Teotitlán del Valle (Textile Village)',                        es: 'Teotitlán del Valle (Pueblo Textil)' },                             priceUsd: 90,    duration: { en: '45–60 min',                          es: '45–60 min' } },
+  { id: 'artisan_villages', emoji: '🎨',  name: { en: 'San Bartolo Coyotepec / San Martín Tilcajete (Artisan Villages)', es: 'San Bartolo Coyotepec / San Martín Tilcajete (Pueblos Artesanales)' }, priceUsd: 65, duration: { en: '25–40 min',                          es: '25–40 min' } },
 ];
 
 // Round MXN down to nearest 10
@@ -100,7 +100,7 @@ const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: Transport
           Authorization: `Bearer ${session.token}`,
         },
         body: JSON.stringify({
-          destination: selectedDest.name,
+          destination: selectedDest.name.en,
           datetime,
           passengers,
           roundTrip,
@@ -149,10 +149,10 @@ const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: Transport
             className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-amber-600 transition-colors disabled:bg-gray-100"
             required
           >
-            <option value="">Select a destination</option>
+            <option value="">{t('portal.transportRequest.selectDestination')}</option>
             {DESTINATIONS.map((dest) => (
               <option key={dest.id} value={dest.id}>
-                {dest.emoji} {dest.name} — {formatDropdownPrice(dest.priceUsd)} · {dest.duration}
+                {dest.emoji} {dest.name[language === 'es' ? 'es' : 'en']} — {formatDropdownPrice(dest.priceUsd)} · {dest.duration[language === 'es' ? 'es' : 'en']}
               </option>
             ))}
           </select>
@@ -160,7 +160,7 @@ const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: Transport
           {/* Duration hint */}
           {selectedDest && (
             <p className="mt-1.5 text-xs text-gray-500">
-              ⏱ {selectedDest.duration} one way
+              ⏱ {selectedDest.duration[language === 'es' ? 'es' : 'en']} {t('portal.transportRequest.oneWayHint')}
             </p>
           )}
         </div>
@@ -198,14 +198,14 @@ const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: Transport
             >
               {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
                 <option key={n} value={n}>
-                  {n} {n === 1 ? 'person' : 'people'}
+                  {n} {n === 1 ? t('portal.transportRequest.person') : t('portal.transportRequest.people')}
                 </option>
               ))}
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Trip Type</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t('portal.transportRequest.tripType')}</label>
             <label className="flex items-center gap-2 h-10 px-4 border-2 border-gray-300 rounded-lg bg-gray-50 cursor-pointer">
               <input
                 type="checkbox"
@@ -214,7 +214,7 @@ const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: Transport
                 disabled={loading}
                 className="w-4 h-4"
               />
-              <span className="text-sm select-none">Round-trip (10% off)</span>
+              <span className="text-sm select-none">{t('portal.transportRequest.roundTrip')}</span>
             </label>
           </div>
         </div>
@@ -222,13 +222,13 @@ const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: Transport
         {/* Notes */}
         <div>
           <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-2">
-            Notes <span className="text-gray-400">(optional)</span>
+            {t('portal.transportRequest.notes')} <span className="text-gray-400">({t('portal.transportRequest.notesOptional')})</span>
           </label>
           <textarea
             id="notes"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="Any special instructions for the driver?"
+            placeholder={t('portal.transportRequest.notesPlaceholder')}
             disabled={loading}
             rows={3}
             className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-amber-600 transition-colors disabled:bg-gray-100"
@@ -241,26 +241,26 @@ const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: Transport
             {roundTrip ? (
               <>
                 <div className="flex justify-between text-sm text-gray-700">
-                  <span>One-way × 2</span>
+                  <span>{t('portal.transportRequest.oneWayX2')}</span>
                   <span>{formatPrice(selectedDest.priceUsd * 2)}</span>
                 </div>
                 <div className="flex justify-between text-sm text-green-700">
-                  <span>Round-trip discount (−10%)</span>
+                  <span>{t('portal.transportRequest.roundTripDiscount')}</span>
                   <span>−{formatPrice(selectedDest.priceUsd * 2 * 0.1)}</span>
                 </div>
                 <div className="flex justify-between font-semibold text-gray-900 border-t border-amber-200 pt-2 mt-1">
-                  <span>Total</span>
+                  <span>{t('portal.transportRequest.total')}</span>
                   <span>{formatPrice(priceUsd)}</span>
                 </div>
               </>
             ) : (
               <div className="flex justify-between font-semibold text-gray-900">
-                <span>Estimated price</span>
+                <span>{t('portal.transportRequest.estimatedPrice')}</span>
                 <span>{formatPrice(priceUsd)}</span>
               </div>
             )}
             <p className="text-xs text-gray-500 pt-1">
-              Final price confirmed at booking. May vary with driving conditions.
+              {t('portal.transportRequest.priceDisclaimer')}
             </p>
           </div>
         )}

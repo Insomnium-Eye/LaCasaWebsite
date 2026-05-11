@@ -62,6 +62,12 @@ const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: Transport
 
   if (!session) return null;
 
+  // Clamp min to the later of checkIn or right now; max ends at 23:59 on checkout day
+  const checkInDatetime = session.checkIn.slice(0, 10) + 'T00:00';
+  const nowDatetime = new Date().toISOString().slice(0, 16);
+  const minDatetime = checkInDatetime > nowDatetime ? checkInDatetime : nowDatetime;
+  const maxDatetime = session.checkOut.slice(0, 10) + 'T23:59';
+
   const selectedDest = DESTINATIONS.find((d) => d.id === destinationId) ?? null;
 
   // Price calculation: round trip = base × 2 × 0.9 (10% off)
@@ -177,12 +183,8 @@ const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: Transport
             value={datetime}
             onChange={setDatetime}
             language={language}
-            min={(() => {
-              const checkInDatetime = session.checkIn + 'T00:00';
-              const now = new Date().toISOString().slice(0, 16);
-              return checkInDatetime > now ? checkInDatetime : now;
-            })()}
-            max={session.checkOut + 'T23:59'}
+            min={minDatetime}
+            max={maxDatetime}
             required
             disabled={loading}
             className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-amber-600 transition-colors disabled:bg-gray-100"

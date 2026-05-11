@@ -1,5 +1,7 @@
 'use client';
 
+import { useRef } from 'react';
+
 type InputType = 'date' | 'datetime-local';
 
 interface DateInputProps {
@@ -31,18 +33,16 @@ const PLACEHOLDER: Record<InputType, string> = {
   'datetime-local': 'DD/MM/AAAA HH:MM',
 };
 
-// Expanding the calendar-picker-indicator to cover the full input area makes any
-// click open the picker popup, not just clicking the small calendar icon on the right.
-const EXPAND_INDICATOR = [
-  '[&::-webkit-calendar-picker-indicator]:absolute',
-  '[&::-webkit-calendar-picker-indicator]:inset-0',
-  '[&::-webkit-calendar-picker-indicator]:opacity-0',
-].join(' ');
-
 export default function DateInput({
   value, onChange, language, type = 'date', min, max, disabled, required, className, id,
 }: DateInputProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
   if (language !== 'es') {
+    // English: native input, but programmatically call showPicker() on any click so
+    // clicking the text area (not just the small calendar icon) opens the picker.
+    // Per spec, showPicker() is a no-op if the picker is already open, so clicking
+    // the calendar icon natively (which opens it) then firing showPicker() is safe.
     return (
       <input
         id={id}
@@ -53,23 +53,31 @@ export default function DateInput({
         max={max}
         disabled={disabled}
         required={required}
-        className={[
-          className ?? '',
-          'relative',
-          EXPAND_INDICATOR,
-          disabled ? '[&::-webkit-calendar-picker-indicator]:cursor-not-allowed' : '[&::-webkit-calendar-picker-indicator]:cursor-pointer',
-        ].join(' ')}
+        className={className}
+        onClick={(e) => {
+          if (!disabled) {
+            try { (e.currentTarget as HTMLInputElement).showPicker(); } catch (_) {}
+          }
+        }}
       />
     );
   }
 
-  // Spanish mode: native input sits absolutely over a formatted overlay.
-  // Internal datetime text is hidden; indicator expanded to full area so one click opens picker.
+  // Spanish mode: the wrapper div owns all clicks. The native input is invisible
+  // (opacity-0, pointer-events-none) so it never intercepts clicks itself — only the
+  // wrapper does, which then calls showPicker() once per click with no conflicts.
   const wrapperClass = (className ?? '').replace(/\bfocus:/g, 'focus-within:');
 
   return (
-    <div className={`relative ${wrapperClass}`}>
-      {/* Formatted overlay — visible through the transparent native input above it */}
+    <div
+      className={`relative ${wrapperClass} ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+      onClick={() => {
+        if (!disabled) {
+          try { inputRef.current?.showPicker(); } catch (_) {}
+        }
+      }}
+    >
+      {/* Formatted overlay — DD/MM/AAAA display, non-interactive */}
       <div className="pointer-events-none flex items-center justify-between gap-2 w-full">
         <span className={value ? '' : 'text-gray-400'}>
           {value ? isoToDisplay(value, type) : PLACEHOLDER[type]}
@@ -80,7 +88,9 @@ export default function DateInput({
         </svg>
       </div>
 
+      {/* Native input: invisible but present for value binding, onChange, and form validation */}
       <input
+        ref={inputRef}
         id={id}
         type={type}
         value={value}
@@ -89,13 +99,8 @@ export default function DateInput({
         max={max}
         disabled={disabled}
         required={required}
-        className={[
-          'absolute inset-0 w-full h-full p-0 border-none outline-none bg-transparent',
-          '[&::-webkit-datetime-edit]:opacity-0',
-          EXPAND_INDICATOR,
-          disabled ? 'cursor-not-allowed [&::-webkit-calendar-picker-indicator]:cursor-not-allowed'
-                   : 'cursor-pointer [&::-webkit-calendar-picker-indicator]:cursor-pointer',
-        ].join(' ')}
+        tabIndex={-1}
+        className="absolute inset-0 w-full h-full opacity-0 pointer-events-none"
       />
     </div>
   );

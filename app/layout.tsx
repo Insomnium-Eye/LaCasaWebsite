@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import ClientLayout from "../components/ClientLayout";
 
 export const metadata: Metadata = {
-  title: "La Casa Oaxaca | Direct Booking Boutique Retreat",
+  title: "Oaxaca Bungalow Rentals",
   description: "Luxury direct-booking rental in San Felipe del Agua, Oaxaca with private bungalows.",
 };
 

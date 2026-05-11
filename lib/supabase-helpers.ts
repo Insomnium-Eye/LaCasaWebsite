@@ -21,13 +21,13 @@ export const findReservationByIdentifier = async (
 
   if (type === 'email') {
     rows = await sql<Reservation[]>`
-      SELECT * FROM reservations WHERE email = ${identifier} AND status = 'confirmed' LIMIT 1`;
+      SELECT * FROM reservations WHERE LOWER(email) = ${identifier} AND status IN ('confirmed', 'checked_in') LIMIT 1`;
   } else if (type === 'phone') {
     rows = await sql<Reservation[]>`
-      SELECT * FROM reservations WHERE phone = ${identifier} AND status = 'confirmed' LIMIT 1`;
+      SELECT * FROM reservations WHERE phone = ${identifier} AND status IN ('confirmed', 'checked_in') LIMIT 1`;
   } else {
     rows = await sql<Reservation[]>`
-      SELECT * FROM reservations WHERE digital_key = ${identifier} AND status = 'confirmed' LIMIT 1`;
+      SELECT * FROM reservations WHERE digital_key = ${identifier} AND status IN ('confirmed', 'checked_in') LIMIT 1`;
   }
 
   return rows[0] ?? null;

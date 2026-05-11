@@ -22,14 +22,10 @@ const CleaningRequestForm = ({ session }: CleaningRequestFormProps) => {
 
   if (!session) return null;
 
-  // Calculate date range (check-in to check-out)
-  const minDate = session.checkIn;
-  const maxDate = session.checkOut;
+  const minDate = session.checkIn.slice(0, 10);
+  const maxDate = session.checkOut.slice(0, 10);
   const today = new Date().toISOString().split('T')[0];
-  const earliestAvailable = new Date(Math.max(
-    new Date(minDate).getTime(),
-    new Date(today).getTime()
-  )).toISOString().split('T')[0];
+  const earliestAvailable = minDate > today ? minDate : today;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

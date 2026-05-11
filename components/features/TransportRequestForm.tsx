@@ -171,40 +171,18 @@ const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: Transport
           <label htmlFor="datetime" className="block text-sm font-medium text-gray-700 mb-2">
             {t('portal.transportRequest.date')} &amp; {t('portal.transportRequest.time')} <span className="text-red-500">*</span>
           </label>
-          {language === 'es' ? (
-            <div className="flex gap-2">
-              <DateInput
-                value={datetime ? datetime.split('T')[0] : ''}
-                onChange={(iso) => setDatetime(iso + 'T' + (datetime ? datetime.split('T')[1] || '09:00' : '09:00'))}
-                language={language}
-                min={new Date().toISOString().slice(0, 10)}
-                max={session.checkOut}
-                required
-                disabled={loading}
-                className="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-amber-600 transition-colors disabled:bg-gray-100"
-              />
-              <input
-                type="time"
-                value={datetime ? datetime.split('T')[1] || '09:00' : '09:00'}
-                onChange={(e) => setDatetime((datetime ? datetime.split('T')[0] : new Date().toISOString().slice(0, 10)) + 'T' + e.target.value)}
-                required
-                disabled={loading}
-                className="w-32 px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-amber-600 transition-colors disabled:bg-gray-100"
-              />
-            </div>
-          ) : (
-            <input
-              id="datetime"
-              type="datetime-local"
-              value={datetime}
-              onChange={(e) => setDatetime(e.target.value)}
-              min={new Date().toISOString().slice(0, 16)}
-              max={session.checkOut}
-              required
-              disabled={loading}
-              className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-amber-600 transition-colors disabled:bg-gray-100"
-            />
-          )}
+          <DateInput
+            id="datetime"
+            type="datetime-local"
+            value={datetime}
+            onChange={setDatetime}
+            language={language}
+            min={new Date().toISOString().slice(0, 16)}
+            max={session.checkOut}
+            required
+            disabled={loading}
+            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-amber-600 transition-colors disabled:bg-gray-100"
+          />
         </div>
 
         {/* Passengers & Round Trip */}

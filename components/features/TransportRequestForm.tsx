@@ -177,8 +177,12 @@ const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: Transport
             value={datetime}
             onChange={setDatetime}
             language={language}
-            min={new Date().toISOString().slice(0, 16)}
-            max={session.checkOut}
+            min={(() => {
+              const checkInDatetime = session.checkIn + 'T00:00';
+              const now = new Date().toISOString().slice(0, 16);
+              return checkInDatetime > now ? checkInDatetime : now;
+            })()}
+            max={session.checkOut + 'T23:59'}
             required
             disabled={loading}
             className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-amber-600 transition-colors disabled:bg-gray-100"

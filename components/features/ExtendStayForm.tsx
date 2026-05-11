@@ -9,7 +9,8 @@ interface ExtendStayFormProps {
 }
 
 const ExtendStayForm = ({ session }: ExtendStayFormProps) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const locale = language === 'es' ? 'es-MX' : 'en-US';
   const [newCheckout, setNewCheckout] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -92,9 +93,9 @@ const ExtendStayForm = ({ session }: ExtendStayFormProps) => {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Current Checkout */}
         <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-          <p className="text-sm text-gray-600">Current Checkout Date</p>
+          <p className="text-sm text-gray-600">{t('portal.extendStay.currentCheckout')}</p>
           <p className="text-lg font-semibold text-gray-900">
-            {currentCheckout.toLocaleDateString('en-US', {
+            {new Date(session.checkOut.slice(0,10) + 'T12:00:00Z').toLocaleDateString(locale, {
               weekday: 'long',
               month: 'long',
               day: 'numeric',
@@ -111,6 +112,7 @@ const ExtendStayForm = ({ session }: ExtendStayFormProps) => {
           <input
             id="newCheckout"
             type="date"
+            lang={language === 'es' ? 'es' : 'en-US'}
             value={newCheckout}
             onChange={handleCheckoutChange}
             min={minNewCheckout.toISOString().split('T')[0]}
@@ -127,7 +129,7 @@ const ExtendStayForm = ({ session }: ExtendStayFormProps) => {
               <span className="font-semibold">{t('portal.extendStay.additionalNights')}:</span> {extraNights}
             </p>
             <p className="text-sm text-gray-700">
-              <span className="font-semibold">Nightly Rate:</span> ${session.nightlyRate.toFixed(2)} USD
+              <span className="font-semibold">{t('portal.extendStay.nightlyRate')}:</span> ${session.nightlyRate.toFixed(2)} USD
             </p>
             <div className="pt-2 border-t border-amber-300">
               <p className="text-lg font-bold text-amber-900">
@@ -140,7 +142,7 @@ const ExtendStayForm = ({ session }: ExtendStayFormProps) => {
         {/* Disclaimer */}
         <div className="bg-blue-50 border-l-4 border-blue-600 p-4 rounded">
           <p className="text-sm text-gray-700">
-            <span className="font-semibold">Note:</span> Extension is subject to availability. We'll confirm within 24 hours.
+            <span className="font-semibold">{t('portal.extendStay.noteLabel')}:</span> {t('portal.extendStay.noteText')}
           </p>
         </div>
 
@@ -153,9 +155,7 @@ const ExtendStayForm = ({ session }: ExtendStayFormProps) => {
 
         {success && (
           <div className="p-4 bg-green-50 border-l-4 border-green-500 rounded">
-            <p className="text-sm text-green-700">
-              ✓ Extension request submitted! We'll confirm within 24 hours.
-            </p>
+            <p className="text-sm text-green-700">✓ {t('portal.extendStay.success')}</p>
           </div>
         )}
 

@@ -9,7 +9,8 @@ interface CancelReservationFormProps {
 }
 
 const CancelReservationForm = ({ session }: CancelReservationFormProps) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const locale = language === 'es' ? 'es-MX' : 'en-US';
   const [reason, setReason] = useState('');
   const [explanation, setExplanation] = useState('');
   const [confirmationStep, setConfirmationStep] = useState(false);
@@ -22,7 +23,7 @@ const CancelReservationForm = ({ session }: CancelReservationFormProps) => {
   const handleInitialSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!reason) {
-      setError('Please select a cancellation reason');
+      setError(t('portal.cancelReservation.pleaseSelect'));
       return;
     }
     setConfirmationStep(true);
@@ -78,8 +79,8 @@ const CancelReservationForm = ({ session }: CancelReservationFormProps) => {
 
         {/* Warning Banner */}
         <div className="bg-red-50 border-l-4 border-red-600 p-4 rounded mb-6">
-          <p className="text-sm font-semibold text-red-900 mb-2">Cancellation Policy</p>
-          <p className="text-sm text-red-800">{CANCELLATION_POLICY}</p>
+          <p className="text-sm font-semibold text-red-900 mb-2">{t('portal.cancelReservation.policyTitle')}</p>
+          <p className="text-sm text-red-800">{t('portal.cancelReservation.policyText')}</p>
         </div>
 
         <form onSubmit={handleInitialSubmit} className="space-y-6">
@@ -96,10 +97,10 @@ const CancelReservationForm = ({ session }: CancelReservationFormProps) => {
               className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-amber-600 transition-colors disabled:bg-gray-100"
               required
             >
-              <option value="">Select a reason</option>
-              {CANCELLATION_REASONS.map((r) => (
+              <option value="">{t('portal.cancelReservation.selectReason')}</option>
+              {CANCELLATION_REASONS.map((r, i) => (
                 <option key={r} value={r}>
-                  {r}
+                  {(t('portal.cancelReservation.reasons') as string[])[i] ?? r}
                 </option>
               ))}
             </select>
@@ -108,13 +109,13 @@ const CancelReservationForm = ({ session }: CancelReservationFormProps) => {
           {/* Additional Details */}
           <div>
             <label htmlFor="explanation" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('portal.cancelReservation.notes')} <span className="text-gray-400">(optional)</span>
+              {t('portal.cancelReservation.notes')} <span className="text-gray-400">({t('portal.cancelReservation.optional')})</span>
             </label>
             <textarea
               id="explanation"
               value={explanation}
               onChange={(e) => setExplanation(e.target.value)}
-              placeholder="Help us improve: what could we have done better?"
+              placeholder={t('portal.cancelReservation.explanationPlaceholder')}
               disabled={loading}
               rows={4}
               className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-amber-600 transition-colors disabled:bg-gray-100"
@@ -148,29 +149,28 @@ const CancelReservationForm = ({ session }: CancelReservationFormProps) => {
 
       {/* Warning */}
       <div className="bg-red-50 border-l-4 border-red-600 p-4 rounded mb-6">
-        <p className="text-sm font-semibold text-red-900 mb-2">This action cannot be undone</p>
+        <p className="text-sm font-semibold text-red-900 mb-2">{t('portal.cancelReservation.cannotUndo')}</p>
         <p className="text-sm text-red-800">
-          Are you sure you want to cancel your reservation for{' '}
+          {t('portal.cancelReservation.areYouSureText')}{' '}
           <span className="font-bold">
-            {new Date(session.checkIn).toLocaleDateString()} -{' '}
-            {new Date(session.checkOut).toLocaleDateString()}
+            {new Date(session.checkIn.slice(0,10) + 'T12:00:00Z').toLocaleDateString(locale)} -{' '}
+            {new Date(session.checkOut.slice(0,10) + 'T12:00:00Z').toLocaleDateString(locale)}
           </span>
           ?
         </p>
         <p className="text-sm text-red-700 mt-3">
-          You will begin the cancellation process. Our team will review your request and contact you
-          within 24 hours regarding any applicable refunds.
+          {t('portal.cancelReservation.processText')}
         </p>
       </div>
 
       {/* Summary */}
       <div className="bg-gray-50 p-4 rounded mb-6 space-y-2">
         <p className="text-sm text-gray-700">
-          <span className="font-semibold">Reason:</span> {reason}
+          <span className="font-semibold">{t('portal.cancelReservation.reasonLabel')}:</span> {reason}
         </p>
         {explanation && (
           <p className="text-sm text-gray-700">
-            <span className="font-semibold">Details:</span> {explanation}
+            <span className="font-semibold">{t('portal.cancelReservation.detailsLabel')}:</span> {explanation}
           </p>
         )}
       </div>
@@ -185,7 +185,7 @@ const CancelReservationForm = ({ session }: CancelReservationFormProps) => {
           disabled={loading}
           className="flex-1 bg-gray-200 hover:bg-gray-300 disabled:bg-gray-400 text-gray-900 font-bold py-3 px-4 rounded-lg transition-all duration-200"
         >
-          Go Back
+          {t('portal.cancelReservation.goBack')}
         </button>
 
         <button
@@ -207,9 +207,7 @@ const CancelReservationForm = ({ session }: CancelReservationFormProps) => {
       {/* Success Message */}
       {success && (
         <div className="mt-4 p-4 bg-green-50 border-l-4 border-green-500 rounded">
-          <p className="text-sm text-green-700">
-            ✓ Cancellation request submitted. We will contact you within 24 hours.
-          </p>
+          <p className="text-sm text-green-700">✓ {t('portal.cancelReservation.successText')}</p>
         </div>
       )}
     </div>

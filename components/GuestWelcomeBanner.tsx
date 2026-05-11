@@ -67,7 +67,7 @@ const GuestWelcomeBanner = ({ session, onLogout, onTransportRequest }: GuestWelc
                 <span className="font-semibold">{unitDisplayName}</span>
               </p>
               <p>
-                🏁 {language === 'es' ? 'Check-out:' : 'Check-out:'}{' '}
+                🏁 {t('portal.checkingOut')}{' '}
                 <span className="font-semibold">{fmt(session.checkOut)}</span>
               </p>
             </div>

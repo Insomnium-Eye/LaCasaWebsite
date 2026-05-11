@@ -173,6 +173,7 @@ const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: Transport
           <input
             id="datetime"
             type="datetime-local"
+            lang={language === 'es' ? 'es' : 'en-US'}
             value={datetime}
             onChange={(e) => setDatetime(e.target.value)}
             min={new Date().toISOString().slice(0, 16)}

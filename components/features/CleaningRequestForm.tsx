@@ -12,6 +12,7 @@ interface CleaningRequestFormProps {
 
 const CleaningRequestForm = ({ session }: CleaningRequestFormProps) => {
   const { t, language } = useLanguage();
+  const locale = language === 'es' ? 'es-MX' : 'en-US';
   const [date, setDate] = useState('');
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
@@ -84,6 +85,7 @@ const CleaningRequestForm = ({ session }: CleaningRequestFormProps) => {
           <input
             id="date"
             type="date"
+            lang={language === 'es' ? 'es' : 'en-US'}
             value={date}
             onChange={(e) => setDate(e.target.value)}
             min={earliestAvailable}
@@ -94,21 +96,21 @@ const CleaningRequestForm = ({ session }: CleaningRequestFormProps) => {
           />
           <p className="mt-2 text-xs text-gray-500">
             {t('portal.cleaningRequest.availableBetween')
-              .replace('{checkIn}', new Date(session.checkIn).toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US'))
-              .replace('{checkOut}', new Date(session.checkOut).toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US'))}
+              .replace('{checkIn}', new Date(session.checkIn.slice(0,10) + 'T12:00:00Z').toLocaleDateString(locale))
+              .replace('{checkOut}', new Date(session.checkOut.slice(0,10) + 'T12:00:00Z').toLocaleDateString(locale))}
           </p>
         </div>
 
         {/* Notes */}
         <div>
           <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-2">
-            {t('portal.cleaningRequest.notes')} <span className="text-gray-400">(optional)</span>
+            {t('portal.cleaningRequest.notes')} <span className="text-gray-400">({t('portal.cleaningRequest.notesOptional')})</span>
           </label>
           <textarea
             id="notes"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="e.g., Focus on windows, avoid towel cabinet, etc."
+            placeholder={t('portal.cleaningRequest.notesPlaceholder')}
             disabled={loading}
             rows={4}
             className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-amber-600 transition-colors disabled:bg-gray-100"
@@ -118,10 +120,10 @@ const CleaningRequestForm = ({ session }: CleaningRequestFormProps) => {
         {/* Fee Display */}
         <div className="bg-amber-50 border-l-4 border-amber-600 p-4 rounded">
           <p className="text-sm text-gray-700">
-            <span className="font-semibold">Cleaning Fee:</span> ${CLEANING_FEE.toFixed(2)} USD
+            <span className="font-semibold">{t('portal.cleaningRequest.fee')}</span> ${CLEANING_FEE.toFixed(2)} USD
           </p>
           <p className="text-xs text-gray-600 mt-1">
-            This fee will be added to your account after confirmation
+            {t('portal.cleaningRequest.feeNote')}
           </p>
         </div>
 

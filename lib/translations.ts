@@ -10,7 +10,8 @@ export const translations = {
       faq: "FAQ",
       contact: "Contact",
       bookDirect: "Book direct",
-      backToHome: "← Back to Home"
+      backToHome: "← Back to Home",
+      guestSignIn: "Already a guest? Sign in!"
     },
     explore: {
       label: "Around La Casa",
@@ -477,7 +478,8 @@ export const translations = {
       faq: "Preguntas Frecuentes",
       contact: "Contacto",
       bookDirect: "Reservar directo",
-      backToHome: "← Volver al Inicio"
+      backToHome: "← Volver al Inicio",
+      guestSignIn: "¿Ya eres huésped? ¡Inicia sesión!"
     },
     explore: {
       label: "Alrededor de La Casa",

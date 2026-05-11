@@ -21,7 +21,7 @@ export const attractionCategories: AttractionCategory[] = [
     attractions: [
       {
         id: 'zocalo',
-        emoji: '🏛️',
+        emoji: '⛪',
         name: 'El Zócalo',
         en: {
           description: 'The vibrant heart of Oaxaca. Stroll the main square, linger over coffee, and catch live marimba music most evenings.',
@@ -93,7 +93,7 @@ export const attractionCategories: AttractionCategory[] = [
     attractions: [
       {
         id: 'monte-alban',
-        emoji: '🏔️',
+        emoji: '🔺',
         name: 'Monte Albán',
         en: {
           description: 'A UNESCO World Heritage Site and one of the oldest cities in Mesoamerica. These Zapotec ruins overlook the valley, dating back to 500 BC.',
@@ -165,7 +165,7 @@ export const attractionCategories: AttractionCategory[] = [
     attractions: [
       {
         id: 'mezcal',
-        emoji: '🥃',
+        emoji: '🍾',
         name: 'Mezcal Distillery Tour',
         en: {
           description: "Visit a traditional palenque, watch the agave-to-bottle process, and taste some of the finest mezcal you'll ever have.",

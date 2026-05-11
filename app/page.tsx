@@ -64,7 +64,7 @@ export default function HomePage() {
               {t("explore.title")}
             </button>
             <Link href="/portal" className="rounded-full border border-slate-500 px-5 py-2 text-sm font-semibold text-slate-100 transition hover:bg-slate-900/50">
-              Already a guest? Sign in!
+              {t("nav.guestSignIn")}
             </Link>
             <Link href="/book" className="rounded-full bg-garden px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#3c5a35]">
               {t("nav.bookDirect")}
@@ -196,9 +196,9 @@ export default function HomePage() {
                   </div>
                   <p className="text-lg text-slate-100">{t(`units.items.entire-house.summary`)}</p>
                   <div className="bg-slate-900/50 rounded-3xl p-6 space-y-4">
-                    <p className="text-sm text-slate-300"><span className="font-semibold text-slate-100">👥 Capacity:</span> {units.find((unit) => unit.slug === 'entire-house')?.capacity} guests</p>
-                    <p className="text-sm text-slate-300"><span className="font-semibold text-slate-100">🚪 Bathrooms:</span> {units.find((unit) => unit.slug === 'entire-house')?.bathroom}</p>
-                    <p className="text-sm text-slate-300"><span className="font-semibold text-slate-100">🌳 Terraces:</span> {units.find((unit) => unit.slug === 'entire-house')?.terrace}</p>
+                    <p className="text-sm text-slate-300"><span className="font-semibold text-slate-100">👥 {t('home.modal.capacity')}</span> {units.find((unit) => unit.slug === 'entire-house')?.capacity} {t('home.modal.guests')}</p>
+                    <p className="text-sm text-slate-300"><span className="font-semibold text-slate-100">🚪 {t('home.modal.bathroom')}</span> {units.find((unit) => unit.slug === 'entire-house')?.bathroom}</p>
+                    <p className="text-sm text-slate-300"><span className="font-semibold text-slate-100">🌳 {t('home.modal.terrace')}</span> {units.find((unit) => unit.slug === 'entire-house')?.terrace}</p>
                   </div>
                   <div className="pt-4 border-t border-slate-600/50 space-y-3">
                     <p className="text-sm text-slate-300"><span className="text-lg font-semibold text-slate-50">{formatPrice(1200, language)}</span>/{t('book.priceUnit.week')}</p>

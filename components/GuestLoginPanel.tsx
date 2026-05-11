@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface GuestLoginPanelProps {
@@ -65,6 +66,12 @@ const GuestLoginPanel = ({ onLogin, loading, error }: GuestLoginPanelProps) => {
 
       {/* Login Card */}
       <div className="relative z-10 w-full max-w-md">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1 mb-4 text-sm font-semibold text-amber-100 hover:text-white transition-colors"
+        >
+          {t('nav.backToHome')}
+        </Link>
         <div className="bg-white rounded-lg shadow-2xl overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-amber-700 to-orange-600 p-8">

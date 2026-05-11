@@ -7,7 +7,7 @@ interface LeaveReviewFormProps {
 }
 
 const LeaveReviewForm = ({ session }: LeaveReviewFormProps) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [stars, setStars] = useState(0);
   const [headline, setHeadline] = useState('');
   const [body, setBody] = useState('');
@@ -24,10 +24,10 @@ const LeaveReviewForm = ({ session }: LeaveReviewFormProps) => {
   const isLocked = today < session.checkOut;
 
   if (isLocked) {
-    const locale = session.unitName ? undefined : 'en-US';
-    const checkOutFormatted = new Date(session.checkOut + 'T12:00:00').toLocaleDateString(
+    const locale = language === 'es' ? 'es-MX' : 'en-US';
+    const checkOutFormatted = new Date(session.checkOut + 'T12:00:00Z').toLocaleDateString(
       locale,
-      { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }
+      { day: '2-digit', month: '2-digit', year: 'numeric' }
     );
     return (
       <div className="bg-white rounded-lg shadow-lg p-8 max-w-2xl mx-auto text-center">

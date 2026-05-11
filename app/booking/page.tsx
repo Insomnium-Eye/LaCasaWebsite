@@ -6,6 +6,7 @@ import TransportationAddons from '@/components/TransportationAddons';
 import IdVerification from '@/components/IdVerification';
 import BackgroundSlideshow from '@/components/BackgroundSlideshow';
 import useUsdToMxn from '@/hooks/useUsdToMxn';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Unit {
   id: string;
@@ -54,6 +55,8 @@ const MOCK_AVAILABILITY: Record<string, boolean[]> = {
 };
 
 const BookingPage: React.FC = () => {
+  const { language } = useLanguage();
+  const locale = language === 'es' ? 'es-MX' : 'en-US';
   const {
     convertToMxn,
     formatCurrency,
@@ -323,7 +326,7 @@ const BookingPage: React.FC = () => {
                     ← Prev
                   </button>
                   <h3 className="text-lg font-bold text-amber-900">
-                    {currentMonth.toLocaleString('default', {
+                    {currentMonth.toLocaleString(locale, {
                       month: 'long',
                       year: 'numeric',
                     })}
@@ -364,7 +367,7 @@ const BookingPage: React.FC = () => {
                   <p className="text-green-900 font-semibold">
                     📍 Check-in:{' '}
                     <span className="text-lg">
-                      {dateRange.start.toLocaleDateString('en-US', {
+                      {dateRange.start.toLocaleDateString(locale, {
                         weekday: 'short',
                         month: 'short',
                         day: 'numeric',
@@ -375,7 +378,7 @@ const BookingPage: React.FC = () => {
                         {' '}
                         | Check-out:{' '}
                         <span className="text-lg">
-                          {dateRange.end.toLocaleDateString('en-US', {
+                          {dateRange.end.toLocaleDateString(locale, {
                             weekday: 'short',
                             month: 'short',
                             day: 'numeric',

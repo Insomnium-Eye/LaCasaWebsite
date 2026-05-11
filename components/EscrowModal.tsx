@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '../contexts/LanguageContext';
+import { formatDate } from '../lib/date';
 import { formatPrice } from '../lib/currency';
 import useUsdToMxn from '../hooks/useUsdToMxn';
 
@@ -136,7 +137,7 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
         <div className="bg-gray-50 rounded-xl p-4 mb-6 space-y-1.5">
           <p className="font-semibold text-gray-900">{bookingData.unitName}</p>
           <p className="text-sm text-gray-600">
-            {bookingData.checkIn} → {bookingData.checkOut} · {nights} {nights !== 1 ? t('book.payment.nights') : t('book.payment.night')}
+            {formatDate(bookingData.checkIn, language)} → {formatDate(bookingData.checkOut, language)} · {nights} {nights !== 1 ? t('book.payment.nights') : t('book.payment.night')}
           </p>
           <div className="flex justify-between pt-1 border-t border-gray-200 mt-2">
             <span className="text-sm text-gray-600">{t('book.payment.depositDueNow')}</span>

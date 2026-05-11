@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { formatDate } from '../lib/date';
 import { Unit } from '../data/units';
 
 interface BookingModalProps {
@@ -23,7 +24,7 @@ function daysBetween(start: string, end: string) {
 }
 
 export default function BookingModal({ unit, onClose, onBackToUnit }: BookingModalProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
   const [bookingPeriod, setBookingPeriod] = useState<'nightly' | 'weekly' | 'monthly'>('nightly');
@@ -153,7 +154,7 @@ export default function BookingModal({ unit, onClose, onBackToUnit }: BookingMod
           {total > 0 && (
             <div className="rounded-xl bg-slate-50 p-4 space-y-2">
               <p className="font-semibold text-slate-900">{unit.name} · {getPeriodDisplay()}</p>
-              <p className="text-sm text-slate-600">{checkIn} {t('bookingModal.to')} {checkOut}</p>
+              <p className="text-sm text-slate-600">{formatDate(checkIn, language)} {t('bookingModal.to')} {formatDate(checkOut, language)}</p>
               <div className="flex justify-between font-semibold text-slate-900">
                 <span>{t('bookingModal.total')}</span>
                 <span>${total.toFixed(2)}</span>

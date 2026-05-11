@@ -5,10 +5,11 @@ import { Suspense } from 'react';
 import Link from 'next/link';
 import BackgroundSlideshow from '../../../components/BackgroundSlideshow';
 import { useLanguage } from '../../../contexts/LanguageContext';
+import { formatDate } from '../../../lib/date';
 
 function ConfirmationContent() {
   const params = useSearchParams();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const code    = params.get('code') ?? '????';
   const name    = params.get('name') ?? 'Guest';
@@ -69,9 +70,9 @@ function ConfirmationContent() {
             <span className="text-slate-400">{t('book.confirmation.property')}</span>
             <span className="text-slate-100 font-medium">{unit}</span>
             <span className="text-slate-400">{t('book.confirmation.checkIn')}</span>
-            <span className="text-slate-100 font-medium">{checkin}</span>
+            <span className="text-slate-100 font-medium">{formatDate(checkin, language)}</span>
             <span className="text-slate-400">{t('book.confirmation.checkOut')}</span>
-            <span className="text-slate-100 font-medium">{checkout}</span>
+            <span className="text-slate-100 font-medium">{formatDate(checkout, language)}</span>
             <span className="text-slate-400">{t('book.confirmation.nights')}</span>
             <span className="text-slate-100 font-medium">{nights}</span>
             <span className="text-slate-400">{t('book.confirmation.guests')}</span>

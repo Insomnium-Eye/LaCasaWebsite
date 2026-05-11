@@ -153,8 +153,8 @@ const CancelReservationForm = ({ session }: CancelReservationFormProps) => {
         <p className="text-sm text-red-800">
           {t('portal.cancelReservation.areYouSureText')}{' '}
           <span className="font-bold">
-            {new Date(session.checkIn.slice(0,10) + 'T12:00:00Z').toLocaleDateString(locale)} -{' '}
-            {new Date(session.checkOut.slice(0,10) + 'T12:00:00Z').toLocaleDateString(locale)}
+            {new Date(session.checkIn.slice(0,10) + 'T12:00:00Z').toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' })} -{' '}
+            {new Date(session.checkOut.slice(0,10) + 'T12:00:00Z').toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' })}
           </span>
           ?
         </p>

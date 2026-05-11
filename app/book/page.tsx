@@ -12,6 +12,7 @@ import type { BookingDetails, DepositTiming } from "../../lib/deposit";
 import BackgroundSlideshow from "../../components/BackgroundSlideshow";
 import IdVerification from "../../components/IdVerification";
 import EscrowModal from "../../components/EscrowModal";
+import DateInput from "../../components/DateInput";
 
 const initialState = {
   name: "",
@@ -210,26 +211,26 @@ export default function BookPage() {
             </label>
             <label className="block">
               <span className="text-sm font-semibold text-slate-900">{t('book.checkIn')}</span>
-              <input
-                type="date"
-                min={today}
+              <DateInput
                 value={form.checkIn}
-                onChange={(event) => setForm({ ...form, checkIn: event.target.value })}
-                className="mt-2 w-full rounded-3xl border border-slate-300 bg-slate-50 p-4 text-slate-900 outline-none focus:border-garden focus:ring-2 focus:ring-garden/20"
+                onChange={(iso) => setForm({ ...form, checkIn: iso })}
+                language={language}
+                min={today}
                 required
+                className="mt-2 w-full rounded-3xl border border-slate-300 bg-slate-50 p-4 text-slate-900 outline-none focus:border-garden focus:ring-2 focus:ring-garden/20"
               />
             </label>
           </div>
           <div className="grid gap-6 sm:grid-cols-2">
             <label className="block">
               <span className="text-sm font-semibold text-slate-900">{t('book.checkOut')}</span>
-              <input
-                type="date"
-                min={checkOutMinDate}
+              <DateInput
                 value={form.checkOut}
-                onChange={(event) => setForm({ ...form, checkOut: event.target.value })}
-                className="mt-2 w-full rounded-3xl border border-slate-300 bg-slate-50 p-4 text-slate-900 outline-none focus:border-garden focus:ring-2 focus:ring-garden/20"
+                onChange={(iso) => setForm({ ...form, checkOut: iso })}
+                language={language}
+                min={checkOutMinDate}
                 required
+                className="mt-2 w-full rounded-3xl border border-slate-300 bg-slate-50 p-4 text-slate-900 outline-none focus:border-garden focus:ring-2 focus:ring-garden/20"
               />
             </label>
           </div>

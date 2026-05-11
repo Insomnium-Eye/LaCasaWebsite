@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { GuestSession, CleaningRequest } from '@/types/guest-portal';
 import { useLanguage } from '@/contexts/LanguageContext';
+import DateInput from '@/components/DateInput';
 
 const CLEANING_FEE = parseFloat(process.env.NEXT_PUBLIC_CLEANING_FEE || '15');
 
@@ -82,12 +83,11 @@ const CleaningRequestForm = ({ session }: CleaningRequestFormProps) => {
           <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-2">
             {t('portal.cleaningRequest.cleaningDate')} <span className="text-red-500">*</span>
           </label>
-          <input
+          <DateInput
             id="date"
-            type="date"
-            lang={language === 'es' ? 'es' : 'en-US'}
             value={date}
-            onChange={(e) => setDate(e.target.value)}
+            onChange={setDate}
+            language={language}
             min={earliestAvailable}
             max={maxDate}
             required

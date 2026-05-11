@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { GuestSession } from '@/types/guest-portal';
 import { useLanguage } from '@/contexts/LanguageContext';
+import DateInput from '@/components/DateInput';
 
 interface ExtendStayFormProps {
   session: GuestSession | null;
@@ -109,12 +110,11 @@ const ExtendStayForm = ({ session }: ExtendStayFormProps) => {
           <label htmlFor="newCheckout" className="block text-sm font-medium text-gray-700 mb-2">
             {t('portal.extendStay.newCheckOut')} <span className="text-red-500">*</span>
           </label>
-          <input
+          <DateInput
             id="newCheckout"
-            type="date"
-            lang={language === 'es' ? 'es' : 'en-US'}
             value={newCheckout}
             onChange={handleCheckoutChange}
+            language={language}
             min={minNewCheckout.toISOString().split('T')[0]}
             required
             disabled={loading}

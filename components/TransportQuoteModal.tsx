@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import DateInput from '@/components/DateInput';
 
 interface TransportQuoteModalProps {
   open: boolean;
@@ -9,7 +10,7 @@ interface TransportQuoteModalProps {
 }
 
 export default function TransportQuoteModal({ open, onClose }: TransportQuoteModalProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [formData, setFormData] = useState({
     destination: '',
     date: '',
@@ -112,11 +113,10 @@ export default function TransportQuoteModal({ open, onClose }: TransportQuoteMod
               <label className="block text-sm font-semibold text-slate-900 mb-2">
                 Date <span className="text-red-600">*</span>
               </label>
-              <input
-                type="date"
-                name="date"
+              <DateInput
                 value={formData.date}
-                onChange={handleInputChange}
+                onChange={(iso) => setFormData((prev) => ({ ...prev, date: iso }))}
+                language={language}
                 required
                 className="w-full px-4 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-garden transition-colors"
               />

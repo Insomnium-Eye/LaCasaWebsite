@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { formatDate } from '../lib/date';
+import DateInput from './DateInput';
 import { Unit } from '../data/units';
 
 interface BookingModalProps {
@@ -131,20 +132,20 @@ export default function BookingModal({ unit, onClose, onBackToUnit }: BookingMod
             </label>
             <label className="block">
               <span className="text-sm font-semibold text-slate-900">{t('bookingModal.checkInDate')}</span>
-              <input
-                type="date"
+              <DateInput
                 value={checkIn}
-                onChange={(e) => setCheckIn(e.target.value)}
+                onChange={setCheckIn}
+                language={language}
                 min={new Date().toISOString().split('T')[0]}
                 className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 p-3 text-slate-900 outline-none focus:border-terracotta focus:ring-2 focus:ring-terracotta/20"
               />
             </label>
             <label className="block">
               <span className="text-sm font-semibold text-slate-900">{t('bookingModal.checkOutDate')}</span>
-              <input
-                type="date"
+              <DateInput
                 value={checkOut}
-                onChange={(e) => setCheckOut(e.target.value)}
+                onChange={setCheckOut}
+                language={language}
                 min={checkIn || new Date().toISOString().split('T')[0]}
                 className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 p-3 text-slate-900 outline-none focus:border-terracotta focus:ring-2 focus:ring-terracotta/20"
               />

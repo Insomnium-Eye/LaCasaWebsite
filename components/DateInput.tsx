@@ -1,13 +1,11 @@
 'use client';
 
-import { useState, useEffect, ChangeEvent } from 'react';
-
 interface DateInputProps {
-  value: string;            // ISO YYYY-MM-DD
+  value: string;
   onChange: (iso: string) => void;
   language: string;
-  min?: string;             // ISO YYYY-MM-DD
-  max?: string;             // ISO YYYY-MM-DD
+  min?: string;
+  max?: string;
   disabled?: boolean;
   required?: boolean;
   className?: string;
@@ -20,27 +18,9 @@ function isoToDisplay(iso: string): string {
   return `${d}/${m}/${y}`;
 }
 
-function displayToIso(display: string): string {
-  const match = display.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-  return match ? `${match[3]}-${match[2]}-${match[1]}` : '';
-}
-
-function autoFormat(raw: string): string {
-  const digits = raw.replace(/\D/g, '').slice(0, 8);
-  if (digits.length <= 2) return digits;
-  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
-  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
-}
-
 export default function DateInput({
   value, onChange, language, min, max, disabled, required, className, id,
 }: DateInputProps) {
-  const [display, setDisplay] = useState(() => language === 'es' ? isoToDisplay(value) : '');
-
-  useEffect(() => {
-    if (language === 'es') setDisplay(isoToDisplay(value));
-  }, [value, language]);
-
   if (language !== 'es') {
     return (
       <input
@@ -57,28 +37,36 @@ export default function DateInput({
     );
   }
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const formatted = autoFormat(e.target.value);
-    setDisplay(formatted);
-    const iso = displayToIso(formatted);
-    if (iso) {
-      if (min && iso < min) return;
-      if (max && iso > max) return;
-      onChange(iso);
-    }
-  };
+  // Spanish: styled wrapper shows DD/MM/AAAA; invisible native input underneath provides the calendar picker
+  const wrapperClass = (className ?? '')
+    .replace(/\bfocus:/g, 'focus-within:')
+    .replace(/\boutline-none\b/, '');
 
   return (
-    <input
-      id={id}
-      type="text"
-      inputMode="numeric"
-      placeholder="DD/MM/AAAA"
-      value={display}
-      onChange={handleChange}
-      disabled={disabled}
-      required={required}
-      className={className}
-    />
+    <div className={`relative ${wrapperClass}`}>
+      <span className={value ? '' : 'text-gray-400'}>
+        {value ? isoToDisplay(value) : 'DD/MM/AAAA'}
+      </span>
+      {/* Calendar icon */}
+      <svg
+        className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+        fill="none" viewBox="0 0 24 24" stroke="currentColor"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+      {/* Native date input — invisible but clickable; opens the calendar picker */}
+      <input
+        id={id}
+        type="date"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        min={min}
+        max={max}
+        disabled={disabled}
+        required={required}
+        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+      />
+    </div>
   );
 }

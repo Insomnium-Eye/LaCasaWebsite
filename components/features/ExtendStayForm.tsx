@@ -24,8 +24,7 @@ const ExtendStayForm = ({ session }: ExtendStayFormProps) => {
   const minNewCheckout = new Date(currentCheckout);
   minNewCheckout.setDate(minNewCheckout.getDate() + 1);
 
-  const handleCheckoutChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+  const handleCheckoutChange = (value: string) => {
     setNewCheckout(value);
 
     if (value) {

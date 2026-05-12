@@ -1,15 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkIsIdentityDocument } from '@/lib/google-vision';
-import { verifyGuestJWT } from '@/lib/guest-auth';
 
 export async function POST(req: NextRequest) {
-  const auth = req.headers.get('authorization');
-  const token = auth?.replace('Bearer ', '') ?? '';
-  const session = verifyGuestJWT(token);
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
   const { imageBase64, mimeType } = await req.json();
 
   if (!imageBase64 || typeof imageBase64 !== 'string') {

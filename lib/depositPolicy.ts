@@ -2,10 +2,10 @@ import type { DepositPolicy, SeasonType } from './deposit';
 
 export const DEFAULT_DEPOSIT_POLICY: DepositPolicy = {
   shortStayDeposit: 100,        // < 7 nights
-  mediumStayDeposit: 500,       // 7–27 nights
-  longStayDepositMonths: 1,     // 28+ nights: 1 × effective monthly rate
+  mediumStayDeposit: 100,       // 7–27 nights
+  longStayDepositMonths: 0,     // 28+ nights: overridden by min/max clamp below
   minDeposit: 100,
-  maxDeposit: 2000,
+  maxDeposit: 100,              // flat $100 security deposit for all stay lengths
   peakSeasonMultiplier: 1.25,
   advanceDepositEnabled: true,
   advanceDepositPercent: 0.20,  // 20% of total stay due upfront

@@ -7,17 +7,6 @@ interface IdVerificationProps {
 
 type VerificationStep = 'idle' | 'upload' | 'processing' | 'success' | 'error';
 
-/**
- * IdVerification Component
- * 
- * Handles ID verification flow for booking:
- * 1. Upload government ID (photo/scan)
- * 2. Submit for processing
- * 3. Display verification status
- * 
- * For current version, accepts any image upload.
- * Future versions will integrate background check APIs.
- */
 const IdVerification: React.FC<IdVerificationProps> = ({
   onVerificationComplete,
   onStatusChange,
@@ -26,7 +15,6 @@ const IdVerification: React.FC<IdVerificationProps> = ({
   const [idFile, setIdFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Reset verification attempt
   const handleReset = () => {
     setStep('idle');
     setIdFile(null);
@@ -34,12 +22,10 @@ const IdVerification: React.FC<IdVerificationProps> = ({
     onStatusChange?.('pending');
   };
 
-  // Handle ID file upload
   const handleIdUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type and size
     if (!file.type.startsWith('image/')) {
       setError('Please upload an image file (JPG, PNG, etc.)');
       return;
@@ -51,9 +37,46 @@ const IdVerification: React.FC<IdVerificationProps> = ({
 
     setIdFile(file);
     setError(null);
-    setStep('success');
-    onStatusChange?.('verified');
-    onVerificationComplete?.(true);
+    setStep('processing');
+    onStatusChange?.('in-progress');
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+      try {
+        const imageBase64 = (reader.result as string).split(',')[1];
+        const res = await fetch('/api/verify/document', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ imageBase64, mimeType: file.type }),
+        });
+        const data = await res.json();
+
+        if (!res.ok || data.error) {
+          throw new Error(data.error ?? 'Verification service unavailable');
+        }
+
+        if (data.isIdentityDocument) {
+          setStep('success');
+          onStatusChange?.('verified');
+          onVerificationComplete?.(true);
+        } else {
+          setError('The uploaded image does not appear to be a valid government ID or passport. Please upload a clear photo of your ID.');
+          setStep('error');
+          onStatusChange?.('failed');
+        }
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Verification failed';
+        setError(msg);
+        setStep('error');
+        onStatusChange?.('failed');
+      }
+    };
+    reader.onerror = () => {
+      setError('Could not read the file. Please try again.');
+      setStep('error');
+      onStatusChange?.('failed');
+    };
+    reader.readAsDataURL(file);
   };
 
   return (

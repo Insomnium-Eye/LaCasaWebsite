@@ -345,6 +345,7 @@ export default function BookPage() {
       </div>
       {showIdVerification && (
         <IdVerification
+          guestName={form.name}
           onVerificationComplete={handleIdVerificationComplete}
           onStatusChange={(status) => console.log('ID verification status:', status)}
         />

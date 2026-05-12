@@ -44,7 +44,47 @@ export interface DocumentCheckResult {
   documentType: string | null;
   confidence: number;
   extractedText: string;
+  extractedName: string | null;
   error?: string;
+}
+
+export function extractNameFromOCR(text: string): string | null {
+  const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
+
+  // Passport MRZ: line starting with P< followed by 3-letter country then name<<givenname
+  const mrzLine = lines.find((l) => /^P<[A-Z]{3}[A-Z<]{10,}$/.test(l.replace(/\s/g, '')));
+  if (mrzLine) {
+    const clean = mrzLine.replace(/\s/g, '').slice(5); // strip P<CCC
+    const [surname, given] = clean.split('<<');
+    const s = surname?.replace(/<+/g, ' ').trim();
+    const g = given?.replace(/<+/g, ' ').trim();
+    if (s && g) return `${g} ${s}`;
+    if (s) return s;
+  }
+
+  // Keyword-based: NOMBRE, NAME, APELLIDO on its own line followed by value
+  const keywordPatterns = [
+    /^(?:nombre[s]?|apellidos?\s+y\s+nombre[s]?)[:\s]+(.+)$/i,
+    /^(?:full\s+name|name)[:\s]+(.+)$/i,
+    /^(?:apellidos?)[:\s]+(.+)$/i,
+  ];
+  for (const line of lines) {
+    for (const pat of keywordPatterns) {
+      const m = line.match(pat);
+      if (m?.[1]?.trim()) return m[1].trim();
+    }
+  }
+
+  // Last resort: find a line of 2–4 ALL-CAPS words that looks like a name
+  for (const line of lines) {
+    if (/^[A-ZÁÉÍÓÚÜÑ]{2,}(\s[A-ZÁÉÍÓÚÜÑ]{2,}){1,3}$/.test(line)) {
+      // Skip lines that are clearly not names (doc type labels, country names, etc.)
+      const skip = ['REPUBLICA', 'MEXICO', 'ESTADOS', 'UNIDOS', 'MEXICANA', 'PASSPORT', 'PASAPORTE'];
+      if (!skip.some((s) => line.includes(s))) return line;
+    }
+  }
+
+  return null;
 }
 
 export async function checkIsIdentityDocument(
@@ -97,14 +137,15 @@ export async function checkIsIdentityDocument(
   const data = await res.json();
   const response = data.responses?.[0];
   if (!response) {
-    return { isIdentityDocument: false, documentType: null, confidence: 0, extractedText: '' };
+    return { isIdentityDocument: false, documentType: null, confidence: 0, extractedText: '', extractedName: null };
   }
 
   const labels: Array<{ description: string; score: number }> = response.labelAnnotations ?? [];
-  const fullText: string =
-    response.fullTextAnnotation?.text?.toLowerCase() ??
-    response.textAnnotations?.[0]?.description?.toLowerCase() ??
-    '';
+  // Use original-case text for name extraction, lowercase for keyword matching
+  const rawText: string =
+    response.fullTextAnnotation?.text ??
+    response.textAnnotations?.[0]?.description ?? '';
+  const fullText = rawText.toLowerCase();
 
   // Check label annotations
   const matchingLabel = labels.find((l) =>
@@ -123,10 +164,13 @@ export async function checkIsIdentityDocument(
   else if (fullText.includes('curp') || fullText.includes('ine') || fullText.includes('credencial')) documentType = 'Mexican INE / ID';
   else if (matchingLabel) documentType = matchingLabel.description;
 
+  const extractedName = isIdentityDocument ? extractNameFromOCR(rawText) : null;
+
   return {
     isIdentityDocument,
     documentType,
     confidence,
-    extractedText: response.textAnnotations?.[0]?.description ?? '',
+    extractedText: rawText,
+    extractedName,
   };
 }

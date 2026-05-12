@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 interface IdVerificationProps {
+  guestName?: string;
   onVerificationComplete?: (verified: boolean) => void;
   onStatusChange?: (status: 'pending' | 'in-progress' | 'verified' | 'failed') => void;
 }
@@ -29,6 +30,7 @@ function compressImage(dataUrl: string, mimeType: string): Promise<string> {
 }
 
 const IdVerification: React.FC<IdVerificationProps> = ({
+  guestName,
   onVerificationComplete,
   onStatusChange,
 }) => {
@@ -69,7 +71,7 @@ const IdVerification: React.FC<IdVerificationProps> = ({
         const res = await fetch('/api/verify/document', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ imageBase64, mimeType: file.type }),
+          body: JSON.stringify({ imageBase64, mimeType: file.type, guestName: guestName ?? null }),
         });
 
         if (!res.ok) {

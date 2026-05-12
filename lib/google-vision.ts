@@ -51,7 +51,7 @@ export interface DocumentCheckResult {
 export function extractNameFromOCR(text: string): string | null {
   const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
 
-  // Passport MRZ: line starting with P< followed by 3-letter country then name<<givenname
+  // 1. Passport MRZ: line starting with P< followed by 3-letter country then NAME<<GIVEN
   const mrzLine = lines.find((l) => /^P<[A-Z]{3}[A-Z<]{10,}$/.test(l.replace(/\s/g, '')));
   if (mrzLine) {
     const clean = mrzLine.replace(/\s/g, '').slice(5); // strip P<CCC
@@ -62,25 +62,41 @@ export function extractNameFromOCR(text: string): string | null {
     if (s) return s;
   }
 
-  // Keyword-based: NOMBRE, NAME, APELLIDO on its own line followed by value
-  const keywordPatterns = [
-    /^(?:nombre[s]?|apellidos?\s+y\s+nombre[s]?)[:\s]+(.+)$/i,
-    /^(?:full\s+name|name)[:\s]+(.+)$/i,
+  // 2. Same-line keyword: "NOMBRE: Juan Carlos" or "NAME: Juan Carlos"
+  const sameLinePatterns = [
+    /^(?:nombre[s]?|apellidos?\s+y\s+nombre[s]?|full\s+name|name)[:\s]+(.+)$/i,
     /^(?:apellidos?)[:\s]+(.+)$/i,
   ];
   for (const line of lines) {
-    for (const pat of keywordPatterns) {
+    for (const pat of sameLinePatterns) {
       const m = line.match(pat);
       if (m?.[1]?.trim()) return m[1].trim();
     }
   }
 
-  // Last resort: find a line of 2–4 ALL-CAPS words that looks like a name
+  // 3. Multi-line keyword (Mexican INE format): label on one line, value on next
+  // e.g. "APELLIDO PATERNO\nMARTINEZ\nAPELLIDO MATERNO\nGARCIA\nNOMBRE(S)\nJUAN CARLOS"
+  const SKIP_LABELS = /^(apellido\s+paterno|apellido\s+materno|nombre[s]?|domicilio|municipio|estado|curp|clave|folio|sección|año|vigencia)/i;
+  let apellidoPaterno = '';
+  let apellidoMaterno = '';
+  let nombres = '';
+  for (let i = 0; i < lines.length - 1; i++) {
+    const label = lines[i].toLowerCase();
+    const value = lines[i + 1];
+    if (/^apellido\s+paterno/.test(label) && value && !SKIP_LABELS.test(value)) apellidoPaterno = value;
+    else if (/^apellido\s+materno/.test(label) && value && !SKIP_LABELS.test(value)) apellidoMaterno = value;
+    else if (/^nombre[s]?\(?/.test(label) && value && !SKIP_LABELS.test(value)) nombres = value;
+  }
+  if (nombres && apellidoPaterno) {
+    return `${nombres} ${apellidoPaterno}${apellidoMaterno ? ' ' + apellidoMaterno : ''}`.trim();
+  }
+
+  // 4. Last resort: first line of 2–4 ALL-CAPS words that looks like a name
+  const SKIP_WORDS = ['REPUBLICA', 'MEXICO', 'ESTADOS', 'UNIDOS', 'MEXICANA', 'PASSPORT',
+    'PASAPORTE', 'NACIONAL', 'ELECTORAL', 'INSTITUTO', 'CREDENCIAL', 'VOTAR'];
   for (const line of lines) {
     if (/^[A-ZÁÉÍÓÚÜÑ]{2,}(\s[A-ZÁÉÍÓÚÜÑ]{2,}){1,3}$/.test(line)) {
-      // Skip lines that are clearly not names (doc type labels, country names, etc.)
-      const skip = ['REPUBLICA', 'MEXICO', 'ESTADOS', 'UNIDOS', 'MEXICANA', 'PASSPORT', 'PASAPORTE'];
-      if (!skip.some((s) => line.includes(s))) return line;
+      if (!SKIP_WORDS.some((w) => line.includes(w))) return line;
     }
   }
 

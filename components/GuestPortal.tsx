@@ -11,6 +11,7 @@ import TransportRequestForm from './features/TransportRequestForm';
 import ExtendStayForm from './features/ExtendStayForm';
 import CancelReservationForm from './features/CancelReservationForm';
 import LeaveReviewForm from './features/LeaveReviewForm';
+import IDVerificationForm from './features/IDVerificationForm';
 
 interface TransportPrefill {
   destinationId: string;
@@ -77,6 +78,7 @@ const GuestPortal = () => {
           {activeSection === 'extend' && <ExtendStayForm session={session} />}
           {activeSection === 'cancel' && <CancelReservationForm session={session} />}
           {activeSection === 'review' && <LeaveReviewForm session={session} />}
+          {activeSection === 'verification' && <IDVerificationForm session={session} />}
         </div>
       </div>
     </div>

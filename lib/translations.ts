@@ -463,8 +463,30 @@ export const translations = {
         cancel: "Cancel Reservation",
         cancelDesc: "Initiate cancellation",
         review: "Leave a Review",
-        reviewDesc: "Share your experience"
+        reviewDesc: "Share your experience",
+        verification: "ID Verification",
+        verificationDesc: "Verify your identity"
       }
+    },
+    idVerification: {
+      title: "ID Verification",
+      description: "Upload a photo of your government-issued ID or passport. Your name is automatically screened against the OFAC sanctions list (US Treasury).",
+      guestName: "Guest Name",
+      uploadLabel: "ID / Passport Photo",
+      uploadPlaceholder: "Click to upload a photo of your ID or passport",
+      verifyButton: "Run Verification",
+      verifying: "Verifying…",
+      documentCheck: "Document Check",
+      sanctionsCheck: "Sanctions Screening (OFAC)",
+      documentValid: "Valid identity document",
+      documentInvalid: "Not recognised as an ID",
+      setupRequired: "Vision API not configured",
+      clear: "Clear — no matches",
+      warningMatch: "Similar name found — review",
+      alertMatch: "High-confidence match — flag",
+      checkFailed: "Check failed",
+      noMatches: "No matches",
+      disclaimer: "Document check uses Google Cloud Vision API (free tier). Sanctions screening uses the official OFAC Specially Designated Nationals list published by the US Treasury — free, public domain, updated regularly. This is not a substitute for a professional background check."
     }
   },
   es: {
@@ -934,8 +956,30 @@ export const translations = {
         cancel: "Cancelar Reserva",
         cancelDesc: "Iniciar cancelación",
         review: "Dejar Reseña",
-        reviewDesc: "Comparte tu experiencia"
+        reviewDesc: "Comparte tu experiencia",
+        verification: "Verificación de ID",
+        verificationDesc: "Verifica tu identidad"
       }
+    },
+    idVerification: {
+      title: "Verificación de Identidad",
+      description: "Sube una foto de tu identificación oficial o pasaporte. Tu nombre se coteja automáticamente contra la lista de sanciones OFAC del Tesoro de EE. UU.",
+      guestName: "Nombre del Huésped",
+      uploadLabel: "Foto del ID / Pasaporte",
+      uploadPlaceholder: "Haz clic para subir una foto de tu identificación o pasaporte",
+      verifyButton: "Iniciar Verificación",
+      verifying: "Verificando…",
+      documentCheck: "Verificación de Documento",
+      sanctionsCheck: "Lista de Sanciones (OFAC)",
+      documentValid: "Documento de identidad válido",
+      documentInvalid: "No reconocido como identificación",
+      setupRequired: "API de visión no configurada",
+      clear: "Sin coincidencias",
+      warningMatch: "Nombre similar encontrado — revisar",
+      alertMatch: "Coincidencia de alta confianza — reportar",
+      checkFailed: "Verificación fallida",
+      noMatches: "Sin coincidencias",
+      disclaimer: "La verificación de documentos usa la API de Google Cloud Vision (nivel gratuito). El cotejo de sanciones usa la lista oficial OFAC de Nacionales Especialmente Designados del Tesoro de EE. UU. — gratuita, de dominio público y actualizada regularmente. No sustituye una revisión profesional de antecedentes."
     }
   }
 };

@@ -85,13 +85,18 @@ export async function POST(req: NextRequest) {
   const base64 = imageBase64.replace(/^data:[^;]+;base64,/, '');
   const result = await checkIsIdentityDocument(base64, mimeType ?? 'image/jpeg');
 
-  if (result.isIdentityDocument && !result.error && process.env.RESEND_API_KEY) {
+  if (result.isIdentityDocument && process.env.RESEND_API_KEY) {
     const nameToCheck = result.extractedName ?? formName ?? null;
 
-    // Give OFAC check 6 seconds — don't let it block or kill the email
-    const sanctions = nameToCheck
-      ? await withTimeout(checkNameAgainstOFAC(nameToCheck), 6000)
-      : null;
+    // OFAC check: 5s timeout, never throws — email fires regardless
+    let sanctions = null;
+    if (nameToCheck) {
+      try {
+        sanctions = await withTimeout(checkNameAgainstOFAC(nameToCheck), 5000);
+      } catch (err) {
+        console.error('[OFAC check error]', err instanceof Error ? err.message : err);
+      }
+    }
 
     const subject = sanctions?.alertLevel === 'alert'
       ? `🚨 ALERT – ID Verified: ${nameToCheck ?? 'Unknown'}`
@@ -99,12 +104,17 @@ export async function POST(req: NextRequest) {
       ? `⚠️ WARNING – ID Verified: ${nameToCheck ?? 'Unknown'}`
       : `✅ ID Verified: ${nameToCheck ?? result.documentType ?? 'Guest'}`;
 
-    await resend.emails.send({
-      from: 'La Casa Oaxaca <onboarding@resend.dev>',
-      to: ['ebm22david@gmail.com'],
-      subject,
-      html: buildEmail(result.extractedName, formName ?? null, result.documentType, sanctions),
-    }).catch((err) => console.error('[ID verify email error]', err));
+    try {
+      await resend.emails.send({
+        from: 'La Casa Oaxaca <onboarding@resend.dev>',
+        to: ['ebm22david@gmail.com'],
+        subject,
+        html: buildEmail(result.extractedName, formName ?? null, result.documentType, sanctions),
+      });
+      console.log('[ID verify email] sent:', subject);
+    } catch (err) {
+      console.error('[ID verify email error]', err instanceof Error ? err.message : err);
+    }
   }
 
   return NextResponse.json(result);

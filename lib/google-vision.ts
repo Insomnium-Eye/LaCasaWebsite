@@ -82,12 +82,15 @@ export async function checkIsIdentityDocument(
   });
 
   if (!res.ok) {
+    const body = await res.text().catch(() => '');
+    let detail = '';
+    try { detail = JSON.parse(body)?.error?.message ?? ''; } catch { detail = body.slice(0, 120); }
     return {
       isIdentityDocument: false,
       documentType: null,
       confidence: 0,
       extractedText: '',
-      error: `Vision API error: ${res.status}`,
+      error: `Vision API error ${res.status}${detail ? `: ${detail}` : ''}`,
     };
   }
 

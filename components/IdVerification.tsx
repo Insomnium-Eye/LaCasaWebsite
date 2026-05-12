@@ -7,6 +7,27 @@ interface IdVerificationProps {
 
 type VerificationStep = 'idle' | 'upload' | 'processing' | 'success' | 'error';
 
+function compressImage(dataUrl: string, mimeType: string): Promise<string> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 1600;
+      let { width, height } = img;
+      if (width > MAX || height > MAX) {
+        if (width > height) { height = Math.round((height * MAX) / width); width = MAX; }
+        else { width = Math.round((width * MAX) / height); height = MAX; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext('2d')!.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL(mimeType === 'image/png' ? 'image/png' : 'image/jpeg', 0.85));
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+
 const IdVerification: React.FC<IdVerificationProps> = ({
   onVerificationComplete,
   onStatusChange,
@@ -43,17 +64,23 @@ const IdVerification: React.FC<IdVerificationProps> = ({
     const reader = new FileReader();
     reader.onload = async () => {
       try {
-        const imageBase64 = (reader.result as string).split(',')[1];
+        const compressed = await compressImage(reader.result as string, file.type);
+        const imageBase64 = compressed.split(',')[1];
         const res = await fetch('/api/verify/document', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ imageBase64, mimeType: file.type }),
         });
-        const data = await res.json();
 
-        if (!res.ok || data.error) {
-          throw new Error(data.error ?? 'Verification service unavailable');
+        if (!res.ok) {
+          const text = await res.text().catch(() => '');
+          throw new Error(
+            text.startsWith('{') ? JSON.parse(text).error : `Server error ${res.status}`,
+          );
         }
+
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
 
         if (data.isIdentityDocument) {
           setStep('success');

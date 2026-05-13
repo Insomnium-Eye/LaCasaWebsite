@@ -85,15 +85,28 @@ export async function POST(req: NextRequest) {
   const base64 = imageBase64.replace(/^data:[^;]+;base64,/, '');
   const result = await checkIsIdentityDocument(base64, mimeType ?? 'image/jpeg');
 
+  const debug: Record<string, unknown> = {
+    isIdentityDocument: result.isIdentityDocument,
+    extractedName: result.extractedName,
+    documentType: result.documentType,
+    hasResendKey: !!process.env.RESEND_API_KEY,
+    emailSent: false,
+    emailError: null,
+    sanctionsRan: false,
+    sanctionsTimedOut: false,
+  };
+
   if (result.isIdentityDocument && process.env.RESEND_API_KEY) {
     const nameToCheck = result.extractedName ?? formName ?? null;
 
-    // OFAC check: 5s timeout, never throws — email fires regardless
     let sanctions = null;
     if (nameToCheck) {
       try {
         sanctions = await withTimeout(checkNameAgainstOFAC(nameToCheck), 5000);
+        debug.sanctionsRan = sanctions !== null;
+        debug.sanctionsTimedOut = sanctions === null;
       } catch (err) {
+        debug.sanctionsRan = false;
         console.error('[OFAC check error]', err instanceof Error ? err.message : err);
       }
     }
@@ -111,11 +124,13 @@ export async function POST(req: NextRequest) {
         subject,
         html: buildEmail(result.extractedName, formName ?? null, result.documentType, sanctions),
       });
+      debug.emailSent = true;
       console.log('[ID verify email] sent:', subject);
     } catch (err) {
-      console.error('[ID verify email error]', err instanceof Error ? err.message : err);
+      debug.emailError = err instanceof Error ? err.message : String(err);
+      console.error('[ID verify email error]', debug.emailError);
     }
   }
 
-  return NextResponse.json(result);
+  return NextResponse.json({ ...result, debug });
 }

@@ -130,6 +130,7 @@ export async function checkIsIdentityDocument(
       documentType: null,
       confidence: 0,
       extractedText: '',
+      extractedName: null,
       error: 'GOOGLE_CLOUD_VISION_API_KEY is not configured.',
     };
   }
@@ -161,6 +162,7 @@ export async function checkIsIdentityDocument(
       documentType: null,
       confidence: 0,
       extractedText: '',
+      extractedName: null,
       error: `Vision API error ${res.status}${detail ? `: ${detail}` : ''}`,
     };
   }

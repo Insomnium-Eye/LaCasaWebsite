@@ -9,7 +9,7 @@ export const DEFAULT_DEPOSIT_POLICY: DepositPolicy = {
   peakSeasonMultiplier: 1.25,
   advanceDepositEnabled: true,
   advanceDepositPercent: 0.20,  // 20% of total stay due upfront
-  securityDepositTiming: 'at_checkin',
+  securityDepositTiming: 'upfront',
   advanceDepositTiming: 'upfront',
 };
 

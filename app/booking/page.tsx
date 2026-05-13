@@ -70,6 +70,20 @@ const BookingPage: React.FC = () => {
   const [transportationTotal, setTransportationTotal] = useState(0);
   const [verificationComplete, setVerificationComplete] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [blockedRanges, setBlockedRanges] = useState<{ start: string; end: string }[]>([]);
+
+  // Fetch availability for all selected units (union of blocked ranges)
+  useEffect(() => {
+    const slugMap: Record<string, string> = {
+      bungalow1: 'bungalow-1',
+      bungalow2: 'bungalow-2',
+      bedroom: 'main-bedroom',
+    };
+    const slugs = Array.from(selectedUnits).map((id) => slugMap[id] ?? id);
+    if (slugs.length === 0) { setBlockedRanges([]); return; }
+    Promise.all(slugs.map((s) => fetch(`/api/availability/${s}`).then((r) => r.json()).catch(() => ({ blocked: [] }))))
+      .then((results) => setBlockedRanges(results.flatMap((r) => r.blocked ?? [])));
+  }, [selectedUnits]);
 
   // UI state
   const [visibleStep, setVisibleStep] = useState<'units' | 'dates' | 'verification' | 'summary'>('units');
@@ -153,6 +167,16 @@ const BookingPage: React.FC = () => {
     }
   };
 
+  const isDateBlocked = (date: Date): boolean => {
+    const iso = date.toISOString().slice(0, 10);
+    return blockedRanges.some((r) => iso >= r.start && iso < r.end);
+  };
+
+  const isPast = (date: Date): boolean => {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    return date < today;
+  };
+
   // Render calendar
   const renderCalendar = () => {
     const year = currentMonth.getFullYear();
@@ -167,6 +191,7 @@ const BookingPage: React.FC = () => {
 
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
+      const blocked = isDateBlocked(date) || isPast(date);
       const isStart = dateRange.start && date.toDateString() === dateRange.start.toDateString();
       const isEnd = dateRange.end && date.toDateString() === dateRange.end.toDateString();
       const isInRange =
@@ -178,9 +203,13 @@ const BookingPage: React.FC = () => {
       days.push(
         <button
           key={day}
-          onClick={() => handleDayClick(day)}
+          onClick={() => !blocked && handleDayClick(day)}
+          disabled={blocked}
+          title={blocked ? 'Unavailable' : undefined}
           className={`p-2 text-sm rounded-lg font-semibold transition-all ${
-            isStart || isEnd
+            blocked
+              ? 'bg-red-100 text-red-300 line-through cursor-not-allowed opacity-60'
+              : isStart || isEnd
               ? 'bg-green-600 text-white'
               : isInRange
               ? 'bg-green-100 text-green-800'

@@ -36,6 +36,16 @@ function addDays(value: string, days: number) {
   return next.toISOString().split('T')[0];
 }
 
+function isRangeBlocked(
+  checkIn: string,
+  checkOut: string,
+  blocked: { start: string; end: string }[],
+): boolean {
+  if (!checkIn) return false;
+  const end = checkOut || checkIn;
+  return blocked.some((r) => checkIn < r.end && end > r.start);
+}
+
 function daysBetween(start: string, end: string) {
   const startDate = parseDate(start);
   const endDate = parseDate(end);
@@ -51,14 +61,30 @@ export default function BookPage() {
   const [showIdVerification, setShowIdVerification] = useState(false);
   const [idVerified, setIdVerified] = useState(false);
   const [showEscrow, setShowEscrow] = useState(false);
+  const [blockedRanges, setBlockedRanges] = useState<{ start: string; end: string }[]>([]);
   const nights = useMemo(() => daysBetween(form.checkIn, form.checkOut), [form.checkIn, form.checkOut]);
   const selectedUnit = units.find((unit) => unit.slug === form.unit) ?? units[0];
-  
+
   const today = new Date().toISOString().split('T')[0];
   const minNights = selectedUnit.slug === 'entire-house' ? 7 : 1;
   const checkOutMinDate = form.checkIn
     ? addDays(form.checkIn, selectedUnit.slug === 'entire-house' ? minNights : 1)
     : today;
+
+  // Fetch blocked dates whenever the selected unit changes
+  useEffect(() => {
+    fetch(`/api/availability/${selectedUnit.slug}`)
+      .then((r) => r.json())
+      .then((data) => setBlockedRanges(data.blocked ?? []))
+      .catch(() => setBlockedRanges([]));
+  }, [selectedUnit.slug]);
+
+  // Reset dates if they now conflict after a unit change
+  useEffect(() => {
+    if (form.checkIn && isRangeBlocked(form.checkIn, form.checkOut || form.checkIn, blockedRanges)) {
+      setForm((prev) => ({ ...prev, checkIn: '', checkOut: '' }));
+    }
+  }, [blockedRanges]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (selectedUnit.slug !== 'entire-house' || !form.checkIn || !form.checkOut) return;
@@ -234,6 +260,13 @@ export default function BookPage() {
               />
             </label>
           </div>
+          {form.checkIn && form.checkOut && isRangeBlocked(form.checkIn, form.checkOut, blockedRanges) && (
+            <p className="rounded-xl bg-red-900/60 px-4 py-3 text-sm font-semibold text-red-200">
+              {language === 'es'
+                ? 'Esas fechas no están disponibles. Por favor elige otras fechas.'
+                : 'Those dates are unavailable. Please choose different dates.'}
+            </p>
+          )}
           <button type="button" onClick={handleRequestDetails} className="inline-flex items-center justify-center rounded-full bg-garden px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#3c5a35]">
             {t('book.requestDetails')}
           </button>

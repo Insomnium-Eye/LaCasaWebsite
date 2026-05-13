@@ -85,17 +85,6 @@ export async function POST(req: NextRequest) {
   const base64 = imageBase64.replace(/^data:[^;]+;base64,/, '');
   const result = await checkIsIdentityDocument(base64, mimeType ?? 'image/jpeg');
 
-  const debug: Record<string, unknown> = {
-    isIdentityDocument: result.isIdentityDocument,
-    extractedName: result.extractedName,
-    documentType: result.documentType,
-    hasResendKey: !!process.env.RESEND_API_KEY,
-    emailSent: false,
-    emailError: null,
-    sanctionsRan: false,
-    sanctionsTimedOut: false,
-  };
-
   if (result.isIdentityDocument && process.env.RESEND_API_KEY) {
     const nameToCheck = result.extractedName ?? formName ?? null;
 
@@ -103,10 +92,7 @@ export async function POST(req: NextRequest) {
     if (nameToCheck) {
       try {
         sanctions = await withTimeout(checkNameAgainstOFAC(nameToCheck), 5000);
-        debug.sanctionsRan = sanctions !== null;
-        debug.sanctionsTimedOut = sanctions === null;
       } catch (err) {
-        debug.sanctionsRan = false;
         console.error('[OFAC check error]', err instanceof Error ? err.message : err);
       }
     }
@@ -124,13 +110,16 @@ export async function POST(req: NextRequest) {
         subject,
         html: buildEmail(result.extractedName, formName ?? null, result.documentType, sanctions),
       });
-      debug.emailSent = true;
       console.log('[ID verify email] sent:', subject);
     } catch (err) {
-      debug.emailError = err instanceof Error ? err.message : String(err);
-      console.error('[ID verify email error]', debug.emailError);
+      console.error('[ID verify email error]', err instanceof Error ? err.message : err);
     }
   }
 
-  return NextResponse.json({ ...result, debug });
+  // Return only what the client needs — don't expose extracted PII
+  return NextResponse.json({
+    isIdentityDocument: result.isIdentityDocument,
+    documentType: result.documentType,
+    error: result.error,
+  });
 }

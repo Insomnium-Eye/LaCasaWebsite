@@ -209,7 +209,6 @@ export default function BookPage() {
               <PhoneInput
                 value={form.phone}
                 onChange={(phone) => setForm({ ...form, phone })}
-                className="mt-2 w-full"
                 placeholder={t('book.phone')}
               />
             </label>

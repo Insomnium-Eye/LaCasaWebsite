@@ -3,9 +3,9 @@ import { verifyAdminToken } from '@/lib/adminToken';
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  const { id } = params;
+  const { id } = await params;
   const token = req.nextUrl.searchParams.get('token') ?? '';
 
   if (!verifyAdminToken(id, token)) {

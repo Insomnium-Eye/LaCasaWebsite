@@ -41,9 +41,9 @@ function buildIcal(
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { unitSlug: string } },
+  { params }: { params: Promise<{ unitSlug: string }> },
 ) {
-  const { unitSlug } = params;
+  const { unitSlug } = await params;
 
   try {
     const { getSql } = await import('@/lib/db');

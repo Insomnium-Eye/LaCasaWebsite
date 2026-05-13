@@ -29,10 +29,10 @@ async function sendSms(to: string, message: string): Promise<void> {
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await req.json() as { action?: string; token?: string };
     const { action, token } = body;
 

@@ -40,6 +40,10 @@ export interface DepositResult {
   advanceDepositTiming: DepositTiming;
   seasonType: SeasonType;
   breakdown: DepositBreakdown;
+  // Long-stay (>28 nights) installment info
+  isMonthlyPlan?: boolean;
+  monthlyPayment?: number;   // baseNightlyRate × 28
+  installments?: number;     // how many additional 28-day payments after the first
 }
 
 export interface RefundDeduction {

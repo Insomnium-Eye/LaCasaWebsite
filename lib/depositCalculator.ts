@@ -45,11 +45,23 @@ export function calculateDeposit(
     Math.max(policy.minDeposit, Math.min(policy.maxDeposit, afterMultiplier))
   );
 
-  // 4. Advance deposit — short stays (≤ 7 nights) require full payment upfront
-  const advancePercent = booking.nights <= 7 ? 1 : policy.advanceDepositPercent;
-  const advanceDeposit = policy.advanceDepositEnabled
-    ? round2(booking.totalStayAmount * advancePercent)
-    : 0;
+  // 4. Advance deposit
+  //    ≤ 7 nights  → full stay amount upfront
+  //    8–28 nights → advanceDepositPercent of total
+  //    > 28 nights → first 28 nights as upfront, remainder paid in 28-day installments
+  const isMonthlyPlan = booking.nights > 28;
+  const monthlyPayment = isMonthlyPlan ? round2(booking.baseNightlyRate * 28) : 0;
+
+  let advanceDeposit = 0;
+  if (policy.advanceDepositEnabled) {
+    if (booking.nights <= 7) {
+      advanceDeposit = round2(booking.totalStayAmount);
+    } else if (isMonthlyPlan) {
+      advanceDeposit = monthlyPayment;
+    } else {
+      advanceDeposit = round2(booking.totalStayAmount * policy.advanceDepositPercent);
+    }
+  }
 
   // 5. Remaining balance after advance deposit
   const remainingBalance = round2(booking.totalStayAmount - advanceDeposit);
@@ -60,6 +72,11 @@ export function calculateDeposit(
     (policy.securityDepositTiming === 'upfront' ? securityDeposit : 0)
   );
 
+  // Remaining installments after the first 28-night payment
+  const installments = isMonthlyPlan
+    ? Math.ceil((booking.nights - 28) / 28)
+    : undefined;
+
   return {
     securityDeposit,
     advanceDeposit,
@@ -69,6 +86,9 @@ export function calculateDeposit(
     advanceDepositTiming: policy.advanceDepositTiming,
     seasonType: booking.seasonType,
     breakdown: { base, seasonMultiplier: multiplier, afterMultiplier, wasCapped },
+    isMonthlyPlan,
+    monthlyPayment: isMonthlyPlan ? monthlyPayment : undefined,
+    installments,
   };
 }
 

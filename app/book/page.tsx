@@ -293,10 +293,17 @@ export default function BookPage() {
                 )}
               </div>
               <div className="mt-4 space-y-2 border-t border-slate-700 pt-4 text-sm">
-                {depositResult.advanceDeposit > 0 && (
+                {depositResult.advanceDeposit > 0 && !depositResult.isMonthlyPlan && (
                   <div className="flex justify-between text-slate-300">
                     <span>{t('book.deposit.remainingBalance')}</span>
                     <span>{formatPrice(depositResult.remainingBalance, language, rate)}</span>
+                  </div>
+                )}
+                {depositResult.isMonthlyPlan && depositResult.installments != null && depositResult.monthlyPayment != null && (
+                  <div className="rounded-lg bg-amber-900/30 px-3 py-2 text-amber-200 text-xs">
+                    {language === 'es'
+                      ? `Pago mensual de ${formatPrice(depositResult.monthlyPayment, language, rate)} cada 28 días · ${depositResult.installments} pago${depositResult.installments !== 1 ? 's' : ''} restante${depositResult.installments !== 1 ? 's' : ''} tras el primero`
+                      : `${formatPrice(depositResult.monthlyPayment, language, rate)} every 28 days · ${depositResult.installments} further payment${depositResult.installments !== 1 ? 's' : ''} after the first`}
                   </div>
                 )}
                 <div className="flex justify-between font-semibold text-slate-100">

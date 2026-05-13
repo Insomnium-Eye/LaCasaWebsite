@@ -64,11 +64,11 @@ export default function PhoneInput({ value, onChange, className, placeholder }: 
   return (
     <div className={`flex ${className ?? ''}`} ref={dropdownRef}>
       {/* Country code picker */}
-      <div className="relative flex-shrink-0 self-stretch flex">
+      <div className="relative">
         <button
           type="button"
           onClick={() => setOpen(o => !o)}
-          className="flex w-full items-center gap-1.5 px-3 py-4 rounded-l-3xl border border-r-0 border-slate-300 bg-slate-100 text-slate-800 hover:bg-slate-200 transition whitespace-nowrap"
+          className="flex items-center gap-1.5 px-3 py-4 rounded-l-3xl border border-r-0 border-slate-300 bg-slate-100 text-slate-800 hover:bg-slate-200 transition whitespace-nowrap"
         >
           <span className="text-lg leading-none">{countryFlag(selectedCountry.iso)}</span>
           <span className="text-sm font-medium">{selectedCountry.dialCode}</span>

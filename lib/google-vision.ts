@@ -74,9 +74,24 @@ export function extractNameFromOCR(text: string): string | null {
     }
   }
 
-  // 3. Multi-line keyword (Mexican INE format): label on one line, value on next
-  // e.g. "APELLIDO PATERNO\nMARTINEZ\nAPELLIDO MATERNO\nGARCIA\nNOMBRE(S)\nJUAN CARLOS"
-  const SKIP_LABELS = /^(apellido\s+paterno|apellido\s+materno|nombre[s]?|domicilio|municipio|estado|curp|clave|folio|sección|año|vigencia)/i;
+  // 3. Mexican INE format: "NOMBRE" label followed by apellido paterno, apellido materno, given name(s)
+  //    e.g. "NOMBRE\nDURAN\nRAMIREZ\nROSA ELENA"
+  const isNameLike = (s: string) => /^[A-ZÁÉÍÓÚÜÑ][A-ZÁÉÍÓÚÜÑ\s]{1,40}$/.test(s);
+  const isLabel = (s: string) =>
+    /^(domicilio|municipio|estado|curp|clave|folio|sección|año|vigencia|emisión|emision|sexo|fecha)/i.test(s);
+  const nombreIdx = lines.findIndex((l) => /^nombre[s]?\(?s?\)?$/i.test(l));
+  if (nombreIdx !== -1) {
+    const next = lines.slice(nombreIdx + 1, nombreIdx + 4).filter((l) => isNameLike(l) && !isLabel(l));
+    if (next.length >= 2) {
+      // last entry is given name(s), earlier entries are apellidos
+      const givenName = next[next.length - 1];
+      const apellidos = next.slice(0, next.length - 1).join(' ');
+      return `${givenName} ${apellidos}`.trim();
+    }
+  }
+
+  // 3b. Separate APELLIDO PATERNO / APELLIDO MATERNO / NOMBRE(S) labels on own lines
+  const SKIP_LABELS = /^(apellido|domicilio|municipio|estado|curp|clave|folio|sección|año|vigencia)/i;
   let apellidoPaterno = '';
   let apellidoMaterno = '';
   let nombres = '';

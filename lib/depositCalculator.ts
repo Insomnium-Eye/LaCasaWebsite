@@ -45,9 +45,10 @@ export function calculateDeposit(
     Math.max(policy.minDeposit, Math.min(policy.maxDeposit, afterMultiplier))
   );
 
-  // 4. Advance deposit (fraction of total stay, credited toward balance — not an extra charge)
+  // 4. Advance deposit — short stays (≤ 7 nights) require full payment upfront
+  const advancePercent = booking.nights <= 7 ? 1 : policy.advanceDepositPercent;
   const advanceDeposit = policy.advanceDepositEnabled
-    ? round2(booking.totalStayAmount * policy.advanceDepositPercent)
+    ? round2(booking.totalStayAmount * advancePercent)
     : 0;
 
   // 5. Remaining balance after advance deposit

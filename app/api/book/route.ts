@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import { generateAdminToken } from '@/lib/adminToken';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -25,7 +26,7 @@ async function saveToSupabase(data: {
       (${data.name}, ${data.email || null}, ${data.phone || null},
        ${data.unitSlug}, ${data.unitName}, ${data.checkIn}, ${data.checkOut},
        ${data.nights}, ${data.guests || 1}, ${data.totalUsd || 0}, ${data.depositUsd || 0},
-       ${data.lockCode}, 'confirmed')
+       ${data.lockCode}, 'pending')
     RETURNING id`;
 
   const [firstName, ...rest] = data.name.trim().split(' ');
@@ -38,7 +39,7 @@ async function saveToSupabase(data: {
       VALUES
         (${firstName}, ${rest.join(' ') || ''}, ${data.email || ''}, ${data.phone || null},
          ${data.lockCode}, ${data.unitSlug}, ${data.unitName}, ${data.checkIn}, ${data.checkOut},
-         ${parseFloat(nightlyRate.toFixed(2))}, 'confirmed')`;
+         ${parseFloat(nightlyRate.toFixed(2))}, 'pending')`;
   } catch (err) {
     console.warn('[Booking] Reservation insert error:', err instanceof Error ? err.message : err);
   }
@@ -79,58 +80,66 @@ export async function POST(request: NextRequest) {
       console.warn('[Booking] DB save skipped:', dbError);
     }
 
-    // Send guest confirmation email
+    // Guest pending email (lock code withheld until admin confirms)
     if (email && process.env.RESEND_API_KEY) {
       await resend.emails.send({
         from: 'La Casa Oaxaca <onboarding@resend.dev>',
         to: [email],
         replyTo: 'ebm22david@gmail.com',
-        subject: '🎉 Booking Confirmed – La Casa Oaxaca',
+        subject: '📩 Booking Request Received – La Casa Oaxaca',
         html: `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #8d4a3f;">Your stay is confirmed!</h2>
+          <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
+            <h2 style="color:#8d4a3f;">We've received your booking request!</h2>
             <p>Hi ${firstName},</p>
-            <p>Your booking at <strong>${unitName}, La Casa Oaxaca</strong> is confirmed.</p>
-            <table style="width:100%; border-collapse:collapse; margin: 20px 0;">
-              <tr><td style="padding:8px; color:#555;">Check-in</td><td style="padding:8px; font-weight:bold;">${checkIn}</td></tr>
-              <tr style="background:#f9f9f9;"><td style="padding:8px; color:#555;">Check-out</td><td style="padding:8px; font-weight:bold;">${checkOut}</td></tr>
-              <tr><td style="padding:8px; color:#555;">Nights</td><td style="padding:8px; font-weight:bold;">${nights}</td></tr>
-              <tr style="background:#f9f9f9;"><td style="padding:8px; color:#555;">Guests</td><td style="padding:8px; font-weight:bold;">${guests}</td></tr>
+            <p>Thanks for choosing <strong>${unitName}, La Casa Oaxaca</strong>. Your request is under review and you'll receive a confirmation or update shortly.</p>
+            <table style="width:100%;border-collapse:collapse;margin:20px 0;">
+              <tr><td style="padding:8px;color:#555;">Check-in</td><td style="padding:8px;font-weight:bold;">${checkIn}</td></tr>
+              <tr style="background:#f9f9f9;"><td style="padding:8px;color:#555;">Check-out</td><td style="padding:8px;font-weight:bold;">${checkOut}</td></tr>
+              <tr><td style="padding:8px;color:#555;">Nights</td><td style="padding:8px;font-weight:bold;">${nights}</td></tr>
+              <tr style="background:#f9f9f9;"><td style="padding:8px;color:#555;">Guests</td><td style="padding:8px;font-weight:bold;">${guests}</td></tr>
             </table>
-            <div style="background:#fdf3f0; border-left:4px solid #8d4a3f; padding:20px; margin:24px 0; border-radius:8px;">
-              <p style="margin:0 0 8px; font-size:14px; color:#8d4a3f; text-transform:uppercase; letter-spacing:0.1em;">🔑 Your Lock Code</p>
-              <p style="margin:0; font-size:3rem; font-weight:bold; letter-spacing:0.4em; color:#1a1008;">${lockCode}</p>
-              <p style="margin:8px 0 0; font-size:13px; color:#666;">Use this code to unlock your unit door. Keep it safe.</p>
-            </div>
-            <p>You can also use this code — or your email/phone — to access the <a href="https://oaxaca-rental.com/portal" style="color:#8d4a3f;">Guest Portal</a>.</p>
-            <p style="color:#888; font-size:13px; margin-top:32px;">Questions? Reply to this email or message us on WhatsApp.<br>— La Casa Oaxaca</p>
+            <p style="color:#888;font-size:13px;margin-top:32px;">Questions? Reply to this email or message us on WhatsApp.<br>— La Casa Oaxaca</p>
           </div>
         `,
-      });
+      }).catch((err: unknown) => console.error('[Guest pending email]', err));
     }
 
-    // Notify admin
+    // Admin notification with Confirm / Deny buttons
     if (process.env.RESEND_API_KEY) {
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://oaxaca-rental.com';
+      const reviewUrl = dbSaved
+        ? `${baseUrl}/admin/booking/${bookingId}?token=${generateAdminToken(bookingId)}`
+        : null;
+
       await resend.emails.send({
         from: 'La Casa Oaxaca <onboarding@resend.dev>',
         to: ['ebm22david@gmail.com'],
-        subject: `New Booking: ${name} – ${unitName} (${checkIn})`,
+        subject: `⏳ New Booking Request: ${name} – ${unitName} (${checkIn})`,
         html: `
-          <h3>New Booking Confirmed</h3>
-          <ul>
-            <li><strong>Guest:</strong> ${name}</li>
-            <li><strong>Email:</strong> ${email || 'N/A'}</li>
-            <li><strong>Phone:</strong> ${phone || 'N/A'}</li>
-            <li><strong>Unit:</strong> ${unitName}</li>
-            <li><strong>Check-in:</strong> ${checkIn}</li>
-            <li><strong>Check-out:</strong> ${checkOut}</li>
-            <li><strong>Nights:</strong> ${nights}</li>
-            <li><strong>Guests:</strong> ${guests}</li>
-            <li><strong>Total:</strong> $${(totalUsd || 0).toFixed(2)} USD</li>
-            <li><strong>Lock Code:</strong> <strong style="font-size:1.2em;">${lockCode}</strong></li>
-          </ul>
+          <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
+            <h2 style="color:#8d4a3f;">New Booking Request</h2>
+            <table style="width:100%;border-collapse:collapse;margin:16px 0;">
+              <tr><td style="padding:8px;color:#555;width:140px;">Guest</td><td style="padding:8px;font-weight:bold;">${name}</td></tr>
+              <tr style="background:#f9f9f9;"><td style="padding:8px;color:#555;">Email</td><td style="padding:8px;">${email || 'N/A'}</td></tr>
+              <tr><td style="padding:8px;color:#555;">Phone</td><td style="padding:8px;">${phone || 'N/A'}</td></tr>
+              <tr style="background:#f9f9f9;"><td style="padding:8px;color:#555;">Unit</td><td style="padding:8px;">${unitName}</td></tr>
+              <tr><td style="padding:8px;color:#555;">Check-in</td><td style="padding:8px;font-weight:bold;">${checkIn}</td></tr>
+              <tr style="background:#f9f9f9;"><td style="padding:8px;color:#555;">Check-out</td><td style="padding:8px;font-weight:bold;">${checkOut}</td></tr>
+              <tr><td style="padding:8px;color:#555;">Nights</td><td style="padding:8px;">${nights}</td></tr>
+              <tr style="background:#f9f9f9;"><td style="padding:8px;color:#555;">Guests</td><td style="padding:8px;">${guests}</td></tr>
+              <tr><td style="padding:8px;color:#555;">Total</td><td style="padding:8px;font-weight:bold;">$${(totalUsd || 0).toFixed(2)} USD</td></tr>
+              <tr style="background:#f9f9f9;"><td style="padding:8px;color:#555;">Lock Code</td><td style="padding:8px;font-size:1.3em;font-weight:bold;letter-spacing:0.2em;">${lockCode}</td></tr>
+            </table>
+            ${reviewUrl ? `
+            <div style="margin-top:24px;text-align:center;">
+              <a href="${reviewUrl}" style="display:inline-block;background:#4a7c3f;color:white;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;margin-right:12px;">✓ Review &amp; Confirm</a>
+              <a href="${reviewUrl}" style="display:inline-block;background:#c0392b;color:white;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;">✗ Review &amp; Deny</a>
+            </div>
+            <p style="color:#aaa;font-size:12px;text-align:center;margin-top:8px;">Both buttons open the same review page where you can confirm your decision.</p>
+            ` : '<p style="color:#c0392b;font-size:13px;">⚠️ DB save failed — manual action required.</p>'}
+          </div>
         `,
-      });
+      }).catch((err: unknown) => console.error('[Admin email]', err));
     }
 
     return NextResponse.json({ success: true, bookingId, lockCode, dbSaved, dbError });

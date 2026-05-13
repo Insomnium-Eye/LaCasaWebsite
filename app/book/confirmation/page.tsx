@@ -6,10 +6,13 @@ import Link from 'next/link';
 import BackgroundSlideshow from '../../../components/BackgroundSlideshow';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { formatDate } from '../../../lib/date';
+import useUsdToMxn from '../../../hooks/useUsdToMxn';
+import { formatPrice } from '../../../lib/currency';
 
 function ConfirmationContent() {
   const params = useSearchParams();
   const { t, language } = useLanguage();
+  const { rate } = useUsdToMxn();
 
   const code    = params.get('code') ?? '????';
   const name    = params.get('name') ?? 'Guest';
@@ -78,7 +81,7 @@ function ConfirmationContent() {
             <span className="text-slate-400">{t('book.confirmation.guests')}</span>
             <span className="text-slate-100 font-medium">{guests}</span>
             <span className="text-slate-400 font-semibold pt-2 border-t border-slate-700">{t('book.confirmation.total')}</span>
-            <span className="text-slate-100 font-semibold pt-2 border-t border-slate-700">${parseFloat(total).toFixed(2)} USD</span>
+            <span className="text-slate-100 font-semibold pt-2 border-t border-slate-700">{formatPrice(parseFloat(total), language, rate)}</span>
           </div>
         </div>
 

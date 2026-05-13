@@ -13,6 +13,7 @@ import BackgroundSlideshow from "../../components/BackgroundSlideshow";
 import IdVerification from "../../components/IdVerification";
 import EscrowModal from "../../components/EscrowModal";
 import DateInput from "../../components/DateInput";
+import PhoneInput from "../../components/PhoneInput";
 
 const initialState = {
   name: "",
@@ -145,6 +146,12 @@ export default function BookPage() {
       alert(t('book.entireHouseMinNightsError'));
       return;
     }
+    if (isRangeBlocked(form.checkIn, form.checkOut, blockedRanges)) {
+      alert(language === 'es'
+        ? 'Esas fechas no están disponibles para esa unidad. Por favor elige otras fechas.'
+        : 'Those dates are not available for that unit. Please choose different dates.');
+      return;
+    }
     setShowIdVerification(true);
   };
   
@@ -199,11 +206,10 @@ export default function BookPage() {
           <div className="grid gap-6 sm:grid-cols-2">
             <label className="block">
               <span className="text-sm font-semibold text-slate-900">{t('book.phone')} <span className="text-red-500">*</span></span>
-              <input
-                type="tel"
+              <PhoneInput
                 value={form.phone}
-                onChange={(event) => setForm({ ...form, phone: event.target.value })}
-                className="mt-2 w-full rounded-3xl border border-slate-300 bg-slate-50 p-4 text-slate-900 outline-none focus:border-garden focus:ring-2 focus:ring-garden/20"
+                onChange={(phone) => setForm({ ...form, phone })}
+                className="mt-2 w-full"
                 placeholder={t('book.phone')}
               />
             </label>
@@ -261,13 +267,19 @@ export default function BookPage() {
             </label>
           </div>
           {form.checkIn && form.checkOut && isRangeBlocked(form.checkIn, form.checkOut, blockedRanges) && (
-            <p className="rounded-xl bg-red-900/60 px-4 py-3 text-sm font-semibold text-red-200">
+            <div className="rounded-xl border border-red-500/40 bg-red-900/60 px-4 py-3 text-sm font-semibold text-red-200">
+              <span className="mr-2">🚫</span>
               {language === 'es'
-                ? 'Esas fechas no están disponibles. Por favor elige otras fechas.'
-                : 'Those dates are unavailable. Please choose different dates.'}
-            </p>
+                ? 'Esas fechas no están disponibles para esta unidad. Por favor elige otras fechas.'
+                : 'Those dates are already booked for this unit. Please choose different dates.'}
+            </div>
           )}
-          <button type="button" onClick={handleRequestDetails} className="inline-flex items-center justify-center rounded-full bg-garden px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#3c5a35]">
+          <button
+            type="button"
+            onClick={handleRequestDetails}
+            disabled={!!(form.checkIn && form.checkOut && isRangeBlocked(form.checkIn, form.checkOut, blockedRanges))}
+            className="inline-flex items-center justify-center rounded-full bg-garden px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#3c5a35] disabled:bg-slate-500 disabled:cursor-not-allowed"
+          >
             {t('book.requestDetails')}
           </button>
         </form>

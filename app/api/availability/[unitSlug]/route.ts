@@ -26,12 +26,12 @@ export async function GET(
       SELECT check_in::date::text AS check_in, check_out::date::text AS check_out
       FROM bookings
       WHERE unit_slug = ${unitSlug}
-        AND status IN ('confirmed', 'checked_in')
+        AND status IN ('pending', 'confirmed', 'checked_in')
       UNION ALL
       SELECT check_in::date::text, check_out::date::text
       FROM reservations
       WHERE unit_id = ${unitSlug}
-        AND status IN ('confirmed', 'checked_in')
+        AND status IN ('pending', 'confirmed', 'checked_in')
     `.catch(() => []);
 
     // External platform blocks (iCal imports)

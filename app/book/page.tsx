@@ -13,12 +13,13 @@ import BackgroundSlideshow from "../../components/BackgroundSlideshow";
 import IdVerification from "../../components/IdVerification";
 import EscrowModal from "../../components/EscrowModal";
 import DateInput from "../../components/DateInput";
-import PhoneInput from "../../components/PhoneInput";
+import { COUNTRIES, countryFlag } from "../../data/countryCodes";
 
 const initialState = {
   name: "",
   email: "",
   phone: "",
+  phoneDialCode: "+52",
   guests: 2,
   unit: "bungalow-1",
   checkIn: "",
@@ -206,11 +207,27 @@ export default function BookPage() {
           <div className="grid gap-6 sm:grid-cols-2">
             <label className="block">
               <span className="text-sm font-semibold text-slate-900">{t('book.phone')} <span className="text-red-500">*</span></span>
-              <PhoneInput
-                value={form.phone}
-                onChange={(phone) => setForm({ ...form, phone })}
-                placeholder={t('book.phone')}
-              />
+              <div className="mt-2 flex w-full rounded-3xl border border-slate-300 bg-slate-50 focus-within:border-garden focus-within:ring-2 focus-within:ring-garden/20 overflow-hidden">
+                <select
+                  value={form.phoneDialCode}
+                  onChange={(e) => setForm({ ...form, phoneDialCode: e.target.value })}
+                  className="flex-shrink-0 bg-slate-100 border-r border-slate-300 px-3 py-4 text-sm text-slate-900 outline-none cursor-pointer"
+                >
+                  {COUNTRIES.map((c) => (
+                    <option key={c.iso} value={c.dialCode}>
+                      {countryFlag(c.iso)} {c.dialCode}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  type="tel"
+                  value={form.phone}
+                  onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, '').slice(0, 15) })}
+                  inputMode="numeric"
+                  placeholder={t('book.phone')}
+                  className="min-w-0 flex-1 bg-transparent px-4 py-4 text-sm text-slate-900 outline-none"
+                />
+              </div>
             </label>
             <label className="block">
               <span className="text-sm font-semibold text-slate-900">{t('book.unit')}</span>
@@ -408,7 +425,7 @@ export default function BookPage() {
           bookingData={{
             name: form.name,
             email: form.email,
-            phone: form.phone,
+            phone: form.phone ? `${form.phoneDialCode} ${form.phone}` : '',
             unitSlug: selectedUnit.slug,
             unitName: t(`units.items.${selectedUnit.slug}.name`),
             checkIn: form.checkIn,

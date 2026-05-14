@@ -67,7 +67,7 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
     setCvv(raw.replace(/\D/g, '').slice(0, 4));
   }
 
-  const deposit = nights < 7 ? total : nights < 28 ? total * 0.5 : Math.max(total / nights, 75) * 7;
+  const deposit = bookingData.depositUsd;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

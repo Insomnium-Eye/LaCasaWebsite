@@ -222,7 +222,7 @@ export default function BookPage() {
                 <input
                   type="tel"
                   value={form.phone}
-                  onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, '').slice(0, 15) })}
+                  onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
                   inputMode="numeric"
                   placeholder={t('book.phone')}
                   className="min-w-0 flex-1 bg-transparent px-4 py-4 text-sm text-slate-900 outline-none"

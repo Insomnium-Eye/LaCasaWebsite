@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
 
     // Admin notification with Confirm / Deny buttons
     if (process.env.RESEND_API_KEY) {
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://oaxaca-rental.com';
+      const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL ?? 'https://oaxaca-rental.com').replace(/^﻿/, '');
       const adminToken = dbSaved ? generateAdminToken(bookingId) : null;
       const confirmUrl = adminToken ? `${baseUrl}/approve/${bookingId}/${adminToken}` : null;
       const denyUrl    = adminToken ? `${baseUrl}/reject/${bookingId}/${adminToken}`  : null;

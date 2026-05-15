@@ -104,12 +104,30 @@ export async function POST(request: NextRequest) {
       }).catch((err: unknown) => console.error('[Guest pending email]', err));
     }
 
+    // Guest receipt SMS (sent regardless of email)
+    if (phone) {
+      const receiptSms = `La Casa Oaxaca: Hi ${firstName}! We've received your booking request for ${unitName} (check-in: ${checkIn}). We'll text you once your stay is confirmed.`;
+      const sid = process.env.TWILIO_ACCOUNT_SID;
+      const authToken = process.env.TWILIO_AUTH_TOKEN;
+      const from = process.env.TWILIO_FROM_NUMBER;
+      if (sid && authToken && from) {
+        await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
+          method: 'POST',
+          headers: {
+            Authorization: 'Basic ' + Buffer.from(`${sid}:${authToken}`).toString('base64'),
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({ To: phone.replace(/\s/g, ''), From: from, Body: receiptSms }).toString(),
+        }).catch((err: unknown) => console.error('[Receipt SMS]', err));
+      }
+    }
+
     // Admin notification with Confirm / Deny buttons
     if (process.env.RESEND_API_KEY) {
       const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://oaxaca-rental.com';
       const adminToken = dbSaved ? generateAdminToken(bookingId) : null;
-      const confirmUrl = adminToken ? `${baseUrl}/api/booking/${bookingId}/approve/${adminToken}` : null;
-      const denyUrl    = adminToken ? `${baseUrl}/api/booking/${bookingId}/reject/${adminToken}`  : null;
+      const confirmUrl = adminToken ? `${baseUrl}/approve/${bookingId}/${adminToken}` : null;
+      const denyUrl    = adminToken ? `${baseUrl}/reject/${bookingId}/${adminToken}`  : null;
 
       await resend.emails.send({
         from: 'La Casa Oaxaca <onboarding@resend.dev>',

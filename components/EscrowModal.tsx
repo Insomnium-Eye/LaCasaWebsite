@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useLanguage } from '../contexts/LanguageContext';
 import { formatDate } from '../lib/date';
 import { formatPrice } from '../lib/currency';
@@ -37,7 +36,6 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
 }) => {
   const { t, language } = useLanguage();
   const { formatCurrency } = useUsdToMxn();
-  const router = useRouter();
 
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'spei'>('card');
   const [cardNumber, setCardNumber] = useState('');
@@ -46,6 +44,7 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
   const [cardholderName, setCardholderName] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [submitted, setSubmitted] = useState(false);
 
   function handleCardNumber(raw: string) {
     const digits = raw.replace(/\D/g, '').slice(0, 16);
@@ -102,24 +101,49 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
         return;
       }
 
-      const params = new URLSearchParams({
-        id: data.bookingId,
-        code: data.lockCode,
-        name: bookingData.name,
-        unit: bookingData.unitName,
-        checkin: bookingData.checkIn,
-        checkout: bookingData.checkOut,
-        nights: String(bookingData.nights),
-        guests: String(bookingData.guests),
-        total: String(bookingData.totalUsd.toFixed(2)),
-      });
-
-      router.push(`/book/confirmation?${params.toString()}`);
+      setSubmitted(true);
     } catch (err) {
       setError(t('book.payment.errorNetwork'));
       setSubmitting(false);
     }
   };
+
+  if (submitted) {
+    return (
+      <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+        <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl text-gray-900 text-center space-y-5">
+          <div className="flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-4xl mx-auto">
+            📩
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900">
+            {language === 'es' ? '¡Solicitud recibida!' : 'Request Received!'}
+          </h2>
+          <p className="text-gray-600 text-sm leading-relaxed">
+            {language === 'es'
+              ? `Gracias, ${bookingData.name.split(' ')[0]}. Tu solicitud de reserva está siendo revisada. Recibirás un correo con la confirmación y tu código de acceso en breve.`
+              : `Thanks, ${bookingData.name.split(' ')[0]}. Your booking request is under review. You'll receive an email with confirmation and your lock code shortly.`}
+          </p>
+          <div className="bg-gray-50 rounded-xl p-4 text-left text-sm space-y-1">
+            <p className="font-semibold text-gray-900">{bookingData.unitName}</p>
+            <p className="text-gray-600">
+              {formatDate(bookingData.checkIn, language)} → {formatDate(bookingData.checkOut, language)} · {nights} {nights !== 1 ? t('book.payment.nights') : t('book.payment.night')}
+            </p>
+          </div>
+          <p className="text-xs text-gray-400">
+            {language === 'es'
+              ? 'Revisa tu bandeja de entrada — te enviamos un correo de confirmación.'
+              : 'Check your inbox — we sent you a confirmation email.'}
+          </p>
+          <button
+            onClick={onClose}
+            className="w-full bg-garden hover:bg-[#3c5a35] text-white font-semibold py-3 px-4 rounded-lg transition"
+          >
+            {language === 'es' ? 'Cerrar' : 'Close'}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">

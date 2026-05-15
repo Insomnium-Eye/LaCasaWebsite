@@ -107,9 +107,9 @@ export async function POST(request: NextRequest) {
     // Admin notification with Confirm / Deny buttons
     if (process.env.RESEND_API_KEY) {
       const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://oaxaca-rental.com';
-      const reviewUrl = dbSaved
-        ? `${baseUrl}/admin/booking/${bookingId}?token=${generateAdminToken(bookingId)}`
-        : null;
+      const adminToken = dbSaved ? generateAdminToken(bookingId) : null;
+      const confirmUrl = adminToken ? `${baseUrl}/api/booking/${bookingId}/action?token=${adminToken}&action=confirm` : null;
+      const denyUrl    = adminToken ? `${baseUrl}/api/booking/${bookingId}/action?token=${adminToken}&action=deny`    : null;
 
       await resend.emails.send({
         from: 'La Casa Oaxaca <onboarding@resend.dev>',
@@ -130,12 +130,12 @@ export async function POST(request: NextRequest) {
               <tr><td style="padding:8px;color:#555;">Total</td><td style="padding:8px;font-weight:bold;">$${(totalUsd || 0).toFixed(2)} USD</td></tr>
               <tr style="background:#f9f9f9;"><td style="padding:8px;color:#555;">Lock Code</td><td style="padding:8px;font-size:1.3em;font-weight:bold;letter-spacing:0.2em;">${lockCode}</td></tr>
             </table>
-            ${reviewUrl ? `
+            ${confirmUrl && denyUrl ? `
             <div style="margin-top:24px;text-align:center;">
-              <a href="${reviewUrl}" style="display:inline-block;background:#4a7c3f;color:white;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;margin-right:12px;">✓ Review &amp; Confirm</a>
-              <a href="${reviewUrl}" style="display:inline-block;background:#c0392b;color:white;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;">✗ Review &amp; Deny</a>
+              <a href="${confirmUrl}" style="display:inline-block;background:#4a7c3f;color:white;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;margin-right:12px;">✓ Confirm Booking</a>
+              <a href="${denyUrl}" style="display:inline-block;background:#c0392b;color:white;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;">✗ Deny Booking</a>
             </div>
-            <p style="color:#aaa;font-size:12px;text-align:center;margin-top:8px;">Both buttons open the same review page where you can confirm your decision.</p>
+            <p style="color:#aaa;font-size:12px;text-align:center;margin-top:8px;">One click — no login required. Each button acts immediately.</p>
             ` : '<p style="color:#c0392b;font-size:13px;">⚠️ DB save failed — manual action required.</p>'}
           </div>
         `,

@@ -48,6 +48,13 @@ function isRangeBlocked(
   return blocked.some((r) => checkIn < r.end && end > r.start);
 }
 
+function formatPhoneDisplay(digits: string): string {
+  if (digits.length === 0) return '';
+  if (digits.length <= 3) return `(${digits}`;
+  if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+}
+
 function daysBetween(start: string, end: string) {
   const startDate = parseDate(start);
   const endDate = parseDate(end);
@@ -221,10 +228,10 @@ export default function BookPage() {
                 </select>
                 <input
                   type="tel"
-                  value={form.phone}
+                  value={formatPhoneDisplay(form.phone)}
                   onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
                   inputMode="numeric"
-                  placeholder={t('book.phone')}
+                  placeholder="(555) 555-5555"
                   className="min-w-0 flex-1 bg-transparent px-4 py-4 text-sm text-slate-900 outline-none"
                 />
               </div>

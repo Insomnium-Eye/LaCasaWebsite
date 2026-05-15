@@ -3,6 +3,7 @@ import { Resend } from 'resend';
 import { verifyAdminToken } from '@/lib/adminToken';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+const PORTAL_URL = 'https://oaxaca-rental.com/portal';
 
 async function sendSms(to: string, message: string): Promise<void> {
   const sid = process.env.TWILIO_ACCOUNT_SID;
@@ -25,6 +26,12 @@ async function sendSms(to: string, message: string): Promise<void> {
   if (!res.ok) {
     console.error('[SMS error]', await res.text());
   }
+}
+
+function buildLoginHint(hasEmail: boolean, hasPhone: boolean): string {
+  if (hasEmail && hasPhone) return 'your lock code, email address, or phone number';
+  if (hasEmail) return 'your lock code or email address';
+  return 'your lock code or phone number';
 }
 
 export async function POST(
@@ -74,19 +81,18 @@ export async function POST(
 
     const newStatus = action === 'confirm' ? 'confirmed' : 'denied';
     const [firstName] = booking.guest_name.trim().split(' ');
+    const hasEmail = !!booking.email;
+    const hasPhone = !!booking.phone;
 
-    // Update bookings table
     await sql`UPDATE bookings SET status = ${newStatus} WHERE id = ${id}::uuid`;
-
-    // Try to mirror into reservations table
     await sql`
       UPDATE reservations SET status = ${newStatus}
       WHERE digital_key = ${booking.lock_code}
     `.catch(() => null);
 
-    // Guest email
-    if (booking.email && process.env.RESEND_API_KEY) {
-      if (action === 'confirm') {
+    if (action === 'confirm') {
+      if (hasEmail && process.env.RESEND_API_KEY) {
+        const loginHint = buildLoginHint(true, hasPhone);
         await resend.emails.send({
           from: 'La Casa Oaxaca <onboarding@resend.dev>',
           to: [booking.email],
@@ -94,9 +100,9 @@ export async function POST(
           subject: '🎉 Your Stay is Confirmed – La Casa Oaxaca',
           html: `
             <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
-              <h2 style="color:#8d4a3f;">Your stay is confirmed!</h2>
+              <h2 style="color:#8d4a3f;">🎉 Your stay is confirmed!</h2>
               <p>Hi ${firstName},</p>
-              <p>Great news — your booking at <strong>${booking.unit_name}, La Casa Oaxaca</strong> has been confirmed.</p>
+              <p>Great news — your booking at <strong>${booking.unit_name}, La Casa Oaxaca</strong> has been confirmed. We can't wait to welcome you!</p>
               <table style="width:100%;border-collapse:collapse;margin:20px 0;">
                 <tr><td style="padding:8px;color:#555;">Check-in</td><td style="padding:8px;font-weight:bold;">${booking.check_in}</td></tr>
                 <tr style="background:#f9f9f9;"><td style="padding:8px;color:#555;">Check-out</td><td style="padding:8px;font-weight:bold;">${booking.check_out}</td></tr>
@@ -106,14 +112,33 @@ export async function POST(
               <div style="background:#fdf3f0;border-left:4px solid #8d4a3f;padding:20px;margin:24px 0;border-radius:8px;">
                 <p style="margin:0 0 8px;font-size:14px;color:#8d4a3f;text-transform:uppercase;letter-spacing:0.1em;">🔑 Your Lock Code</p>
                 <p style="margin:0;font-size:3rem;font-weight:bold;letter-spacing:0.4em;color:#1a1008;">${booking.lock_code}</p>
-                <p style="margin:8px 0 0;font-size:13px;color:#666;">Use this code to unlock your unit door. Keep it safe.</p>
+                <p style="margin:8px 0 0;font-size:13px;color:#666;">Enter this code on your unit's keypad to unlock the door.</p>
               </div>
-              <p>Access the <a href="https://oaxaca-rental.com/portal" style="color:#8d4a3f;">Guest Portal</a> with your lock code, email, or phone number.</p>
+              <div style="background:#f0f7f0;border-left:4px solid #4a7043;padding:16px;margin:20px 0;border-radius:8px;">
+                <p style="margin:0 0 6px;font-size:14px;color:#4a7043;font-weight:bold;">🏠 Guest Portal</p>
+                <p style="margin:0 0 8px;font-size:13px;color:#555;">Access your booking details, make requests, and manage your stay at<br>
+                  <a href="${PORTAL_URL}" style="color:#4a7043;font-weight:bold;">${PORTAL_URL}</a></p>
+                <p style="margin:0;font-size:13px;color:#555;">Log in with ${loginHint}.</p>
+              </div>
+              <div style="background:#fff8f0;border-left:4px solid #c36a4f;padding:16px;margin:20px 0;border-radius:8px;">
+                <p style="margin:0 0 6px;font-size:14px;color:#c36a4f;font-weight:bold;">✈️ Flying In? Request a Ride</p>
+                <p style="margin:0;font-size:13px;color:#555;">Use the <strong>"Request a Ride"</strong> feature in your Guest Portal to arrange an airport pickup. We'll have someone ready to welcome you!</p>
+              </div>
               <p style="color:#888;font-size:13px;margin-top:32px;">Questions? Reply to this email or message us on WhatsApp.<br>— La Casa Oaxaca</p>
             </div>
           `,
         }).catch((err: unknown) => console.error('[Confirm email]', err));
-      } else {
+      }
+
+      if (hasPhone) {
+        const loginHint = hasEmail ? 'code, email, or phone' : 'code or phone';
+        const sms = `La Casa Oaxaca: Stay confirmed! Check-in: ${booking.check_in}. Lock code: ${booking.lock_code}. Portal: ${PORTAL_URL} (log in with your ${loginHint}). Flying in? Request airport pickup in the portal!`;
+        await sendSms(booking.phone, sms).catch((err: unknown) =>
+          console.error('[SMS]', err instanceof Error ? err.message : err),
+        );
+      }
+    } else {
+      if (hasEmail && process.env.RESEND_API_KEY) {
         await resend.emails.send({
           from: 'La Casa Oaxaca <onboarding@resend.dev>',
           to: [booking.email],
@@ -121,26 +146,25 @@ export async function POST(
           subject: 'Update on Your Booking Request – La Casa Oaxaca',
           html: `
             <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
-              <h2 style="color:#8d4a3f;">Booking Update</h2>
+              <h2 style="color:#8d4a3f;">Update on Your Booking Request</h2>
               <p>Hi ${firstName},</p>
               <p>Unfortunately, we're unable to accommodate your booking request for <strong>${booking.unit_name}</strong> from <strong>${booking.check_in}</strong> to <strong>${booking.check_out}</strong>.</p>
-              <p>This may be due to a scheduling conflict. Please feel free to select different dates or contact us directly — we'd love to find an option that works.</p>
+              <p>This may be due to a scheduling conflict. We'd love to find a time that works — please feel free to select different dates or contact us directly.</p>
+              <div style="background:#fff8f0;border-left:4px solid #c36a4f;padding:16px;margin:20px 0;border-radius:8px;">
+                <p style="margin:0;font-size:13px;color:#555;">💳 <strong>Escrow Released:</strong> Any payment held has been fully released and will be returned to your original payment method within <strong>3–5 business days</strong>.</p>
+              </div>
               <p style="color:#888;font-size:13px;margin-top:32px;">Questions? Reply to this email or message us on WhatsApp.<br>— La Casa Oaxaca</p>
             </div>
           `,
         }).catch((err: unknown) => console.error('[Deny email]', err));
       }
-    }
 
-    // Guest SMS (requires Twilio env vars)
-    if (booking.phone) {
-      const smsText =
-        action === 'confirm'
-          ? `La Casa Oaxaca: Your stay is confirmed! Check-in: ${booking.check_in}. Lock code: ${booking.lock_code}. See you soon!`
-          : `La Casa Oaxaca: We're unable to accommodate your booking request (${booking.check_in}–${booking.check_out}). Please contact us for alternatives.`;
-      await sendSms(booking.phone, smsText).catch((err: unknown) =>
-        console.error('[SMS]', err instanceof Error ? err.message : err),
-      );
+      if (hasPhone) {
+        const sms = `La Casa Oaxaca: We're unable to accommodate your request (${booking.check_in}–${booking.check_out}). Your payment will be fully refunded within 3–5 business days. Contact us for alternative dates.`;
+        await sendSms(booking.phone, sms).catch((err: unknown) =>
+          console.error('[SMS]', err instanceof Error ? err.message : err),
+        );
+      }
     }
 
     return NextResponse.json({ success: true, status: newStatus });

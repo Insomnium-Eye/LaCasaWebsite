@@ -108,8 +108,8 @@ export async function POST(request: NextRequest) {
     if (process.env.RESEND_API_KEY) {
       const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://oaxaca-rental.com';
       const adminToken = dbSaved ? generateAdminToken(bookingId) : null;
-      const confirmUrl = adminToken ? `${baseUrl}/api/booking/${bookingId}/action?token=${adminToken}&action=confirm` : null;
-      const denyUrl    = adminToken ? `${baseUrl}/api/booking/${bookingId}/action?token=${adminToken}&action=deny`    : null;
+      const confirmUrl = adminToken ? `${baseUrl}/api/booking/${bookingId}/action?token=${adminToken}&amp;action=confirm` : null;
+      const denyUrl    = adminToken ? `${baseUrl}/api/booking/${bookingId}/action?token=${adminToken}&amp;action=deny`    : null;
 
       await resend.emails.send({
         from: 'La Casa Oaxaca <onboarding@resend.dev>',

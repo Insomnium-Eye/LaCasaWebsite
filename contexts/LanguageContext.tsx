@@ -12,8 +12,25 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
+function detectLanguage(): Language {
+  if (typeof window === 'undefined') return 'en';
+  const stored = localStorage.getItem('la-casa-language');
+  if (stored === 'en' || stored === 'es') return stored;
+  const langs = navigator.languages?.length ? navigator.languages : [navigator.language];
+  return langs.some(l => l.toLowerCase().startsWith('es')) ? 'es' : 'en';
+}
+
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState<Language>('en');
+  const [language, setLanguageState] = useState<Language>('en');
+
+  useEffect(() => {
+    setLanguageState(detectLanguage());
+  }, []);
+
+  const setLanguage = (lang: Language) => {
+    localStorage.setItem('la-casa-language', lang);
+    setLanguageState(lang);
+  };
 
   useEffect(() => {
     document.documentElement.lang = language;

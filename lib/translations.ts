@@ -487,7 +487,7 @@ export const translations = {
         description: "Immerse yourself in the heart of Oaxaca City with a comprehensive walking tour.",
         highlightsTitle: "Tour Highlights",
         highlights: [
-          "Explore El Llano Park, the vibrant Zócalo, Santo Domingo Church, and surrounding colonial areas.",
+          "Explore the Jardín Etnobotánico, the vibrant Zócalo, Santo Domingo Church, and surrounding colonial areas.",
           "Learn about Oaxaca's history, important historical figures, and local traditions.",
           "Includes transportation for breakfast and lunch at well-known Oaxacan restaurants."
         ],
@@ -1024,7 +1024,7 @@ export const translations = {
         description: "Sumérjase en el corazón de la ciudad con un completo tour a pie.",
         highlightsTitle: "Puntos Destacados",
         highlights: [
-          "Explore el Parque El Llano, el vibrante Zócalo, la Iglesia de Santo Domingo y áreas coloniales.",
+          "Explore el Jardín Etnobotánico, el vibrante Zócalo, la Iglesia de Santo Domingo y áreas coloniales.",
           "Aprenda sobre la historia de Oaxaca, figuras históricas importantes y tradiciones locales.",
           "Incluye transporte para desayuno y comida en reconocidos restaurantes oaxaqueños."
         ],

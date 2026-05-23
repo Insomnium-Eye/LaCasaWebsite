@@ -9,6 +9,7 @@ export const translations = {
       gallery: "Gallery",
       faq: "FAQ",
       contact: "Contact",
+      tours: "Tours",
       bookDirect: "Book direct",
       backToHome: "← Back to Home",
       guestSignIn: "Already a guest? Sign in!"
@@ -236,6 +237,15 @@ export const translations = {
         night: "night",
         week: "week",
         month: "month"
+      },
+      paymentPolicy: {
+        title: "Payment Policy",
+        deposit: "$100 USD refundable security deposit required for all bookings.",
+        short: "Stays ≤ 7 nights: full balance due at booking.",
+        medium: "Stays 8–27 nights: 20% advance deposit at booking; remaining 80% due before check-in.",
+        long: "Stays 28+ nights: first 28 nights due at booking; remaining balance in 28-day installments.",
+        cash: "Cash payment: 19% discount · remaining balance payable at check-in.",
+        card: "Card / Direct Deposit: payment follows the schedule above."
       },
       confirmation: {
         title: "Booking Confirmed!",
@@ -468,6 +478,40 @@ export const translations = {
         verificationDesc: "Verify your identity"
       }
     },
+    tours: {
+      heading: "Tours in Oaxaca",
+      subtitle: "Discover the rich culture, history, and natural beauty of Oaxaca with our expert-guided tours. All tours are led by a fully bilingual guide fluent in English and Spanish.",
+      cityTour: {
+        label: "Tour 1",
+        title: "Guided City Tour of Oaxaca de Juárez",
+        description: "Immerse yourself in the heart of Oaxaca City with a comprehensive walking tour.",
+        highlightsTitle: "Tour Highlights",
+        highlights: [
+          "Explore El Llano Park, the vibrant Zócalo, Santo Domingo Church, and surrounding colonial areas.",
+          "Learn about Oaxaca's history, important historical figures, and local traditions.",
+          "Includes transportation for breakfast and lunch at well-known Oaxacan restaurants."
+        ],
+        durationLabel: "Duration",
+        duration: "5–6 hours (including meals)",
+        priceLabel: "Price",
+        pricePerPerson: "per person",
+        languagesLabel: "Languages",
+        languages: "English or Spanish",
+        scheduleLabel: "Schedule",
+        schedule: "Daily morning departures"
+      },
+      hikingTours: {
+        label: "Tour 2",
+        title: "Hiking Tours",
+        description: "Explore the scenic mountains and trails around Oaxaca with experienced local guides.",
+        areasTitle: "Areas",
+        areas: ["Chigulera", "San Felipe", "Other trails available upon request"],
+        pricing: "Pricing varies by hike duration and difficulty. Contact us for details.",
+        languagesLabel: "Languages",
+        languages: "English or Spanish"
+      },
+      contactButton: "Contact Us to Book"
+    },
     idVerification: {
       title: "ID Verification",
       description: "Upload a photo of your government-issued ID or passport. Your name is automatically screened against the OFAC sanctions list (US Treasury).",
@@ -499,6 +543,7 @@ export const translations = {
       gallery: "Galería",
       faq: "Preguntas Frecuentes",
       contact: "Contacto",
+      tours: "Tours",
       bookDirect: "Reservar directo",
       backToHome: "← Volver al Inicio",
       guestSignIn: "¿Ya eres huésped? ¡Inicia sesión!"
@@ -730,6 +775,15 @@ export const translations = {
         week: "semana",
         month: "mes"
       },
+      paymentPolicy: {
+        title: "Política de Pago",
+        deposit: "Depósito de seguridad reembolsable de $100 USD requerido para todas las reservas.",
+        short: "Estadías ≤ 7 noches: pago completo al momento de la reserva.",
+        medium: "Estadías 8–27 noches: 20% de anticipo al reservar; el 80% restante antes del check-in.",
+        long: "Estadías 28+ noches: primeras 28 noches al reservar; saldo restante en pagos cada 28 días.",
+        cash: "Pago en efectivo: 19% de descuento · saldo restante pagadero al check-in.",
+        card: "Tarjeta / Depósito directo: el pago sigue el calendario indicado arriba."
+      },
       confirmation: {
         title: "¡Reserva Confirmada!",
         welcomePrefix: "Bienvenido/a,",
@@ -960,6 +1014,40 @@ export const translations = {
         verification: "Verificación de ID",
         verificationDesc: "Verifica tu identidad"
       }
+    },
+    tours: {
+      heading: "Tours en Oaxaca",
+      subtitle: "Descubra la rica cultura, historia y belleza natural de Oaxaca con nuestros tours guiados por expertos. Todos los tours son dirigidos por un guía completamente bilingüe en inglés y español.",
+      cityTour: {
+        label: "Tour 1",
+        title: "Tour Guiado por la Ciudad de Oaxaca de Juárez",
+        description: "Sumérjase en el corazón de la ciudad con un completo tour a pie.",
+        highlightsTitle: "Puntos Destacados",
+        highlights: [
+          "Explore el Parque El Llano, el vibrante Zócalo, la Iglesia de Santo Domingo y áreas coloniales.",
+          "Aprenda sobre la historia de Oaxaca, figuras históricas importantes y tradiciones locales.",
+          "Incluye transporte para desayuno y comida en reconocidos restaurantes oaxaqueños."
+        ],
+        durationLabel: "Duración",
+        duration: "5–6 horas (incluyendo comidas)",
+        priceLabel: "Precio",
+        pricePerPerson: "por persona",
+        languagesLabel: "Idiomas",
+        languages: "Inglés o Español",
+        scheduleLabel: "Horario",
+        schedule: "Salidas diarias por la mañana"
+      },
+      hikingTours: {
+        label: "Tour 2",
+        title: "Tours de Senderismo",
+        description: "Explore los impresionantes paisajes montañosos de Oaxaca con guías locales expertos.",
+        areasTitle: "Áreas",
+        areas: ["Chigulera", "San Felipe", "Otras rutas disponibles bajo solicitud"],
+        pricing: "Los precios varían según duración y dificultad. Contáctenos para detalles.",
+        languagesLabel: "Idiomas",
+        languages: "Inglés o Español"
+      },
+      contactButton: "Contáctenos para Reservar"
     },
     idVerification: {
       title: "Verificación de Identidad",

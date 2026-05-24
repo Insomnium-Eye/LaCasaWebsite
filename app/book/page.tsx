@@ -146,7 +146,7 @@ export default function BookPage() {
   };
 
   const handleRequestDetails = () => {
-    if (!form.name || (!form.email && !form.phone) || !form.checkIn || !form.checkOut || nights <= 0) {
+    if (!form.name || !form.email || !form.checkIn || !form.checkOut || nights <= 0) {
       alert(t('book.validationError'));
       return;
     }
@@ -213,7 +213,7 @@ export default function BookPage() {
           </div>
           <div className="grid gap-6 sm:grid-cols-2">
             <label className="block">
-              <span className="text-sm font-semibold text-slate-900">{t('book.phone')} <span className="text-red-500">*</span></span>
+              <span className="text-sm font-semibold text-slate-900">{t('book.phone')} <span className="text-slate-400 font-normal text-xs">(optional)</span></span>
               <div className="mt-2 flex w-full rounded-3xl border border-slate-300 bg-slate-50 focus-within:border-garden focus-within:ring-2 focus-within:ring-garden/20 overflow-hidden">
                 <select
                   value={form.phoneDialCode}

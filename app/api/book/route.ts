@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
       totalUsd, depositUsd,
     } = body;
 
-    if (!name || !unitSlug || !checkIn || !checkOut || !nights) {
+    if (!name || !email || !unitSlug || !checkIn || !checkOut || !nights) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 

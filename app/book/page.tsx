@@ -12,7 +12,7 @@ import type { BookingDetails, DepositTiming } from "../../lib/deposit";
 import BackgroundSlideshow from "../../components/BackgroundSlideshow";
 import IdVerification from "../../components/IdVerification";
 import EscrowModal from "../../components/EscrowModal";
-import DateInput from "../../components/DateInput";
+import DateRangePicker from "../../components/DateRangePicker";
 import { COUNTRIES, countryFlag } from "../../data/countryCodes";
 
 const initialState = {
@@ -76,10 +76,6 @@ export default function BookPage() {
 
   const today = new Date().toISOString().split('T')[0];
   const minNights = selectedUnit.slug === 'entire-house' ? 7 : 1;
-  const checkOutMinDate = form.checkIn
-    ? addDays(form.checkIn, selectedUnit.slug === 'entire-house' ? minNights : 1)
-    : today;
-
   // Fetch blocked dates whenever the selected unit changes
   useEffect(() => {
     fetch(`/api/availability/${selectedUnit.slug}`)
@@ -264,39 +260,17 @@ export default function BookPage() {
                 className="mt-2 w-full rounded-3xl border border-slate-300 bg-slate-50 p-4 text-slate-900 outline-none focus:border-garden focus:ring-2 focus:ring-garden/20"
               />
             </label>
-            <label className="block">
-              <span className="text-sm font-semibold text-slate-900">{t('book.checkIn')}</span>
-              <DateInput
-                value={form.checkIn}
-                onChange={(iso) => setForm({ ...form, checkIn: iso })}
-                language={language}
-                min={today}
-                required
-                className="mt-2 w-full rounded-3xl border border-slate-300 bg-slate-50 p-4 text-slate-900 outline-none focus:border-garden focus:ring-2 focus:ring-garden/20"
-              />
-            </label>
           </div>
-          <div className="grid gap-6 sm:grid-cols-2">
-            <label className="block">
-              <span className="text-sm font-semibold text-slate-900">{t('book.checkOut')}</span>
-              <DateInput
-                value={form.checkOut}
-                onChange={(iso) => setForm({ ...form, checkOut: iso })}
-                language={language}
-                min={checkOutMinDate}
-                required
-                className="mt-2 w-full rounded-3xl border border-slate-300 bg-slate-50 p-4 text-slate-900 outline-none focus:border-garden focus:ring-2 focus:ring-garden/20"
-              />
-            </label>
-          </div>
-          {form.checkIn && form.checkOut && isRangeBlocked(form.checkIn, form.checkOut, blockedRanges) && (
-            <div className="rounded-xl border border-red-500/40 bg-red-900/60 px-4 py-3 text-sm font-semibold text-red-200">
-              <span className="mr-2">🚫</span>
-              {language === 'es'
-                ? 'Esas fechas no están disponibles para esta unidad. Por favor elige otras fechas.'
-                : 'Those dates are already booked for this unit. Please choose different dates.'}
-            </div>
-          )}
+          <DateRangePicker
+            checkIn={form.checkIn}
+            checkOut={form.checkOut}
+            onCheckInChange={(iso) => setForm({ ...form, checkIn: iso, checkOut: '' })}
+            onCheckOutChange={(iso) => setForm({ ...form, checkOut: iso })}
+            blockedRanges={blockedRanges}
+            minDate={today}
+            minNights={minNights}
+            language={language}
+          />
           <button
             type="button"
             onClick={handleRequestDetails}

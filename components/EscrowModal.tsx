@@ -17,6 +17,7 @@ export interface BookingData {
   nights: number;
   guests: number;
   totalUsd: number;
+  subtotalUsd: number;
   depositUsd: number;
 }
 
@@ -37,7 +38,7 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
   const { t, language } = useLanguage();
   const { formatCurrency } = useUsdToMxn();
 
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'spei'>('card');
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'spei' | 'cash'>('card');
   const [cardNumber, setCardNumber] = useState('');
   const [expiry, setExpiry] = useState('');
   const [cvv, setCvv] = useState('');
@@ -176,11 +177,12 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
             <label className="block text-sm font-semibold text-gray-900 mb-2">{t('book.payment.paymentMethod')}</label>
             <select
               value={paymentMethod}
-              onChange={(e) => setPaymentMethod(e.target.value as 'card' | 'spei')}
+              onChange={(e) => setPaymentMethod(e.target.value as 'card' | 'spei' | 'cash')}
               className="w-full border border-gray-300 rounded-lg p-3 text-sm text-gray-900 bg-white"
             >
               <option value="card">{t('book.payment.creditCard')}</option>
               <option value="spei">{t('book.payment.spei')}</option>
+              <option value="cash">{t('book.payment.cash')}</option>
             </select>
           </div>
 
@@ -244,6 +246,17 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
             </div>
           )}
 
+          {paymentMethod === 'cash' && (
+            <div className="bg-green-50 border border-green-200 p-4 rounded-lg text-sm text-green-800 space-y-2">
+              <p>{t('book.payment.cashNotice')}</p>
+              <div className="flex justify-between pt-2 border-t border-green-200">
+                <span className="font-semibold">{t('book.payment.cashPrice')}</span>
+                <span className="font-bold">{formatPrice(bookingData.subtotalUsd, language)}</span>
+              </div>
+              <p className="text-xs text-green-600">{formatCurrency(bookingData.subtotalUsd)}</p>
+            </div>
+          )}
+
           {error && (
             <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">{error}</p>
           )}
@@ -267,6 +280,8 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
                   <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   {t('book.payment.processing')}
                 </span>
+              ) : paymentMethod === 'cash' ? (
+                language === 'es' ? 'Solicitar reserva' : 'Request Booking'
               ) : (
                 `${t('book.payment.payButton')} ${formatPrice(deposit, language)}`
               )}

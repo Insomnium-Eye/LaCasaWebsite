@@ -451,6 +451,7 @@ export default function BookPage() {
             nights,
             guests: form.guests,
             totalUsd: calculatePricing.total,
+            subtotalUsd: calculatePricing.subtotal,
             depositUsd: depositResult?.totalDueUpfront ?? calculatePricing.total * 0.3,
           }}
           onClose={() => setShowEscrow(false)}

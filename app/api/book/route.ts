@@ -111,14 +111,26 @@ export async function POST(request: NextRequest) {
       const authToken = process.env.TWILIO_AUTH_TOKEN;
       const from = process.env.TWILIO_FROM_NUMBER;
       if (sid && authToken && from) {
-        await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
-          method: 'POST',
-          headers: {
-            Authorization: 'Basic ' + Buffer.from(`${sid}:${authToken}`).toString('base64'),
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: new URLSearchParams({ To: phone.replace(/\s/g, ''), From: from, Body: receiptSms }).toString(),
-        }).catch((err: unknown) => console.error('[Receipt SMS]', err));
+        try {
+          const smsRes = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
+            method: 'POST',
+            headers: {
+              Authorization: 'Basic ' + Buffer.from(`${sid}:${authToken}`).toString('base64'),
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({ To: phone.replace(/\s/g, ''), From: from, Body: receiptSms }).toString(),
+          });
+          if (!smsRes.ok) {
+            const errBody = await smsRes.json().catch(() => ({}));
+            console.error('[Receipt SMS] Twilio error', smsRes.status, JSON.stringify(errBody));
+          } else {
+            console.log('[Receipt SMS] sent to', phone);
+          }
+        } catch (err) {
+          console.error('[Receipt SMS] network error', err);
+        }
+      } else {
+        console.warn('[Receipt SMS] missing env vars — TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, or TWILIO_FROM_NUMBER not set');
       }
     }
 

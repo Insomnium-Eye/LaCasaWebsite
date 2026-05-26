@@ -93,14 +93,16 @@ export const translations = {
       highlights: [
         "Direct booking with personalized service.",
         "Private parking, contactless digital locks, and mosquito-protected sleeping areas with bed nets surrounding every bed.",
-        "Authentic garden living with nearby cultural attractions."
+        "Authentic garden living with nearby cultural attractions.",
+        "Customized bilingual tours (English & Spanish) to authentic restaurants, tour sites, rivers, lakes, beaches, and mountain retreats.",
+        "Exclusive access to mountain hikes only available to locals and our guests."
       ],
       features: [
         { title: "Traditional style", description: "Warm textures, calm tones, and indoor/outdoor flow." },
         { title: "Fruit orchard", description: "Avocado, guava, mango, and lemon trees that frame the property." },
         { title: "Quiet and private", description: "Two bungalows plus a main-bedroom option with separate entrances." },
         { title: "Easy access", description: "Minutes from the city center and all Oaxaca attractions." },
-        { title: "In-unit kitchen appliances", description: "Each bungalow and room includes a private mini-fridge and electric oven for your convenience." },
+        { title: "In-unit kitchen appliances", description: "Each bungalow and room includes a private mini-fridge and electric grill for your convenience." },
         { title: "Future pool", description: "We're planning to install a refreshing pool for guests to enjoy during their stay." },
         { title: "Ozone water filtration", description: "An ozone water filtering system provides clean, purified drinking water throughout the property." },
         { title: "Local transportation service", description: "Arrange convenient rides to the Airport, Zócalo, Monte Albán, and other tourist hotspots for a small fee." }
@@ -627,14 +629,16 @@ export const translations = {
       highlights: [
         "Reserva directa con servicio personalizado.",
         "Estacionamiento privado, cerraduras digitales sin contacto y áreas de descanso protegidas con mosquiteros alrededor de cada cama.",
-        "Vida auténtica en el jardín con atracciones culturales cercanas."
+        "Vida auténtica en el jardín con atracciones culturales cercanas.",
+        "Tours personalizados bilingües (inglés y español) a restaurantes auténticos, sitios turísticos, ríos, lagos, playas y retiros en la montaña.",
+        "Acceso exclusivo a caminatas en la montaña, disponibles solo para locales y nuestros huéspedes."
       ],
       features: [
         { title: "Estilo tradicional", description: "Texturas cálidas, tonos tranquilos y flujo interior/exterior." },
         { title: "Huerto de frutas", description: "Árboles de aguacate, guayaba, mango y limón que rodean la propiedad." },
         { title: "Tranquilo y privado", description: "Dos bungalows más una opción de habitación principal con entradas separadas." },
         { title: "Fácil acceso", description: "Minutos al centro de la ciudad y todas las atracciones de Oaxaca." },
-        { title: "Electrodomésticos en cada unidad", description: "Cada bungalow y habitación incluye minirefrigerador privado y estufa eléctrico para tu comodidad." },
+        { title: "Electrodomésticos en cada unidad", description: "Cada bungalow y habitación incluye minirefrigerador privado y parrilla eléctrica para tu comodidad." },
         { title: "Piscina futura", description: "Planeamos instalar una refrescante piscina para que los huéspedes la disfruten durante su estadía." },
         { title: "Filtración de agua por ozono", description: "Un sistema de filtración de agua por ozono proporciona agua potable limpia y purificada en toda la propiedad." },
         { title: "Servicio de transporte local", description: "Organiza paseos convenientes al Aeropuerto, Zócalo, Monte Albán y otros puntos turísticos por un pequeño costo." }

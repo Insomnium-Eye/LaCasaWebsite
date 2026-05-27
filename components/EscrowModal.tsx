@@ -10,6 +10,7 @@ export interface BookingData {
   name: string;
   email: string;
   phone: string;
+  whatsappConsent: boolean;
   unitSlug: string;
   unitName: string;
   checkIn: string;
@@ -82,6 +83,7 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
           name: bookingData.name,
           email: bookingData.email,
           phone: bookingData.phone,
+          whatsappConsent: bookingData.whatsappConsent,
           unitSlug: bookingData.unitSlug,
           unitName: bookingData.unitName,
           checkIn: bookingData.checkIn,

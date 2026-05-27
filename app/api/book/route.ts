@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const {
-      name, email, phone,
+      name, email, phone, whatsappConsent,
       unitSlug, unitName,
       checkIn, checkOut, nights, guests,
       totalUsd, depositUsd,
@@ -104,8 +104,8 @@ export async function POST(request: NextRequest) {
       }).catch((err: unknown) => console.error('[Guest pending email]', err));
     }
 
-    // Guest receipt SMS (sent regardless of email)
-    if (phone) {
+    // Guest WhatsApp notification — only sent when user opted in
+    if (phone && whatsappConsent) {
       const receiptSms = `La Casa Oaxaca: Hi ${firstName}! We've received your booking request for ${unitName} (check-in: ${checkIn}). We'll text you once your stay is confirmed.`;
       const sid = process.env.TWILIO_ACCOUNT_SID;
       const authToken = process.env.TWILIO_AUTH_TOKEN;

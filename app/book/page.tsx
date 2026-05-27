@@ -20,6 +20,7 @@ const initialState = {
   email: "",
   phone: "",
   phoneDialCode: "+52",
+  whatsappConsent: false,
   guests: 2,
   unit: "bungalow-1",
   checkIn: "",
@@ -231,6 +232,21 @@ export default function BookPage() {
                   className="min-w-0 flex-1 bg-transparent px-4 py-4 text-sm text-slate-900 outline-none"
                 />
               </div>
+              {form.phone && (
+                <label className="mt-2 flex items-start gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.whatsappConsent ?? false}
+                    onChange={(e) => setForm({ ...form, whatsappConsent: e.target.checked })}
+                    className="mt-0.5 h-4 w-4 rounded border-slate-300 accent-garden shrink-0"
+                  />
+                  <span className="text-xs text-slate-500 leading-relaxed">
+                    {language === 'es'
+                      ? 'Acepto recibir actualizaciones de mi reserva por WhatsApp de La Casa Oaxaca. No es obligatorio.'
+                      : 'I agree to receive WhatsApp booking updates from La Casa Oaxaca. Not required to book.'}
+                  </span>
+                </label>
+              )}
             </label>
             <label className="block">
               <span className="text-sm font-semibold text-slate-900">{t('book.unit')}</span>
@@ -418,6 +434,7 @@ export default function BookPage() {
             name: form.name,
             email: form.email,
             phone: form.phone ? `${form.phoneDialCode} ${form.phone}` : '',
+            whatsappConsent: form.whatsappConsent,
             unitSlug: selectedUnit.slug,
             unitName: t(`units.items.${selectedUnit.slug}.name`),
             checkIn: form.checkIn,

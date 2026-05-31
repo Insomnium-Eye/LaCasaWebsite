@@ -499,7 +499,10 @@ export const translations = {
           "Museo del Palacio - Espacio de la Diversidad (Museo del Palacio Universum): Located on the south side of the Zócalo in the former State Government Palace. This interactive museum focuses on Oaxacan cultures, history, and diversity, with exhibits, murals, and educational activities for all ages.",
           "Museo de las Culturas de Oaxaca: About a 10-minute walk north of the Zócalo along the Andador Macedonio Alcalá, near the Templo de Santo Domingo. Housed in former monastery buildings with extensive collections on pre-Hispanic and Oaxacan history, artifacts, and regional cultures.",
           "Museo Textil de Oaxaca (Textile Museum): A short walk from the Zócalo near the Santo Domingo area. Showcases traditional and contemporary textiles highlighting Oaxacan weaving traditions, often paired with the nearby Centro Cultural San Pablo.",
-          "Museo de Arte Contemporáneo de Oaxaca (MACO): Located in the historic center within walking distance. Features modern and contemporary art exhibitions in a serene setting with a courtyard."
+          "Museo de Arte Contemporáneo de Oaxaca (MACO): Located in the historic center within walking distance. Features modern and contemporary art exhibitions in a serene setting with a courtyard.",
+          "Mercado Benito Juárez: One to two blocks south of the Zócalo. This historic covered market (dating to 1893) offers a mix of crafts, food, textiles, and everyday goods — a lively spot for souvenirs and local flavors.",
+          "Mercado de Artesanías: Approximately five blocks southwest of the Zócalo. Dedicated to handicrafts, with a wide selection of jewelry, rugs, wooden figures (alebrijes), and other artisanal items at competitive prices.",
+          "Boutiques and specialty shops along García Vigil, Macedonio Alcalá, and nearby streets: Look for stores such as Los Baúles de Juana Cata (high-quality textiles and crafts), La Mano Mágica (art and crafts gallery), and others specializing in mezcal, chocolate, or contemporary artisan goods. Premium shops are mostly north of the Zócalo; more accessible markets to the south."
         ],
         durationLabel: "Duration",
         duration: "5–6 hours (including meals)",
@@ -510,15 +513,47 @@ export const translations = {
         scheduleLabel: "Schedule",
         schedule: "Daily morning departures"
       },
-      hikingTours: {
+      natureTour: {
         label: "Tour 2",
-        title: "Hiking Tours",
-        description: "Explore the scenic mountains and trails around Oaxaca with experienced local guides.",
-        areasTitle: "Areas",
-        areas: ["Chigulera", "San Felipe", "Other trails available upon request"],
-        pricing: "Pricing varies by hike duration and difficulty. Contact us for details.",
+        title: "Guided Cultural & Nature Tour: El Tule and Artisan Villages",
+        description: "Immerse yourself in the rich Zapotec heritage east of Oaxaca City with this balanced half-day tour combining nature, traditional crafts, and cuisine.",
+        highlightsTitle: "Tour Highlights",
+        highlights: [
+          "Árbol del Tule (Tule Tree): Visit the world's widest tree, a majestic Montezuma cypress estimated to be over 1,400–2,000 years old, on the grounds of the Iglesia de Santa María del Tule. Enjoy a guided walk, learn its cultural significance and Zapotec legends, and explore the nearby Los Cinco Sabinos gardens.",
+          "Teotitlán del Valle: Explore this renowned Zapotec weaving village. Visit a traditional family workshop to observe natural dyeing and hand-weaving of wool rugs using ancestral techniques, with ample time to shop directly from artisans.",
+          "Local Market & Gastronomic Experience: Stop at the Mercado Gastronómico in Santa María del Tule or a selected restaurant in Teotitlán del Valle for authentic Oaxacan dishes — tlayudas, moles, tamales, or regional specialties — paired with fresh juices. Mezcal tasting is optional, with non-alcoholic alternatives available.",
+          "Additional Cultural Stops: Brief visit to the Palacio Municipal in Tule for insights into local governance and traditions, with opportunities to shop for rugs, alebrijes, or textiles."
+        ],
+        durationLabel: "Duration",
+        duration: "5–6 hours (including transportation and meals)",
+        priceLabel: "Price",
+        pricePerPerson: "per person",
+        groupDiscount: "Group discounts available for 4+ participants",
         languagesLabel: "Languages",
-        languages: "English or Spanish"
+        languages: "English or Spanish",
+        scheduleLabel: "Schedule",
+        schedule: "Daily morning departures (recommended 9:00 AM start)"
+      },
+      archaeologicalTour: {
+        label: "Tour 3",
+        title: "Guided Archaeological & Cultural Tour: El Tule and Mitla",
+        description: "Discover the ancient Zapotec legacy with this engaging half-day tour that blends natural wonders and significant archaeological heritage.",
+        highlightsTitle: "Tour Highlights",
+        highlights: [
+          "Árbol del Tule: Begin with a guided visit to the iconic Tule Tree and the adjacent 17th-century church. Learn about its natural history and cultural importance to the Zapotec people, and enjoy photo opportunities in the surrounding green spaces.",
+          "Zona Arqueológica de Mitla: Explore the impressive ancient Zapotec site known for its intricate geometric stone mosaics and distinctive architectural style. A professional guide will explain its history, rituals, and role as a post-Classic ceremonial center.",
+          "Shopping & Dining: Dedicated artisan shopping time in Teotitlán del Valle (textiles and crafts) en route or near the sites, plus a relaxed lunch of traditional Oaxacan cuisine at a reputable local restaurant.",
+          "Local Insights: Opportunities to observe daily life in surrounding communities and purchase authentic regional products such as handcrafted textiles or pottery."
+        ],
+        durationLabel: "Duration",
+        duration: "5–6 hours (streamlined itinerary with efficient routing)",
+        priceLabel: "Price",
+        pricePerPerson: "per person",
+        groupDiscount: "Group discounts available for 4+ participants",
+        languagesLabel: "Languages",
+        languages: "English or Spanish",
+        scheduleLabel: "Schedule",
+        schedule: "Daily morning departures"
       },
       contactButton: "Contact Us to Book"
     },
@@ -1046,7 +1081,10 @@ export const translations = {
           "Museo del Palacio - Espacio de la Diversidad (Museo del Palacio Universum): Ubicado en el lado sur del Zócalo, en el antiguo Palacio de Gobierno. Este museo interactivo se enfoca en las culturas, historia y diversidad oaxaqueña, con exhibiciones, murales y actividades educativas para todas las edades.",
           "Museo de las Culturas de Oaxaca: A unos 10 minutos caminando al norte del Zócalo por el Andador Macedonio Alcalá, cerca del Templo de Santo Domingo. Alojado en antiguos edificios de un monasterio, cuenta con amplias colecciones sobre historia prehispánica y oaxaqueña, artefactos y culturas regionales.",
           "Museo Textil de Oaxaca: A pocos pasos del Zócalo, cerca del área de Santo Domingo. Exhibe textiles tradicionales y contemporáneos que destacan las tradiciones textiles oaxaqueñas, frecuentemente combinado con el cercano Centro Cultural San Pablo.",
-          "Museo de Arte Contemporáneo de Oaxaca (MACO): Ubicado en el centro histórico a poca distancia. Presenta exposiciones de arte moderno y contemporáneo en un entorno sereno con patio."
+          "Museo de Arte Contemporáneo de Oaxaca (MACO): Ubicado en el centro histórico a poca distancia. Presenta exposiciones de arte moderno y contemporáneo en un entorno sereno con patio.",
+          "Mercado Benito Juárez: De uno a dos cuadras al sur del Zócalo. Este histórico mercado cubierto (desde 1893) ofrece artesanías, comida, textiles y productos cotidianos — un lugar animado para souvenirs y sabores locales.",
+          "Mercado de Artesanías: Aproximadamente cinco cuadras al suroeste del Zócalo. Dedicado a las artesanías, con una amplia selección de joyería, tapetes, figuras de madera (alebrijes) y otros artículos artesanales a precios competitivos.",
+          "Boutiques y tiendas especializadas en calles como García Vigil, Macedonio Alcalá y zonas cercanas: Busque tiendas como Los Baúles de Juana Cata (textiles y artesanías de alta calidad), La Mano Mágica (galería y tienda de arte y artesanías) y otras especializadas en mezcal, chocolate o artesanías contemporáneas. Las tiendas premium se concentran al norte del Zócalo; los mercados más accesibles, al sur."
         ],
         durationLabel: "Duración",
         duration: "5–6 horas (incluyendo comidas)",
@@ -1057,15 +1095,47 @@ export const translations = {
         scheduleLabel: "Horario",
         schedule: "Salidas diarias por la mañana"
       },
-      hikingTours: {
+      natureTour: {
         label: "Tour 2",
-        title: "Tours de Senderismo",
-        description: "Explore los impresionantes paisajes montañosos de Oaxaca con guías locales expertos.",
-        areasTitle: "Áreas",
-        areas: ["Chigulera", "San Felipe", "Otras rutas disponibles bajo solicitud"],
-        pricing: "Los precios varían según duración y dificultad. Contáctenos para detalles.",
+        title: "Tour Guiado Cultural y de Naturaleza: El Tule y Pueblos Artesanales",
+        description: "Sumérgete en la rica herencia zapoteca al este de la ciudad de Oaxaca con este tour de medio día que combina naturaleza, artesanías tradicionales y gastronomía.",
+        highlightsTitle: "Puntos Destacados",
+        highlights: [
+          "Árbol del Tule: Visite el árbol más ancho del mundo, un majestuoso ahuehuete estimado en más de 1,400–2,000 años, en los terrenos de la Iglesia de Santa María del Tule. Disfrute un recorrido guiado, conozca su significado cultural y las leyendas zapotecas, y explore los jardines Los Cinco Sabinos.",
+          "Teotitlán del Valle: Explore este reconocido pueblo zapoteco de tejedores. Visite un taller familiar para observar el teñido natural y el tejido a mano de tapetes de lana con técnicas ancestrales, con tiempo para comprar directamente a los artesanos.",
+          "Mercado Local y Experiencia Gastronómica: Parada en el Mercado Gastronómico de Santa María del Tule o en un restaurante en Teotitlán del Valle para degustar platillos oaxaqueños — tlayudas, moles, tamales o especialidades regionales — con jugos frescos. Degustación de mezcal opcional, con alternativas sin alcohol disponibles.",
+          "Paradas Culturales Adicionales: Breve visita al Palacio Municipal de Tule para conocer la gobernanza y tradiciones locales, con oportunidades de compra de tapetes, alebrijes o textiles."
+        ],
+        durationLabel: "Duración",
+        duration: "5–6 horas (incluyendo transporte y comidas)",
+        priceLabel: "Precio",
+        pricePerPerson: "por persona",
+        groupDiscount: "Descuentos para grupos de 4+ participantes",
         languagesLabel: "Idiomas",
-        languages: "Inglés o Español"
+        languages: "Inglés o Español",
+        scheduleLabel: "Horario",
+        schedule: "Salidas diarias por la mañana (inicio recomendado a las 9:00 AM)"
+      },
+      archaeologicalTour: {
+        label: "Tour 3",
+        title: "Tour Guiado Arqueológico y Cultural: El Tule y Mitla",
+        description: "Descubre el legado zapoteca ancestral con este fascinante tour de medio día que combina maravillas naturales y un importante patrimonio arqueológico.",
+        highlightsTitle: "Puntos Destacados",
+        highlights: [
+          "Árbol del Tule: Comience con una visita guiada al icónico Árbol del Tule y la iglesia del siglo XVII adyacente. Conozca su historia natural e importancia cultural para el pueblo zapoteca, y disfrute de oportunidades fotográficas en los espacios verdes.",
+          "Zona Arqueológica de Mitla: Explore el impresionante sitio zapoteca conocido por sus intrincados mosaicos de piedra geométricos y su estilo arquitectónico distintivo. Un guía profesional explicará su historia, rituales y papel como centro ceremonial post-Clásico.",
+          "Compras y Comida: Tiempo dedicado para artesanías en Teotitlán del Valle (textiles y artesanías) de camino a los sitios, más un almuerzo relajado con cocina oaxaqueña tradicional en un restaurante local de renombre.",
+          "Vivencias Locales: Oportunidades para observar la vida cotidiana en comunidades cercanas y adquirir productos regionales auténticos como textiles artesanales o cerámica."
+        ],
+        durationLabel: "Duración",
+        duration: "5–6 horas (itinerario optimizado con rutas eficientes)",
+        priceLabel: "Precio",
+        pricePerPerson: "por persona",
+        groupDiscount: "Descuentos para grupos de 4+ participantes",
+        languagesLabel: "Idiomas",
+        languages: "Inglés o Español",
+        scheduleLabel: "Horario",
+        schedule: "Salidas diarias por la mañana"
       },
       contactButton: "Contáctenos para Reservar"
     },

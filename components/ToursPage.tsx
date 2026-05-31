@@ -10,12 +10,24 @@ export default function ToursContent() {
   const { rate } = useUsdToMxn();
 
   const cityHighlights = t('tours.cityTour.highlights') as string[];
-  const hikingAreas = t('tours.hikingTours.areas') as string[];
+  const natureTourHighlights = t('tours.natureTour.highlights') as string[];
+  const archaeologicalHighlights = t('tours.archaeologicalTour.highlights') as string[];
 
   const CITY_TOUR_USD = 60;
+  const NATURE_TOUR_USD = 75;
+  const ARCHAEOLOGICAL_TOUR_USD = 80;
+
   const cityTourPrice = language === 'es'
     ? `$${(Math.floor((CITY_TOUR_USD * rate) / 10) * 10).toLocaleString('es-MX')} MXN ${t('tours.cityTour.pricePerPerson')}`
     : `$${CITY_TOUR_USD} USD ${t('tours.cityTour.pricePerPerson')}`;
+
+  const natureTourPrice = language === 'es'
+    ? `$${(Math.floor((NATURE_TOUR_USD * rate) / 10) * 10).toLocaleString('es-MX')} MXN ${t('tours.natureTour.pricePerPerson')}`
+    : `$${NATURE_TOUR_USD} USD ${t('tours.natureTour.pricePerPerson')}`;
+
+  const archaeologicalTourPrice = language === 'es'
+    ? `$${(Math.floor((ARCHAEOLOGICAL_TOUR_USD * rate) / 10) * 10).toLocaleString('es-MX')} MXN ${t('tours.archaeologicalTour.pricePerPerson')}`
+    : `$${ARCHAEOLOGICAL_TOUR_USD} USD ${t('tours.archaeologicalTour.pricePerPerson')}`;
 
   return (
     <div className="relative overflow-hidden bg-black text-white min-h-screen">
@@ -97,38 +109,105 @@ export default function ToursContent() {
             </Link>
           </div>
 
-          {/* Hiking Tours */}
+          {/* Cultural & Nature Tour */}
           <div className="flex flex-col rounded-4xl border border-slate-700 bg-[#241a13]/90 p-8 shadow-sm shadow-black/10">
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-amber-400">
-              {t('tours.hikingTours.label')}
+              {t('tours.natureTour.label')}
             </p>
             <h2 className="text-2xl font-semibold text-white">
-              {t('tours.hikingTours.title')}
+              {t('tours.natureTour.title')}
             </h2>
             <p className="mt-3 text-slate-300">
-              {t('tours.hikingTours.description')}
+              {t('tours.natureTour.description')}
             </p>
 
             <div className="mt-6">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
-                {t('tours.hikingTours.areasTitle')}
+                {t('tours.natureTour.highlightsTitle')}
               </p>
               <ul className="mt-3 space-y-3">
-                {hikingAreas.map((area, i) => (
+                {natureTourHighlights.map((item, i) => (
                   <li key={i} className="flex gap-3 text-slate-200">
-                    <span className="shrink-0">⛰️</span>
-                    <span>{area}</span>
+                    <span className="mt-0.5 shrink-0 text-amber-400">✓</span>
+                    <span>{item}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
-            <div className="mt-6 rounded-3xl bg-[#1a0f0a]/90 p-5 space-y-3">
+            <div className="mt-6 grid grid-cols-2 gap-4 rounded-3xl bg-[#1a0f0a]/90 p-5">
               <div>
-                <p className="text-xs text-slate-400">{t('tours.hikingTours.languagesLabel')}</p>
-                <p className="mt-1 text-sm font-semibold text-white">{t('tours.hikingTours.languages')}</p>
+                <p className="text-xs text-slate-400">{t('tours.natureTour.durationLabel')}</p>
+                <p className="mt-1 text-sm font-semibold text-white">{t('tours.natureTour.duration')}</p>
               </div>
-              <p className="text-sm text-slate-300">{t('tours.hikingTours.pricing')}</p>
+              <div>
+                <p className="text-xs text-slate-400">{t('tours.natureTour.priceLabel')}</p>
+                <p className="mt-1 text-sm font-semibold text-amber-300">{natureTourPrice}</p>
+                <p className="mt-0.5 text-xs text-slate-400">{t('tours.natureTour.groupDiscount')}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-400">{t('tours.natureTour.languagesLabel')}</p>
+                <p className="mt-1 text-sm font-semibold text-white">{t('tours.natureTour.languages')}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-400">{t('tours.natureTour.scheduleLabel')}</p>
+                <p className="mt-1 text-sm font-semibold text-white">{t('tours.natureTour.schedule')}</p>
+              </div>
+            </div>
+
+            <div className="mt-6 grow" />
+            <Link
+              href="/contact"
+              className="mt-4 inline-flex items-center justify-center rounded-full bg-garden px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#3c5a35]"
+            >
+              {t('tours.contactButton')}
+            </Link>
+          </div>
+
+          {/* Archaeological & Cultural Tour — full width */}
+          <div className="flex flex-col rounded-4xl border border-slate-700 bg-[#241a13]/90 p-8 shadow-sm shadow-black/10 lg:col-span-2">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-amber-400">
+              {t('tours.archaeologicalTour.label')}
+            </p>
+            <h2 className="text-2xl font-semibold text-white">
+              {t('tours.archaeologicalTour.title')}
+            </h2>
+            <p className="mt-3 text-slate-300">
+              {t('tours.archaeologicalTour.description')}
+            </p>
+
+            <div className="mt-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+                {t('tours.archaeologicalTour.highlightsTitle')}
+              </p>
+              <ul className="mt-3 grid gap-3 lg:grid-cols-2">
+                {archaeologicalHighlights.map((item, i) => (
+                  <li key={i} className="flex gap-3 text-slate-200">
+                    <span className="mt-0.5 shrink-0 text-amber-400">✓</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="mt-6 grid grid-cols-2 gap-4 rounded-3xl bg-[#1a0f0a]/90 p-5 lg:grid-cols-4">
+              <div>
+                <p className="text-xs text-slate-400">{t('tours.archaeologicalTour.durationLabel')}</p>
+                <p className="mt-1 text-sm font-semibold text-white">{t('tours.archaeologicalTour.duration')}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-400">{t('tours.archaeologicalTour.priceLabel')}</p>
+                <p className="mt-1 text-sm font-semibold text-amber-300">{archaeologicalTourPrice}</p>
+                <p className="mt-0.5 text-xs text-slate-400">{t('tours.archaeologicalTour.groupDiscount')}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-400">{t('tours.archaeologicalTour.languagesLabel')}</p>
+                <p className="mt-1 text-sm font-semibold text-white">{t('tours.archaeologicalTour.languages')}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-400">{t('tours.archaeologicalTour.scheduleLabel')}</p>
+                <p className="mt-1 text-sm font-semibold text-white">{t('tours.archaeologicalTour.schedule')}</p>
+              </div>
             </div>
 
             <div className="mt-6 grow" />

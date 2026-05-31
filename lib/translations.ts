@@ -494,7 +494,12 @@ export const translations = {
         highlights: [
           "Explore the Jardín Etnobotánico, the vibrant Zócalo, Santo Domingo Church, and surrounding colonial areas.",
           "Learn about Oaxaca's history, important historical figures, and local traditions.",
-          "Includes transportation for breakfast and lunch at well-known Oaxacan restaurants."
+          "Includes transportation for breakfast and lunch at well-known Oaxacan restaurants.",
+          "Mercado 20 de Noviembre and surrounding markets — browse authentic Oaxacan cuisine, farm-raised meat and produce, traditional Mexican clothing such as sombreros and dresses, leather goods and handcrafted belts, artisan mezcal, gold and silver jewelry, and black clay pottery and figurines.",
+          "Museo del Palacio - Espacio de la Diversidad (Museo del Palacio Universum): Located on the south side of the Zócalo in the former State Government Palace. This interactive museum focuses on Oaxacan cultures, history, and diversity, with exhibits, murals, and educational activities for all ages.",
+          "Museo de las Culturas de Oaxaca: About a 10-minute walk north of the Zócalo along the Andador Macedonio Alcalá, near the Templo de Santo Domingo. Housed in former monastery buildings with extensive collections on pre-Hispanic and Oaxacan history, artifacts, and regional cultures.",
+          "Museo Textil de Oaxaca (Textile Museum): A short walk from the Zócalo near the Santo Domingo area. Showcases traditional and contemporary textiles highlighting Oaxacan weaving traditions, often paired with the nearby Centro Cultural San Pablo.",
+          "Museo de Arte Contemporáneo de Oaxaca (MACO): Located in the historic center within walking distance. Features modern and contemporary art exhibitions in a serene setting with a courtyard."
         ],
         durationLabel: "Duration",
         duration: "5–6 hours (including meals)",
@@ -1036,7 +1041,12 @@ export const translations = {
         highlights: [
           "Explore el Jardín Etnobotánico, el vibrante Zócalo, la Iglesia de Santo Domingo y áreas coloniales.",
           "Aprenda sobre la historia de Oaxaca, figuras históricas importantes y tradiciones locales.",
-          "Incluye transporte para desayuno y comida en reconocidos restaurantes oaxaqueños."
+          "Incluye transporte para desayuno y comida en reconocidos restaurantes oaxaqueños.",
+          "Mercado 20 de Noviembre y mercados circundantes — explore cocina oaxaqueña auténtica, carnes y productos de granja, ropa tradicional mexicana como sombreros y vestidos, artículos de cuero y cinturones artesanales, mezcal artesanal, joyería de oro y plata, y barro negro (cerámica y figuras).",
+          "Museo del Palacio - Espacio de la Diversidad (Museo del Palacio Universum): Ubicado en el lado sur del Zócalo, en el antiguo Palacio de Gobierno. Este museo interactivo se enfoca en las culturas, historia y diversidad oaxaqueña, con exhibiciones, murales y actividades educativas para todas las edades.",
+          "Museo de las Culturas de Oaxaca: A unos 10 minutos caminando al norte del Zócalo por el Andador Macedonio Alcalá, cerca del Templo de Santo Domingo. Alojado en antiguos edificios de un monasterio, cuenta con amplias colecciones sobre historia prehispánica y oaxaqueña, artefactos y culturas regionales.",
+          "Museo Textil de Oaxaca: A pocos pasos del Zócalo, cerca del área de Santo Domingo. Exhibe textiles tradicionales y contemporáneos que destacan las tradiciones textiles oaxaqueñas, frecuentemente combinado con el cercano Centro Cultural San Pablo.",
+          "Museo de Arte Contemporáneo de Oaxaca (MACO): Ubicado en el centro histórico a poca distancia. Presenta exposiciones de arte moderno y contemporáneo en un entorno sereno con patio."
         ],
         durationLabel: "Duración",
         duration: "5–6 horas (incluyendo comidas)",

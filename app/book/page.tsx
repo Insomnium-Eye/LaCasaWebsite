@@ -385,7 +385,6 @@ export default function BookPage() {
               <li className="flex gap-2"><span>📅</span><span>{t('book.paymentPolicy.short')}</span></li>
               <li className="flex gap-2"><span>📅</span><span>{t('book.paymentPolicy.medium')}</span></li>
               <li className="flex gap-2"><span>📅</span><span>{t('book.paymentPolicy.long')}</span></li>
-              <li className="flex gap-2"><span className="shrink-0">💰</span><span className="font-semibold text-amber-300">{t('book.paymentPolicy.cash')}</span></li>
               <li className="flex gap-2"><span>💳</span><span>{t('book.paymentPolicy.card')}</span></li>
             </ul>
           </div>

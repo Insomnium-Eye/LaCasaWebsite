@@ -12,10 +12,12 @@ export default function ToursContent() {
   const cityHighlights = t('tours.cityTour.highlights') as string[];
   const natureTourHighlights = t('tours.natureTour.highlights') as string[];
   const archaeologicalHighlights = t('tours.archaeologicalTour.highlights') as string[];
+  const montealbanHighlights = t('tours.montealbanTour.highlights') as string[];
 
   const CITY_TOUR_USD = 60;
   const NATURE_TOUR_USD = 75;
   const ARCHAEOLOGICAL_TOUR_USD = 80;
+  const MONTEALBÁN_TOUR_USD = 70;
 
   const cityTourPrice = language === 'es'
     ? `$${(Math.floor((CITY_TOUR_USD * rate) / 10) * 10).toLocaleString('es-MX')} MXN ${t('tours.cityTour.pricePerPerson')}`
@@ -28,6 +30,10 @@ export default function ToursContent() {
   const archaeologicalTourPrice = language === 'es'
     ? `$${(Math.floor((ARCHAEOLOGICAL_TOUR_USD * rate) / 10) * 10).toLocaleString('es-MX')} MXN ${t('tours.archaeologicalTour.pricePerPerson')}`
     : `$${ARCHAEOLOGICAL_TOUR_USD} USD ${t('tours.archaeologicalTour.pricePerPerson')}`;
+
+  const montealbanTourPrice = language === 'es'
+    ? `$${(Math.floor((MONTEALBÁN_TOUR_USD * rate) / 10) * 10).toLocaleString('es-MX')} MXN ${t('tours.montealbanTour.pricePerPerson')}`
+    : `$${MONTEALBÁN_TOUR_USD} USD ${t('tours.montealbanTour.pricePerPerson')}`;
 
   return (
     <div className="relative overflow-hidden bg-black text-white min-h-screen">
@@ -164,7 +170,7 @@ export default function ToursContent() {
             </Link>
           </div>
 
-          {/* Archaeological & Cultural Tour — full width */}
+          {/* Archaeological & Cultural Tour */}
           <div className="flex flex-col rounded-4xl border border-slate-700 bg-[#241a13]/90 p-8 shadow-sm shadow-black/10 lg:col-span-2">
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-amber-400">
               {t('tours.archaeologicalTour.label')}
@@ -207,6 +213,60 @@ export default function ToursContent() {
               <div>
                 <p className="text-xs text-slate-400">{t('tours.archaeologicalTour.scheduleLabel')}</p>
                 <p className="mt-1 text-sm font-semibold text-white">{t('tours.archaeologicalTour.schedule')}</p>
+              </div>
+            </div>
+
+            <div className="mt-6 grow" />
+            <Link
+              href="/contact"
+              className="mt-4 inline-flex items-center justify-center rounded-full bg-garden px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#3c5a35]"
+            >
+              {t('tours.contactButton')}
+            </Link>
+          </div>
+          {/* Monte Albán Tour — full width */}
+          <div className="flex flex-col rounded-4xl border border-slate-700 bg-[#241a13]/90 p-8 shadow-sm shadow-black/10 lg:col-span-2">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-amber-400">
+              {t('tours.montealbanTour.label')}
+            </p>
+            <h2 className="text-2xl font-semibold text-white">
+              {t('tours.montealbanTour.title')}
+            </h2>
+            <p className="mt-3 text-slate-300">
+              {t('tours.montealbanTour.description')}
+            </p>
+
+            <div className="mt-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+                {t('tours.montealbanTour.highlightsTitle')}
+              </p>
+              <ul className="mt-3 grid gap-3 lg:grid-cols-2">
+                {montealbanHighlights.map((item, i) => (
+                  <li key={i} className="flex gap-3 text-slate-200">
+                    <span className="mt-0.5 shrink-0 text-amber-400">✓</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="mt-6 grid grid-cols-2 gap-4 rounded-3xl bg-[#1a0f0a]/90 p-5 lg:grid-cols-4">
+              <div>
+                <p className="text-xs text-slate-400">{t('tours.montealbanTour.durationLabel')}</p>
+                <p className="mt-1 text-sm font-semibold text-white">{t('tours.montealbanTour.duration')}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-400">{t('tours.montealbanTour.priceLabel')}</p>
+                <p className="mt-1 text-sm font-semibold text-amber-300">{montealbanTourPrice}</p>
+                <p className="mt-0.5 text-xs text-slate-400">{t('tours.montealbanTour.groupDiscount')}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-400">{t('tours.montealbanTour.languagesLabel')}</p>
+                <p className="mt-1 text-sm font-semibold text-white">{t('tours.montealbanTour.languages')}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-400">{t('tours.montealbanTour.scheduleLabel')}</p>
+                <p className="mt-1 text-sm font-semibold text-white">{t('tours.montealbanTour.schedule')}</p>
               </div>
             </div>
 

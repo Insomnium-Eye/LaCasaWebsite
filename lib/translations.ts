@@ -555,6 +555,27 @@ export const translations = {
         scheduleLabel: "Schedule",
         schedule: "Daily morning departures"
       },
+      montealbanTour: {
+        label: "Tour 4",
+        title: "Guided Archaeological Tour: Monte Albán",
+        description: "Explore one of Mesoamerica's most impressive ancient cities perched high above the Oaxaca Valley, with a professional guide who brings its 1,500+ years of Zapotec history to life.",
+        highlightsTitle: "Tour Highlights",
+        highlights: [
+          "Zona Arqueológica de Monte Albán: Professional guided exploration of this hilltop ceremonial center — its pyramids, ball court, palaces, astronomical observatory, and iconic Danzantes carvings. Enjoy panoramic views of the Oaxaca Valley while learning about Zapotec culture, rituals, and engineering achievements. Time is allocated for independent photography and reflection.",
+          "On-Site Museum: Visit the museum at the entrance, which displays artifacts, stelae, and contextual exhibits that deepen understanding of the site.",
+          "Gastronomic Experience: Conclude with a relaxed lunch at a well-regarded local restaurant near Monte Albán or en route back to the city, featuring Oaxacan specialties such as moles, tlayudas, or regional dishes. Non-alcoholic beverages included; optional mezcal tasting available.",
+          "Shopping Opportunity: Brief stop at a nearby artisan shop or market for handcrafted items like black pottery (from San Bartolo Coyotepec) or alebrijes, so guests can purchase authentic souvenirs directly from local makers."
+        ],
+        durationLabel: "Duration",
+        duration: "5–6 hours (including transportation, guided site visit, and meal)",
+        priceLabel: "Price",
+        pricePerPerson: "per person",
+        groupDiscount: "Group discounts available for 4+ participants",
+        languagesLabel: "Languages",
+        languages: "English or Spanish",
+        scheduleLabel: "Schedule",
+        schedule: "Daily morning departures (recommended 8:30–9:00 AM start to avoid midday heat and crowds)"
+      },
       contactButton: "Contact Us to Book"
     },
     idVerification: {
@@ -1136,6 +1157,27 @@ export const translations = {
         languages: "Inglés o Español",
         scheduleLabel: "Horario",
         schedule: "Salidas diarias por la mañana"
+      },
+      montealbanTour: {
+        label: "Tour 4",
+        title: "Tour Guiado Arqueológico: Monte Albán",
+        description: "Explora una de las ciudades antiguas más impresionantes de Mesoamérica, ubicada en lo alto sobre el Valle de Oaxaca, con un guía profesional que da vida a más de 1,500 años de historia zapoteca.",
+        highlightsTitle: "Puntos Destacados",
+        highlights: [
+          "Zona Arqueológica de Monte Albán: Exploración guiada de este centro ceremonial en la cima de una montaña — sus pirámides, juego de pelota, palacios, observatorio astronómico y las icónicas tallas de los Danzantes. Disfrute de vistas panorámicas del Valle de Oaxaca mientras conoce la cultura, rituales y logros de ingeniería zapotecas. Se reserva tiempo para fotografía y contemplación.",
+          "Museo del Sitio: Visita al museo de la entrada, que exhibe artefactos, estelas y exhibiciones contextuales que profundizan la comprensión del sitio.",
+          "Experiencia Gastronómica: Almuerzo relajado en un restaurante local de renombre cerca de Monte Albán o de regreso a la ciudad, con especialidades oaxaqueñas como moles, tlayudas o platillos regionales. Bebidas sin alcohol incluidas; degustación de mezcal opcional.",
+          "Oportunidad de Compras: Parada breve en una tienda artesanal o mercado cercano para adquirir barro negro (de San Bartolo Coyotepec) o alebrijes directamente de artesanos locales."
+        ],
+        durationLabel: "Duración",
+        duration: "5–6 horas (incluyendo transporte, visita guiada y comida)",
+        priceLabel: "Precio",
+        pricePerPerson: "por persona",
+        groupDiscount: "Descuentos para grupos de 4+ participantes",
+        languagesLabel: "Idiomas",
+        languages: "Inglés o Español",
+        scheduleLabel: "Horario",
+        schedule: "Salidas diarias por la mañana (inicio recomendado entre 8:30–9:00 AM para evitar el calor del mediodía y las multitudes)"
       },
       contactButton: "Contáctenos para Reservar"
     },

@@ -170,7 +170,7 @@ export default function HomePage() {
                   <p className="text-sm text-slate-300">{formatPrice(unit.weeklyRate, language)}/{t('book.priceUnit.week')}</p>
                   <p className="text-sm text-slate-300">{formatPrice(unit.monthlyRate, language)}/{t('book.priceUnit.month')}</p>
                 </div>
-                <Link href="/book" className="inline-flex items-center rounded-full bg-terracotta px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#b55e47]">
+                <Link href={`/book?unit=${unit.slug}`} className="inline-flex items-center rounded-full bg-terracotta px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#b55e47]">
                   {t("home.checkAvailability")}
                 </Link>
               </div>
@@ -207,7 +207,7 @@ export default function HomePage() {
                     <p className="text-sm text-slate-300"><span className="text-lg font-semibold text-slate-50">{formatPrice(1200, language)}</span>/{t('book.priceUnit.week')}</p>
                     <p className="text-sm text-slate-300"><span className="text-lg font-semibold text-slate-50">{formatPrice(2700, language)}</span>/{t('book.priceUnit.month')}</p>
                   </div>
-                  <Link href="/book" className="inline-flex items-center rounded-full bg-orange-500 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-orange-500/30 transition hover:bg-orange-600">
+                  <Link href="/book?unit=entire-house" className="inline-flex items-center rounded-full bg-orange-500 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-orange-500/30 transition hover:bg-orange-600">
                     {t("home.checkAvailability")} →
                   </Link>
                 </div>

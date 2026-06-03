@@ -1,9 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { GuestSession } from '@/types/guest-portal';
 import { useLanguage } from '@/contexts/LanguageContext';
 import DateInput from '@/components/DateInput';
+
+function addDays(iso: string, n: number): string {
+  const d = new Date(iso + 'T00:00:00');
+  d.setDate(d.getDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+
+function subDays(iso: string, n: number): string {
+  return addDays(iso, -n);
+}
 
 interface ExtendStayFormProps {
   session: GuestSession | null;
@@ -17,10 +27,35 @@ const ExtendStayForm = ({ session }: ExtendStayFormProps) => {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [calculatedCost, setCalculatedCost] = useState(0);
+  const [maxCheckout, setMaxCheckout] = useState<string | undefined>(undefined);
+
+  const currentCheckoutIso = session?.checkOut?.slice(0, 10) ?? '';
+
+  useEffect(() => {
+    if (!session?.unitSlug) return;
+    fetch(`/api/availability/${session.unitSlug}`)
+      .then(r => r.json())
+      .then((data: { blocked?: { start: string; end: string }[] }) => {
+        const ranges = data.blocked ?? [];
+        // The availability API already uses the 2-day buffer, so r.start = next booking's check_in.
+        // Find the earliest next booking that starts strictly after current checkout.
+        const nextStarts = ranges
+          .map(r => r.start)
+          .filter(s => s > currentCheckoutIso)
+          .sort();
+        if (nextStarts.length > 0) {
+          // Max new checkout = next booking check_in − 2 days (reserves 2 clean days).
+          const computed = subDays(nextStarts[0], 2);
+          // Only set a limit if there's actually room to extend at least 1 day
+          setMaxCheckout(computed > currentCheckoutIso ? computed : currentCheckoutIso);
+        }
+      })
+      .catch(() => {/* no limit if unavailable */});
+  }, [session?.unitSlug, currentCheckoutIso]);
 
   if (!session) return null;
 
-  const currentCheckout = new Date(session.checkOut);
+  const currentCheckout = new Date(currentCheckoutIso);
   const minNewCheckout = new Date(currentCheckout);
   minNewCheckout.setDate(minNewCheckout.getDate() + 1);
 
@@ -83,12 +118,24 @@ const ExtendStayForm = ({ session }: ExtendStayFormProps) => {
       )
     : 0;
 
+  const noRoomToExtend = maxCheckout !== undefined && maxCheckout <= currentCheckoutIso;
+
   return (
     <div className="bg-white rounded-lg shadow-lg p-8 max-w-2xl mx-auto">
       <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('portal.extendStay.title')}</h3>
       <p className="text-gray-600 mb-6">
         {t('portal.extendStay.description')}
       </p>
+
+      {noRoomToExtend && (
+        <div className="mb-6 p-4 bg-amber-50 border-l-4 border-amber-500 rounded">
+          <p className="text-sm text-amber-800 font-medium">
+            {language === 'es'
+              ? 'No hay disponibilidad para extender tu estadía — el siguiente huésped llega dentro de dos días de tu salida.'
+              : 'No extension is available — the next guest arrives within two days of your checkout, leaving no room for the cleaning period.'}
+          </p>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Current Checkout */}
@@ -115,10 +162,18 @@ const ExtendStayForm = ({ session }: ExtendStayFormProps) => {
             onChange={handleCheckoutChange}
             language={language}
             min={minNewCheckout.toISOString().split('T')[0]}
+            max={maxCheckout}
             required
-            disabled={loading}
+            disabled={loading || noRoomToExtend}
             className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-amber-600 transition-colors disabled:bg-gray-100"
           />
+          {maxCheckout && (
+            <p className="mt-1.5 text-xs text-amber-700">
+              {language === 'es'
+                ? `Extensión disponible hasta el ${new Date(maxCheckout + 'T12:00:00Z').toLocaleDateString('es-MX', { day: 'numeric', month: 'long' })} (la siguiente reserva requiere 2 días de preparación).`
+                : `Extension available until ${new Date(maxCheckout + 'T12:00:00Z').toLocaleDateString('en-US', { month: 'long', day: 'numeric' })} — next booking requires 2 prep days.`}
+            </p>
+          )}
         </div>
 
         {/* Cost Breakdown */}
@@ -161,7 +216,7 @@ const ExtendStayForm = ({ session }: ExtendStayFormProps) => {
         {/* Submit Button */}
         <button
           type="submit"
-          disabled={loading || !newCheckout}
+          disabled={loading || !newCheckout || noRoomToExtend}
           className="w-full bg-gradient-to-r from-amber-700 to-orange-600 hover:from-amber-800 hover:to-orange-700 disabled:from-gray-400 disabled:to-gray-400 text-white font-bold py-3 px-4 rounded-lg transition-all duration-200"
         >
           {loading ? (

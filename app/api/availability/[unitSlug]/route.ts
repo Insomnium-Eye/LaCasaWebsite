@@ -21,16 +21,23 @@ export async function GET(
     const { getSql } = await import('@/lib/db');
     const sql = getSql();
 
-    // Own bookings
+    // For the entire house, any individual room booking blocks the dates too
+    const INDIVIDUAL_UNITS = ['bungalow-1', 'bungalow-2', 'main-bedroom'];
+    const slugsToCheck = unitSlug === 'entire-house'
+      ? [...INDIVIDUAL_UNITS, 'entire-house']
+      : INDIVIDUAL_UNITS.includes(unitSlug)
+        ? [unitSlug, 'entire-house']
+        : [unitSlug];
+
     const bookings = await sql<{ check_in: string; check_out: string }[]>`
       SELECT check_in::date::text AS check_in, check_out::date::text AS check_out
       FROM bookings
-      WHERE unit_slug = ${unitSlug}
+      WHERE unit_slug = ANY(${slugsToCheck})
         AND status IN ('pending', 'confirmed', 'checked_in')
       UNION ALL
       SELECT check_in::date::text, check_out::date::text
       FROM reservations
-      WHERE unit_id = ${unitSlug}
+      WHERE unit_id = ANY(${slugsToCheck})
         AND status IN ('pending', 'confirmed', 'checked_in')
     `.catch(() => []);
 
@@ -38,19 +45,19 @@ export async function GET(
     const external = await sql<{ start_date: string; end_date: string }[]>`
       SELECT start_date::text, end_date::text
       FROM external_blocks
-      WHERE unit_slug = ${unitSlug}
+      WHERE unit_slug = ANY(${slugsToCheck})
     `.catch(() => []);
 
     const blocked: BlockedRange[] = [
-      // Own bookings: block check-in through day-after-checkout (cleaning day)
+      // Own bookings: block check-in through 2 days after checkout (cleaning + maintenance buffer)
       ...bookings.map((b) => ({
         start: b.check_in,
-        end: addDays(b.check_out, 1),
+        end: addDays(b.check_out, 2),
       })),
-      // External blocks
+      // External blocks: same 2-day buffer
       ...external.map((e) => ({
         start: e.start_date,
-        end: addDays(e.end_date, 1),
+        end: addDays(e.end_date, 2),
       })),
     ];
 

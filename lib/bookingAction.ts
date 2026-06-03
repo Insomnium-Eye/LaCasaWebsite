@@ -1,6 +1,29 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { verifyAdminToken } from '@/lib/adminToken';
+import { createTimedPasscode } from '@/lib/ttlock';
+
+const FRONT_GATE_LOCK_ID = 32117998;
+
+async function provisionLockCode(
+  lockCode: string,
+  guestName: string,
+  checkIn: string,
+  checkOut: string,
+): Promise<void> {
+  const ready = process.env.TTLOCK_CLIENT_ID && process.env.TTLOCK_CLIENT_SECRET
+    && process.env.TTLOCK_USERNAME && process.env.TTLOCK_PASSWORD;
+  if (!ready) {
+    console.log('[TTLock] env vars not set — skipping lock provisioning');
+    return;
+  }
+  try {
+    await createTimedPasscode(FRONT_GATE_LOCK_ID, lockCode, guestName, checkIn, checkOut);
+    console.log(`[TTLock] passcode ${lockCode} provisioned for ${guestName} (${checkIn}→${checkOut})`);
+  } catch (err) {
+    console.error('[TTLock] failed to provision passcode:', err instanceof Error ? err.message : err);
+  }
+}
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const PORTAL_URL = 'https://oaxaca-rental.com/portal';
@@ -97,6 +120,8 @@ export async function handleBookingAction(
     await sql`UPDATE reservations SET status = ${newStatus} WHERE digital_key = ${booking.lock_code}`.catch(() => null);
 
     if (action === 'confirm') {
+      await provisionLockCode(booking.lock_code, booking.guest_name, booking.check_in, booking.check_out);
+
       if (hasEmail && process.env.RESEND_API_KEY) {
         const loginHint = buildLoginHint(true, hasPhone);
         await resend.emails.send({
@@ -241,6 +266,8 @@ export async function runBookingAction(id: string, action: 'confirm' | 'deny'): 
     await sql`UPDATE reservations SET status = ${newStatus} WHERE digital_key = ${booking.lock_code}`.catch(() => null);
 
     if (action === 'confirm') {
+      await provisionLockCode(booking.lock_code, booking.guest_name, booking.check_in, booking.check_out);
+
       if (hasEmail && process.env.RESEND_API_KEY) {
         const loginHint = buildLoginHint(true, hasPhone);
         await resend.emails.send({

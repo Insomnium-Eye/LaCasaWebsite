@@ -75,6 +75,14 @@ export default function BookPage() {
   const nights = useMemo(() => daysBetween(form.checkIn, form.checkOut), [form.checkIn, form.checkOut]);
   const selectedUnit = units.find((unit) => unit.slug === form.unit) ?? units[0];
 
+  // Pre-select unit from ?unit= URL param (e.g. coming from home page card)
+  useEffect(() => {
+    const slug = new URLSearchParams(window.location.search).get('unit');
+    if (slug && units.find(u => u.slug === slug)) {
+      setForm(prev => ({ ...prev, unit: slug }));
+    }
+  }, []);
+
   const today = new Date().toISOString().split('T')[0];
   const minNights = selectedUnit.slug === 'entire-house' ? 7 : 1;
   // Fetch blocked dates whenever the selected unit changes

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useGuestAuth } from '@/hooks/useGuestAuth';
 import { PORTAL_SECTIONS, PortalSection } from '@/types/guest-portal';
 import GuestLoginPanel from './GuestLoginPanel';
@@ -18,11 +19,48 @@ interface TransportPrefill {
   date: string; // YYYY-MM-DD
 }
 
+const VALID_TABS: PortalSection[] = ['transport', 'cleaning', 'extend', 'cancel', 'review', 'verification'];
+
 const GuestPortal = () => {
   const { session, loading, error, login, logout, isAuthenticated } = useGuestAuth();
   const [activeSection, setActiveSection] = useState<PortalSection>('transport');
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [transportPrefill, setTransportPrefill] = useState<TransportPrefill | null>(null);
+  const searchParams = useSearchParams();
+
+  // Auto-login from email link: /portal?token=JWT&tab=extend
+  useEffect(() => {
+    const token = searchParams.get('token');
+    const tab = searchParams.get('tab') as PortalSection | null;
+    if (!token || isAuthenticated) return;
+
+    fetch('/api/auth/token-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token }),
+    })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success && data.data) {
+          sessionStorage.setItem('guest-portal-session', JSON.stringify(data.data));
+          // Reload so useGuestAuth picks up the stored session
+          window.location.replace(tab && VALID_TABS.includes(tab) ? `/portal?tab=${tab}` : '/portal');
+        }
+      })
+      .catch(() => {/* ignore — user will see login form */});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Navigate to tab from URL after login
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const tab = searchParams.get('tab') as PortalSection | null;
+    if (tab && VALID_TABS.includes(tab)) {
+      setActiveSection(tab);
+      // Clean URL without reloading
+      window.history.replaceState({}, '', '/portal');
+    }
+  }, [isAuthenticated, searchParams]);
 
   const handleSectionChange = (section: PortalSection) => {
     setIsTransitioning(true);

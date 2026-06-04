@@ -84,7 +84,7 @@ export default function BookPage() {
   }, []);
 
   const today = new Date().toISOString().split('T')[0];
-  const minNights = selectedUnit.slug === 'entire-house' ? 7 : 1;
+  const minNights = 1;
   // Fetch blocked dates whenever the selected unit changes
   useEffect(() => {
     fetch(`/api/availability/${selectedUnit.slug}`)
@@ -100,16 +100,15 @@ export default function BookPage() {
     }
   }, [blockedRanges]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    if (selectedUnit.slug !== 'entire-house' || !form.checkIn || !form.checkOut) return;
-    const currentNights = daysBetween(form.checkIn, form.checkOut);
-    if (currentNights > 0 && currentNights < minNights) {
-      setForm((prev) => ({ ...prev, checkOut: addDays(prev.checkIn, minNights) }));
-    }
-  }, [form.checkIn, form.checkOut, selectedUnit.slug, minNights]);
 
-  // $1,000 MXN per extra guest per night, converted to USD (rounded down)
-  const guestFeeUsdPerNight = rate > 0 ? Math.floor(1000 / rate) : 0;
+  // Tiered extra-guest fee in MXN: 1-6 nights = 1,000 · 7-27 = 700 · 28+ = 400
+  function guestFeeMxnRate(n: number): number {
+    if (n >= 28) return 400;
+    if (n >= 7)  return 700;
+    return 1000;
+  }
+  const guestFeeRateMxn = guestFeeMxnRate(nights);
+  const guestFeeUsdPerNight = rate > 0 ? Math.floor(guestFeeRateMxn / rate) : 0;
 
   const calculatePricing = useMemo(() => {
     const effectiveNightlyRate = selectedUnit.nightlyRate > 0
@@ -169,10 +168,6 @@ export default function BookPage() {
       alert(language === 'es'
         ? 'Por favor ingresa una dirección de correo electrónico válida.'
         : 'Please enter a valid email address.');
-      return;
-    }
-    if (selectedUnit.slug === 'entire-house' && nights < minNights) {
-      alert(t('book.entireHouseMinNightsError'));
       return;
     }
     if (isRangeBlocked(form.checkIn, form.checkOut, blockedRanges)) {
@@ -301,8 +296,8 @@ export default function BookPage() {
               />
               <p className="mt-1.5 text-xs text-slate-500">
                 {language === 'es'
-                  ? `1 huésped incluido. Cada huésped adicional: 1,000 MXN por noche. Máximo ${selectedUnit.capacity}.`
-                  : `1 guest included. Each additional guest: 1,000 MXN (~$${guestFeeUsdPerNight} USD) per night. Max ${selectedUnit.capacity}.`}
+                  ? `1 huésped incluido. Huésped adicional: 1,000 MXN/noche (700 MXN en estadías de 7+ noches · 400 MXN en 28+ noches). Máximo ${selectedUnit.capacity}.`
+                  : `1 guest included. Extra guest fee: 1,000 MXN/night · 700 MXN (7+ nights) · 400 MXN (28+ nights). Currently ${guestFeeRateMxn.toLocaleString()} MXN (~$${guestFeeUsdPerNight} USD)/night. Max ${selectedUnit.capacity}.`}
               </p>
             </label>
           </div>
@@ -418,6 +413,7 @@ export default function BookPage() {
               <li className="flex gap-2"><span>📅</span><span>{t('book.paymentPolicy.medium')}</span></li>
               <li className="flex gap-2"><span>📅</span><span>{t('book.paymentPolicy.long')}</span></li>
               <li className="flex gap-2"><span>💳</span><span>{t('book.paymentPolicy.card')}</span></li>
+              <li className="flex gap-2"><span>💵</span><span>{t('book.paymentPolicy.cashCurrencies')}</span></li>
             </ul>
           </div>
           <div className="rounded-4xl bg-[#1a0f0a]/90 p-6 shadow-sm shadow-black/10">
@@ -453,9 +449,6 @@ export default function BookPage() {
               <li className="flex gap-2"><span>🅿️</span><span>{t('book.propertyNotes.parking')}</span></li>
               <li className="flex gap-2"><span>🐾</span><span>{t('book.propertyNotes.pets')}</span></li>
               <li className="flex gap-2"><span>🦎</span><span>{t('book.propertyNotes.wildlife')}</span></li>
-              {form.unit === 'entire-house' && (
-                <li className="flex gap-2 text-amber-300"><span>🏠</span><span>{t('book.propertyNotes.entireHouse')}</span></li>
-              )}
             </ul>
           </div>
         </aside>

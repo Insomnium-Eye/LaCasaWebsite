@@ -178,43 +178,6 @@ export default function HomePage() {
           ))}
         </div>
 
-        {/* Entire House Rental Section */}
-        {units.find((unit) => unit.slug === 'entire-house') && (
-          <div className="mt-10 md:col-span-3">
-            <article onClick={() => setSelectedUnit(units.find((unit) => unit.slug === 'entire-house') || null)} className="group cursor-pointer rounded-4xl border border-slate-700 bg-gradient-to-r from-[#8d4a3f]/95 to-[#5c3628]/95 p-8 shadow-sm shadow-black/10 transition hover:-translate-y-1 hover:shadow-lg">
-              <div className="grid gap-8 md:grid-cols-3 md:items-center">
-                <div className="md:col-span-1">
-                  <div className="h-64 rounded-3xl overflow-hidden bg-transparent">
-                    {units.find((unit) => unit.slug === 'entire-house')?.displayImage ? (
-                      <img src={units.find((unit) => unit.slug === 'entire-house')?.displayImage} alt={t(`units.items.entire-house.name`)} className="h-full w-full object-cover" />
-                    ) : (
-                      <div className="flex h-full items-center justify-center rounded-3xl bg-slate-800 text-slate-400">{t('home.close')}</div>
-                    )}
-                  </div>
-                </div>
-                <div className="md:col-span-2 space-y-6">
-                  <div>
-                    <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-200">✨ {t(`units.items.entire-house.type`)}</p>
-                    <h3 className="text-4xl font-semibold text-slate-50 mt-2">{t(`units.items.entire-house.name`)}</h3>
-                  </div>
-                  <p className="text-lg text-slate-100">{t(`units.items.entire-house.summary`)}</p>
-                  <div className="bg-slate-900/50 rounded-3xl p-6 space-y-4">
-                    <p className="text-sm text-slate-300"><span className="font-semibold text-slate-100">👥 {t('home.modal.capacity')}</span> {units.find((unit) => unit.slug === 'entire-house')?.capacity} {t('home.modal.guests')}</p>
-                    <p className="text-sm text-slate-300"><span className="font-semibold text-slate-100">🚪 {t('home.modal.bathroom')}</span> {units.find((unit) => unit.slug === 'entire-house')?.bathroom}</p>
-                    <p className="text-sm text-slate-300"><span className="font-semibold text-slate-100">🌳 {t('home.modal.terrace')}</span> {units.find((unit) => unit.slug === 'entire-house')?.terrace}</p>
-                  </div>
-                  <div className="pt-4 border-t border-slate-600/50 space-y-3">
-                    <p className="text-sm text-slate-300"><span className="text-lg font-semibold text-slate-50">{formatPrice(1200, language)}</span>/{t('book.priceUnit.week')}</p>
-                    <p className="text-sm text-slate-300"><span className="text-lg font-semibold text-slate-50">{formatPrice(2700, language)}</span>/{t('book.priceUnit.month')}</p>
-                  </div>
-                  <Link href="/book?unit=entire-house" className="inline-flex items-center rounded-full bg-orange-500 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-orange-500/30 transition hover:bg-orange-600">
-                    {t("home.checkAvailability")} →
-                  </Link>
-                </div>
-              </div>
-            </article>
-          </div>
-        )}
       </section>
 
       {/* Good to Know */}

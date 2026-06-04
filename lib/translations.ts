@@ -214,7 +214,7 @@ export const translations = {
         noSmoking: "No smoking anywhere on the property.",
         noParties: "No parties or large gatherings.",
         extraGuest: "Additional overnight guests must be reported to the host in advance.",
-        extraGuestFee: "Fee for each additional overnight guest:",
+        extraGuestFee: "Fee per extra guest: 1,000 MXN/night · 700 MXN (7+ nights) · 400 MXN (28+ nights).",
         beRespectful: "Be respectful of the hosts, other guests, wildlife, and their space.",
         camera: "There is a security camera at the front gate.",
       },
@@ -254,7 +254,8 @@ export const translations = {
         medium: "Stays 8–27 nights: 20% advance deposit at booking; remaining 80% due before check-in.",
         long: "Stays 28+ nights: first 28 nights due at booking; remaining balance in 28-day installments.",
         cash: "Cash payment: 19% discount · remaining balance payable at check-in.",
-        card: "Card / Direct Deposit: payment follows the schedule above."
+        card: "Card / Direct Deposit: payment follows the schedule above.",
+        cashCurrencies: "Cash Payments: Cash accepted on move-in. We accept USD, MXN, and EUR."
       },
       confirmation: {
         title: "Booking Confirmed!",
@@ -824,7 +825,7 @@ export const translations = {
         noSmoking: "No se permite fumar en ninguna parte de la propiedad.",
         noParties: "No se permiten fiestas ni reuniones numerosas.",
         extraGuest: "Los huéspedes adicionales que se queden a dormir deben informarse al anfitrión con anticipación.",
-        extraGuestFee: "Cargo por cada huésped adicional que se quede a dormir:",
+        extraGuestFee: "Cargo por huésped extra: 1,000 MXN/noche · 700 MXN (7+ noches) · 400 MXN (28+ noches).",
         beRespectful: "Sé respetuoso con los anfitriones, otros huéspedes, la fauna y sus espacios.",
         camera: "Hay una cámara de seguridad en la puerta principal.",
       },
@@ -864,7 +865,8 @@ export const translations = {
         medium: "Estadías 8–27 noches: 20% de anticipo al reservar; el 80% restante antes del check-in.",
         long: "Estadías 28+ noches: primeras 28 noches al reservar; saldo restante en pagos cada 28 días.",
         cash: "Pago en efectivo: 19% de descuento · saldo restante pagadero al check-in.",
-        card: "Tarjeta / Depósito directo: el pago sigue el calendario indicado arriba."
+        card: "Tarjeta / Depósito directo: el pago sigue el calendario indicado arriba.",
+        cashCurrencies: "Pagos en efectivo: Se acepta efectivo al momento de la llegada. Aceptamos USD, MXN y EUR."
       },
       confirmation: {
         title: "¡Reserva Confirmada!",

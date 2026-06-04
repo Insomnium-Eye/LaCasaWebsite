@@ -21,7 +21,6 @@ const GuestWelcomeBanner = ({ session, onLogout, onTransportRequest }: GuestWelc
     'Sun of My Heart': 'bungalow-1',
     'Magic Moon': 'bungalow-2',
     'Blessed Land': 'main-bedroom',
-    'Entire House': 'entire-house',
   };
   const resolvedSlug = session.unitSlug ?? SLUG_BY_EN_NAME[session.unitName];
   const unitDisplayName = resolvedSlug

@@ -21,13 +21,7 @@ export async function GET(
     const { getSql } = await import('@/lib/db');
     const sql = getSql();
 
-    // For the entire house, any individual room booking blocks the dates too
-    const INDIVIDUAL_UNITS = ['bungalow-1', 'bungalow-2', 'main-bedroom'];
-    const slugsToCheck = unitSlug === 'entire-house'
-      ? [...INDIVIDUAL_UNITS, 'entire-house']
-      : INDIVIDUAL_UNITS.includes(unitSlug)
-        ? [unitSlug, 'entire-house']
-        : [unitSlug];
+    const slugsToCheck = [unitSlug];
 
     const bookings = await sql<{ check_in: string; check_out: string }[]>`
       SELECT check_in::date::text AS check_in, check_out::date::text AS check_out

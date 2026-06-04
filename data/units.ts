@@ -52,18 +52,4 @@ export const units: Unit[] = [
     weeklyRate: 500,
     monthlyRate: 1650
   },
-  {
-    slug: "entire-house",
-    name: "Entire House",
-    type: "Full property rental",
-    summary: "Rent the entire beautiful property including all bungalows and the main residence (office and master bedroom remain locked).",
-    capacity: 6,
-    bathroom: "Multiple bathrooms",
-    terrace: "Multiple terraces and garden areas",
-    nightlyRate: 0,
-    weeklyRate: 1700,
-    monthlyRate: 2600,
-    displayImage: "/imgs/OaxacaPicture_1.jpg",
-    galleryImages: ["/imgs/OaxacaPicture_2.jpg", "/imgs/OaxacaPicture_3.jpg", "/imgs/OaxacaPicture_4.jpg"]
-  }
 ];

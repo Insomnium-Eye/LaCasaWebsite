@@ -216,6 +216,32 @@ export default function HomePage() {
           </div>
         )}
       </section>
+
+      {/* Good to Know */}
+      <section className="mt-20">
+        <h2 className="text-2xl font-semibold text-white [text-shadow:0_1px_4px_rgba(0,0,0,0.8)]">
+          {t('book.propertyNotes.title')}
+        </h2>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <div className="rounded-3xl border border-slate-700 bg-[#241a13]/90 p-5 flex gap-3 text-sm text-slate-300">
+            <span className="text-lg shrink-0">🅿️</span>
+            <p>{t('book.propertyNotes.parking')}</p>
+          </div>
+          <div className="rounded-3xl border border-slate-700 bg-[#241a13]/90 p-5 flex gap-3 text-sm text-slate-300">
+            <span className="text-lg shrink-0">🐾</span>
+            <p>{t('book.propertyNotes.pets')}</p>
+          </div>
+          <div className="rounded-3xl border border-slate-700 bg-[#241a13]/90 p-5 flex gap-3 text-sm text-slate-300">
+            <span className="text-lg shrink-0">🦎</span>
+            <p>{t('book.propertyNotes.wildlife')}</p>
+          </div>
+          <div className="rounded-3xl border border-slate-700 bg-[#241a13]/90 p-5 flex gap-3 text-sm text-amber-200/90">
+            <span className="text-lg shrink-0">🏠</span>
+            <p>{t('book.propertyNotes.entireHouse')}</p>
+          </div>
+        </div>
+      </section>
+
       <ThingsToDoSection />
       <UnitModal unit={selectedUnit} onClose={() => setSelectedUnit(null)} />
       {galleryOpen && (

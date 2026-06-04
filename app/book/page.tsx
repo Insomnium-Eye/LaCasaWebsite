@@ -108,11 +108,14 @@ export default function BookPage() {
     }
   }, [form.checkIn, form.checkOut, selectedUnit.slug, minNights]);
 
+  // $1,000 MXN per extra guest per night, converted to USD (rounded down)
+  const guestFeeUsdPerNight = rate > 0 ? Math.floor(1000 / rate) : 0;
+
   const calculatePricing = useMemo(() => {
     const effectiveNightlyRate = selectedUnit.nightlyRate > 0
       ? selectedUnit.nightlyRate
       : selectedUnit.weeklyRate / 7;
-    if (!nights || effectiveNightlyRate === 0) return { base: 0, discount: 0, subtotal: 0, iva: 0, ish: 0, total: 0 };
+    if (!nights || effectiveNightlyRate === 0) return { base: 0, discount: 0, guestFee: 0, extraGuests: 0, subtotal: 0, iva: 0, ish: 0, total: 0 };
 
     const base = nights * effectiveNightlyRate;
     let discount = 0;
@@ -121,13 +124,17 @@ export default function BookPage() {
     } else if (nights >= 7) {
       discount = base * 0.10;
     }
-    const subtotal = base - discount;
-    const iva = subtotal * 0.16; // 16% IVA
-    const ish = subtotal * 0.03; // 3% ISH
+
+    const extraGuests = Math.max(0, form.guests - 1);
+    const guestFee = guestFeeUsdPerNight * extraGuests * nights;
+
+    const subtotal = base - discount + guestFee;
+    const iva = subtotal * 0.16;
+    const ish = subtotal * 0.03;
     const total = subtotal + iva + ish;
-    
-    return { base, discount, subtotal, iva, ish, total };
-  }, [nights, selectedUnit.nightlyRate]);
+
+    return { base, discount, guestFee, extraGuests, subtotal, iva, ish, total };
+  }, [nights, selectedUnit.nightlyRate, selectedUnit.weeklyRate, form.guests, guestFeeUsdPerNight]);
 
   const depositResult = useMemo(() => {
     if (!nights || calculatePricing.total === 0) return null;
@@ -289,9 +296,14 @@ export default function BookPage() {
                 min={1}
                 max={selectedUnit.capacity}
                 value={form.guests}
-                onChange={(event) => setForm({ ...form, guests: Number(event.target.value) })}
+                onChange={(event) => setForm({ ...form, guests: Math.min(Number(event.target.value), selectedUnit.capacity) })}
                 className="mt-2 w-full rounded-3xl border border-slate-300 bg-slate-50 p-4 text-slate-900 outline-none focus:border-garden focus:ring-2 focus:ring-garden/20"
               />
+              <p className="mt-1.5 text-xs text-slate-500">
+                {language === 'es'
+                  ? `1 huésped incluido. Cada huésped adicional: 1,000 MXN por noche. Máximo ${selectedUnit.capacity}.`
+                  : `1 guest included. Each additional guest: 1,000 MXN (~$${guestFeeUsdPerNight} USD) per night. Max ${selectedUnit.capacity}.`}
+              </p>
             </label>
           </div>
           <DateRangePicker
@@ -326,6 +338,9 @@ export default function BookPage() {
                   <p>{`${t('book.baseAmount')}: ${formatPrice(calculatePricing.base, language, rate)}`}</p>
                   {calculatePricing.discount > 0 && (
                     <p>{`${t('book.discount')}: -${formatPrice(calculatePricing.discount, language, rate)}`}</p>
+                  )}
+                  {calculatePricing.guestFee > 0 && (
+                    <p className="text-amber-300">{`${language === 'es' ? `Huéspedes adicionales (${calculatePricing.extraGuests} × ${nights} noches)` : `Extra guests (${calculatePricing.extraGuests} × ${nights} nights)`}: +${formatPrice(calculatePricing.guestFee, language, rate)}`}</p>
                   )}
                   <p>{`${t('book.subtotal')}: ${formatPrice(calculatePricing.subtotal, language, rate)}`}</p>
                   <p>{`IVA (16%): ${formatPrice(calculatePricing.iva, language, rate)}`}</p>
@@ -430,6 +445,17 @@ export default function BookPage() {
               <li>{t('book.note1')}</li>
               <li>{t('book.note2')}</li>
               <li>{t('book.note3')}</li>
+            </ul>
+          </div>
+          <div className="rounded-4xl bg-[#1a0f0a]/90 p-6 shadow-sm shadow-black/10">
+            <p className="text-sm uppercase tracking-[0.24em] text-slate-300">{t('book.propertyNotes.title')}</p>
+            <ul className="mt-4 space-y-3 text-slate-300 text-sm">
+              <li className="flex gap-2"><span>🅿️</span><span>{t('book.propertyNotes.parking')}</span></li>
+              <li className="flex gap-2"><span>🐾</span><span>{t('book.propertyNotes.pets')}</span></li>
+              <li className="flex gap-2"><span>🦎</span><span>{t('book.propertyNotes.wildlife')}</span></li>
+              {form.unit === 'entire-house' && (
+                <li className="flex gap-2 text-amber-300"><span>🏠</span><span>{t('book.propertyNotes.entireHouse')}</span></li>
+              )}
             </ul>
           </div>
         </aside>

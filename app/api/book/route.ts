@@ -60,6 +60,9 @@ export async function POST(request: NextRequest) {
     if (!name || !email || !unitSlug || !checkIn || !checkOut || !nights) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim())) {
+      return NextResponse.json({ error: 'Invalid email address' }, { status: 400 });
+    }
 
     const lockCode = generateLockCode();
     const [firstName] = name.trim().split(' ');

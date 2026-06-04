@@ -150,9 +150,18 @@ export default function BookPage() {
     return t('book.deposit.timing.pre_authorization');
   };
 
+  const isValidEmail = (email: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim());
+
   const handleRequestDetails = () => {
     if (!form.name || !form.email || !form.checkIn || !form.checkOut || nights <= 0) {
       alert(t('book.validationError'));
+      return;
+    }
+    if (!isValidEmail(form.email)) {
+      alert(language === 'es'
+        ? 'Por favor ingresa una dirección de correo electrónico válida.'
+        : 'Please enter a valid email address.');
       return;
     }
     if (selectedUnit.slug === 'entire-house' && nights < minNights) {

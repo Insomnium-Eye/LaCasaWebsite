@@ -288,8 +288,8 @@ export default function BookPage() {
           <DateRangePicker
             checkIn={form.checkIn}
             checkOut={form.checkOut}
-            onCheckInChange={(iso) => setForm({ ...form, checkIn: iso, checkOut: '' })}
-            onCheckOutChange={(iso) => setForm({ ...form, checkOut: iso })}
+            onCheckInChange={(iso) => setForm(prev => ({ ...prev, checkIn: iso, checkOut: '' }))}
+            onCheckOutChange={(iso) => setForm(prev => ({ ...prev, checkOut: iso }))}
             blockedRanges={blockedRanges}
             minDate={today}
             minNights={minNights}

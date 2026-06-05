@@ -4,7 +4,7 @@ import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import { units } from "../../data/units";
 import { useLanguage } from "../../contexts/LanguageContext";
-import { formatPrice } from "../../lib/currency";
+import { formatPrice, formatPriceFromUsd } from "../../lib/currency";
 import useUsdToMxn from "../../hooks/useUsdToMxn";
 import { calculateDeposit } from "../../lib/depositCalculator";
 import { DEFAULT_DEPOSIT_POLICY, getSeasonType } from "../../lib/depositPolicy";
@@ -135,20 +135,24 @@ export default function BookPage() {
     return { base, discount, guestFee, extraGuests, subtotal, iva, ish, total };
   }, [nights, selectedUnit.nightlyRate, selectedUnit.weeklyRate, form.guests, guestFeeUsdPerNight]);
 
+  // Convert MXN totals to USD for deposit calc and API storage
+  const totalUsd    = rate > 0 ? Math.floor(calculatePricing.total    / rate) : 0;
+  const subtotalUsd = rate > 0 ? Math.floor(calculatePricing.subtotal / rate) : 0;
+
   const depositResult = useMemo(() => {
-    if (!nights || calculatePricing.total === 0) return null;
-    const effectiveNightlyRate = selectedUnit.nightlyRate > 0
-      ? selectedUnit.nightlyRate
-      : selectedUnit.weeklyRate / 7;
+    if (!nights || totalUsd === 0) return null;
+    const effectiveNightlyRateUsd = rate > 0
+      ? (selectedUnit.nightlyRate > 0 ? selectedUnit.nightlyRate : selectedUnit.weeklyRate / 7) / rate
+      : 0;
     const booking: BookingDetails = {
       nights,
-      baseNightlyRate: effectiveNightlyRate,
-      totalStayAmount: calculatePricing.total,
+      baseNightlyRate: effectiveNightlyRateUsd,
+      totalStayAmount: totalUsd,
       propertySlug: selectedUnit.slug,
       seasonType: getSeasonType(form.checkIn),
     };
     return calculateDeposit(booking, DEFAULT_DEPOSIT_POLICY);
-  }, [nights, calculatePricing.total, selectedUnit, form.checkIn]);
+  }, [nights, totalUsd, selectedUnit, form.checkIn, rate]);
 
   const timingLabel = (timing: DepositTiming) => {
     if (timing === 'upfront') return t('book.deposit.timing.upfront');
@@ -365,7 +369,7 @@ export default function BookPage() {
                     <p className="font-semibold text-slate-100">{t('book.deposit.security')}</p>
                     <p className="text-xs text-slate-400">{t('book.deposit.securityNote')} · {timingLabel(depositResult.securityDepositTiming)}</p>
                   </div>
-                  <p className="shrink-0 font-semibold text-slate-100">{formatPrice(depositResult.securityDeposit, language, rate)}</p>
+                  <p className="shrink-0 font-semibold text-slate-100">{formatPriceFromUsd(depositResult.securityDeposit, language, rate)}</p>
                 </div>
                 {depositResult.advanceDeposit > 0 && (
                   <div className="flex items-start justify-between gap-4">
@@ -373,7 +377,7 @@ export default function BookPage() {
                       <p className="font-semibold text-slate-100">{t('book.deposit.advance')}</p>
                       <p className="text-xs text-slate-400">{t('book.deposit.advanceNote')} · {timingLabel(depositResult.advanceDepositTiming)}</p>
                     </div>
-                    <p className="shrink-0 font-semibold text-slate-100">{formatPrice(depositResult.advanceDeposit, language, rate)}</p>
+                    <p className="shrink-0 font-semibold text-slate-100">{formatPriceFromUsd(depositResult.advanceDeposit, language, rate)}</p>
                   </div>
                 )}
               </div>
@@ -381,19 +385,19 @@ export default function BookPage() {
                 {depositResult.advanceDeposit > 0 && !depositResult.isMonthlyPlan && (
                   <div className="flex justify-between text-slate-300">
                     <span>{t('book.deposit.remainingBalance')}</span>
-                    <span>{formatPrice(depositResult.remainingBalance, language, rate)}</span>
+                    <span>{formatPriceFromUsd(depositResult.remainingBalance, language, rate)}</span>
                   </div>
                 )}
                 {depositResult.isMonthlyPlan && depositResult.installments != null && depositResult.monthlyPayment != null && (
                   <div className="rounded-lg bg-amber-900/30 px-3 py-2 text-amber-200 text-xs">
                     {language === 'es'
-                      ? `Pago mensual de ${formatPrice(depositResult.monthlyPayment, language, rate)} cada 28 días · ${depositResult.installments} pago${depositResult.installments !== 1 ? 's' : ''} restante${depositResult.installments !== 1 ? 's' : ''} tras el primero`
-                      : `${formatPrice(depositResult.monthlyPayment, language, rate)} every 28 days · ${depositResult.installments} further payment${depositResult.installments !== 1 ? 's' : ''} after the first`}
+                      ? `Pago mensual de ${formatPriceFromUsd(depositResult.monthlyPayment, language, rate)} cada 28 días · ${depositResult.installments} pago${depositResult.installments !== 1 ? 's' : ''} restante${depositResult.installments !== 1 ? 's' : ''} tras el primero`
+                      : `${formatPriceFromUsd(depositResult.monthlyPayment, language, rate)} every 28 days · ${depositResult.installments} further payment${depositResult.installments !== 1 ? 's' : ''} after the first`}
                   </div>
                 )}
                 <div className="flex justify-between font-semibold text-slate-100">
                   <span>{t('book.deposit.totalDueNow')}</span>
-                  <span>{formatPrice(depositResult.totalDueUpfront, language, rate)}</span>
+                  <span>{formatPriceFromUsd(depositResult.totalDueUpfront, language, rate)}</span>
                 </div>
               </div>
             </div>
@@ -448,7 +452,7 @@ export default function BookPage() {
             <ul className="mt-4 space-y-3 text-slate-300 text-sm">
               <li className="flex gap-2"><span>🅿️</span><span>{t('book.propertyNotes.parking')}</span></li>
               <li className="flex gap-2"><span>🐾</span><span>{t('book.propertyNotes.pets')}</span></li>
-              <li className="flex gap-2"><span>🦎</span><span>{t('book.propertyNotes.wildlife')}</span></li>
+
             </ul>
           </div>
         </aside>
@@ -476,9 +480,9 @@ export default function BookPage() {
             checkOut: form.checkOut,
             nights,
             guests: form.guests,
-            totalUsd: calculatePricing.total,
-            subtotalUsd: calculatePricing.subtotal,
-            depositUsd: depositResult?.totalDueUpfront ?? calculatePricing.total * 0.3,
+            totalUsd,
+            subtotalUsd,
+            depositUsd: depositResult?.totalDueUpfront ?? totalUsd * 0.3,
           }}
           onClose={() => setShowEscrow(false)}
           onPaymentComplete={handleEscrowComplete}

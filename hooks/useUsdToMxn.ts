@@ -27,11 +27,11 @@ const useUsdToMxn = () => {
     return roundDownToNearestPeso(usdAmount * rate);
   };
 
-  // Format currency for display
-  const formatCurrency = (usdAmount: number): string => {
-    const roundedUsd = Math.round(usdAmount * 100) / 100;
-    const mxnAmount = convertToMxn(roundedUsd);
-    return `$${roundedUsd.toFixed(2)} USD ≈ $${mxnAmount.toLocaleString('es-MX')} MXN`;
+  // Takes MXN as base, shows both currencies
+  const formatCurrency = (mxnAmount: number): string => {
+    const mxn = Math.round(mxnAmount);
+    const usd = Math.floor(mxnAmount / rate);
+    return `$${mxn.toLocaleString('es-MX')} MXN (~$${usd.toLocaleString('en-US')} USD)`;
   };
 
   // Fetch the current exchange rate

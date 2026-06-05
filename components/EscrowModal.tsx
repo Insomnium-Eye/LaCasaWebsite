@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { formatDate } from '../lib/date';
-import { formatPrice } from '../lib/currency';
+import { formatPriceFromUsd } from '../lib/currency';
 import useUsdToMxn from '../hooks/useUsdToMxn';
 
 export interface BookingData {
@@ -37,7 +37,7 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
   onClose,
 }) => {
   const { t, language } = useLanguage();
-  const { formatCurrency } = useUsdToMxn();
+  const { formatCurrency, rate } = useUsdToMxn();
 
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'spei' | 'cash'>('card');
   const [cardNumber, setCardNumber] = useState('');
@@ -168,9 +168,9 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
           </p>
           <div className="flex justify-between pt-1 border-t border-gray-200 mt-2">
             <span className="text-sm text-gray-600">{t('book.payment.depositDueNow')}</span>
-            <span className="font-semibold text-gray-900">{formatPrice(deposit, language)}</span>
+            <span className="font-semibold text-gray-900">{formatPriceFromUsd(deposit, language, rate)}</span>
           </div>
-          <p className="text-xs text-gray-400">{formatCurrency(deposit)}</p>
+          <p className="text-xs text-gray-400">{formatCurrency(Math.round(deposit * rate))}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -253,9 +253,9 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
               <p>{t('book.payment.cashNotice')}</p>
               <div className="flex justify-between pt-2 border-t border-green-200">
                 <span className="font-semibold">{t('book.payment.cashPrice')}</span>
-                <span className="font-bold">{formatPrice(bookingData.subtotalUsd, language)}</span>
+                <span className="font-bold">{formatPriceFromUsd(bookingData.subtotalUsd, language, rate)}</span>
               </div>
-              <p className="text-xs text-green-600">{formatCurrency(bookingData.subtotalUsd)}</p>
+              <p className="text-xs text-green-600">{formatCurrency(Math.round(bookingData.subtotalUsd * rate))}</p>
             </div>
           )}
 
@@ -285,7 +285,7 @@ const EscrowModal: React.FC<EscrowModalProps> = ({
               ) : paymentMethod === 'cash' ? (
                 language === 'es' ? 'Solicitar reserva' : 'Request Booking'
               ) : (
-                `${t('book.payment.payButton')} ${formatPrice(deposit, language)}`
+                `${t('book.payment.payButton')} ${formatPriceFromUsd(deposit, language, rate)}`
               )}
             </button>
           </div>

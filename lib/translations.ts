@@ -94,7 +94,6 @@ export const translations = {
         "Direct booking with personalized service.",
         "Private parking, contactless digital locks, and mosquito-protected sleeping areas with bed nets surrounding every bed.",
         "Authentic garden living with nearby cultural attractions.",
-        "Customized bilingual tours (English & Spanish) to authentic restaurants, tour sites, rivers, lakes, beaches, and mountain retreats.",
         "Exclusive access to mountain hikes only available to locals and our guests."
       ],
       features: [
@@ -487,8 +486,8 @@ export const translations = {
         cancelDesc: "Initiate cancellation",
         review: "Leave a Review",
         reviewDesc: "Share your experience",
-        verification: "ID Verification",
-        verificationDesc: "Verify your identity"
+        maintenance: "Maintenance",
+        maintenanceDesc: "Report an issue"
       }
     },
     tours: {
@@ -702,7 +701,6 @@ export const translations = {
         "Reserva directa con servicio personalizado.",
         "Estacionamiento privado, cerraduras digitales sin contacto y áreas de descanso protegidas con mosquiteros alrededor de cada cama.",
         "Vida auténtica en el jardín con atracciones culturales cercanas.",
-        "Tours personalizados bilingües (inglés y español) a restaurantes auténticos, sitios turísticos, ríos, lagos, playas y retiros en la montaña.",
         "Acceso exclusivo a caminatas en la montaña, disponibles solo para locales y nuestros huéspedes."
       ],
       features: [
@@ -1098,8 +1096,8 @@ export const translations = {
         cancelDesc: "Iniciar cancelación",
         review: "Dejar Reseña",
         reviewDesc: "Comparte tu experiencia",
-        verification: "Verificación de ID",
-        verificationDesc: "Verifica tu identidad"
+        maintenance: "Mantenimiento",
+        maintenanceDesc: "Reportar un problema"
       }
     },
     tours: {

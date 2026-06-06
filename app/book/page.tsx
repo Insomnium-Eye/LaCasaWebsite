@@ -101,20 +101,11 @@ export default function BookPage() {
   }, [blockedRanges]); // eslint-disable-line react-hooks/exhaustive-deps
 
 
-  // Tiered extra-guest fee in MXN: 1-6 nights = 1,000 · 7-27 = 700 · 28+ = 400
-  function guestFeeMxnRate(n: number): number {
-    if (n >= 28) return 400;
-    if (n >= 7)  return 700;
-    return 1000;
-  }
-  const guestFeeRateMxn = guestFeeMxnRate(nights);
-  const guestFeeUsdPerNight = rate > 0 ? Math.floor(guestFeeRateMxn / rate) : 0;
-
   const calculatePricing = useMemo(() => {
     const effectiveNightlyRate = selectedUnit.nightlyRate > 0
       ? selectedUnit.nightlyRate
       : selectedUnit.weeklyRate / 7;
-    if (!nights || effectiveNightlyRate === 0) return { base: 0, discount: 0, guestFee: 0, extraGuests: 0, subtotal: 0, iva: 0, ish: 0, total: 0 };
+    if (!nights || effectiveNightlyRate === 0) return { base: 0, discount: 0, subtotal: 0, iva: 0, ish: 0, total: 0 };
 
     const base = nights * effectiveNightlyRate;
     let discount = 0;
@@ -124,16 +115,13 @@ export default function BookPage() {
       discount = base * 0.10;
     }
 
-    const extraGuests = Math.max(0, form.guests - 1);
-    const guestFee = guestFeeUsdPerNight * extraGuests * nights;
-
-    const subtotal = base - discount + guestFee;
+    const subtotal = base - discount;
     const iva = subtotal * 0.16;
     const ish = subtotal * 0.03;
     const total = subtotal + iva + ish;
 
-    return { base, discount, guestFee, extraGuests, subtotal, iva, ish, total };
-  }, [nights, selectedUnit.nightlyRate, selectedUnit.weeklyRate, form.guests, guestFeeUsdPerNight]);
+    return { base, discount, subtotal, iva, ish, total };
+  }, [nights, selectedUnit.nightlyRate, selectedUnit.weeklyRate]);
 
   // Convert MXN totals to USD for deposit calc and API storage
   const totalUsd    = rate > 0 ? Math.floor(calculatePricing.total    / rate) : 0;
@@ -300,8 +288,8 @@ export default function BookPage() {
               />
               <p className="mt-1.5 text-xs text-slate-500">
                 {language === 'es'
-                  ? `1 huésped incluido. Huésped adicional: 1,000 MXN/noche (700 MXN en estadías de 7+ noches · 400 MXN en 28+ noches). Máximo ${selectedUnit.capacity}.`
-                  : `1 guest included. Extra guest fee: 1,000 MXN/night · 700 MXN (7+ nights) · 400 MXN (28+ nights). Currently ${guestFeeRateMxn.toLocaleString()} MXN (~$${guestFeeUsdPerNight} USD)/night. Max ${selectedUnit.capacity}.`}
+                  ? `Máximo ${selectedUnit.capacity} huéspedes. Los visitantes nocturnos no incluidos en la reserva tienen un cargo adicional de 1,000 MXN por noche.`
+                  : `Max ${selectedUnit.capacity} guests. Unannounced overnight visitors not part of your group: 1,000 MXN/night.`}
               </p>
             </label>
           </div>
@@ -337,9 +325,6 @@ export default function BookPage() {
                   <p>{`${t('book.baseAmount')}: ${formatPrice(calculatePricing.base, language, rate)}`}</p>
                   {calculatePricing.discount > 0 && (
                     <p>{`${t('book.discount')}: -${formatPrice(calculatePricing.discount, language, rate)}`}</p>
-                  )}
-                  {calculatePricing.guestFee > 0 && (
-                    <p className="text-amber-300">{`${language === 'es' ? `Huéspedes adicionales (${calculatePricing.extraGuests} × ${nights} noches)` : `Extra guests (${calculatePricing.extraGuests} × ${nights} nights)`}: +${formatPrice(calculatePricing.guestFee, language, rate)}`}</p>
                   )}
                   <p>{`${t('book.subtotal')}: ${formatPrice(calculatePricing.subtotal, language, rate)}`}</p>
                   <p>{`IVA (16%): ${formatPrice(calculatePricing.iva, language, rate)}`}</p>

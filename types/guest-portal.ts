@@ -165,7 +165,7 @@ export interface ReviewPayload {
 }
 
 // Portal Sidebar Items
-export type PortalSection = 'cleaning' | 'transport' | 'extend' | 'cancel' | 'review' | 'verification';
+export type PortalSection = 'cleaning' | 'transport' | 'extend' | 'cancel' | 'review' | 'maintenance';
 
 export const PORTAL_SECTIONS: Record<
   PortalSection,
@@ -196,10 +196,10 @@ export const PORTAL_SECTIONS: Record<
     icon: '⭐',
     description: 'Share your experience',
   },
-  verification: {
-    label: 'ID Verification',
-    icon: '🪪',
-    description: 'Verify your identity',
+  maintenance: {
+    label: 'Maintenance',
+    icon: '🔧',
+    description: 'Report an issue',
   },
 };
 

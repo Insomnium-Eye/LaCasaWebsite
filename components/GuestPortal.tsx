@@ -12,14 +12,14 @@ import TransportRequestForm from './features/TransportRequestForm';
 import ExtendStayForm from './features/ExtendStayForm';
 import CancelReservationForm from './features/CancelReservationForm';
 import LeaveReviewForm from './features/LeaveReviewForm';
-import IDVerificationForm from './features/IDVerificationForm';
+import MaintenanceRequestForm from './features/MaintenanceRequestForm';
 
 interface TransportPrefill {
   destinationId: string;
   date: string; // YYYY-MM-DD
 }
 
-const VALID_TABS: PortalSection[] = ['transport', 'cleaning', 'extend', 'cancel', 'review', 'verification'];
+const VALID_TABS: PortalSection[] = ['transport', 'cleaning', 'extend', 'cancel', 'review', 'maintenance'];
 
 const GuestPortal = () => {
   const { session, loading, error, login, logout, isAuthenticated } = useGuestAuth();
@@ -116,7 +116,7 @@ const GuestPortal = () => {
           {activeSection === 'extend' && <ExtendStayForm session={session} />}
           {activeSection === 'cancel' && <CancelReservationForm session={session} />}
           {activeSection === 'review' && <LeaveReviewForm session={session} />}
-          {activeSection === 'verification' && <IDVerificationForm session={session} />}
+          {activeSection === 'maintenance' && <MaintenanceRequestForm session={session} />}
         </div>
       </div>
     </div>

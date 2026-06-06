@@ -29,7 +29,7 @@ const PortalSidebar = ({ activeSection, onSectionChange, session }: PortalSideba
         : t('portal.sections.reviewDesc'),
       locked: isReviewLocked,
     },
-    { key: 'verification', label: t('portal.sections.verification'), icon: '🪪', description: t('portal.sections.verificationDesc') },
+    { key: 'maintenance', label: t('portal.sections.maintenance'), icon: '🔧', description: t('portal.sections.maintenanceDesc') },
   ];
 
   return (

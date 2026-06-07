@@ -20,6 +20,7 @@ const PortalSidebar = ({ activeSection, onSectionChange, session }: PortalSideba
     { key: 'transport', label: t('portal.sections.transport'), icon: '🚗', description: t('portal.sections.transportDesc') },
     { key: 'extend', label: t('portal.sections.extend'), icon: '📅', description: t('portal.sections.extendDesc') },
     { key: 'cancel', label: t('portal.sections.cancel'), icon: '❌', description: t('portal.sections.cancelDesc') },
+    { key: 'maintenance', label: t('portal.sections.maintenance'), icon: '🔧', description: t('portal.sections.maintenanceDesc') },
     {
       key: 'review',
       label: t('portal.sections.review'),
@@ -29,7 +30,6 @@ const PortalSidebar = ({ activeSection, onSectionChange, session }: PortalSideba
         : t('portal.sections.reviewDesc'),
       locked: isReviewLocked,
     },
-    { key: 'maintenance', label: t('portal.sections.maintenance'), icon: '🔧', description: t('portal.sections.maintenanceDesc') },
   ];
 
   return (

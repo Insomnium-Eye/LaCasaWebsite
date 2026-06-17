@@ -5,11 +5,10 @@ import { useState } from "react";
 import { units, Unit } from "../../data/units";
 import UnitModal from "../../components/UnitModal";
 import { useLanguage } from "../../contexts/LanguageContext";
-import { formatPrice } from "../../lib/currency";
 import BackgroundSlideshow from "../../components/BackgroundSlideshow";
 
 export default function UnitsPage() {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
 
   return (
@@ -43,15 +42,10 @@ export default function UnitsPage() {
                 <li>{t(`units.items.${unit.slug}.bathroom`)}</li>
                 <li>{t(`units.items.${unit.slug}.terrace`)}</li>
               </ul>
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-3">
-                <div className="space-y-1">
-                  <p className="text-lg font-semibold text-slate-100">{formatPrice(unit.nightlyRate, language)}/{t('book.priceUnit.night')}</p>
-                  <p className="text-sm text-slate-300">{formatPrice(unit.weeklyRate, language)}/{t('book.priceUnit.week')}</p>
-                  <p className="text-sm text-slate-300">{formatPrice(unit.monthlyRate, language)}/{t('book.priceUnit.month')}</p>
-                </div>
-                <Link href="/book" className="rounded-full bg-garden px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3c5a35]">
+              <div className="flex flex-wrap items-center justify-end gap-3 pt-3">
+                <a href={unit.airbnbUrl} target="_blank" rel="noopener noreferrer" className="rounded-full bg-garden px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3c5a35]">
                   {t('units.checkAvailability')}
-                </Link>
+                </a>
               </div>
             </div>
           </article>

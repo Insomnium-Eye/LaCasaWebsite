@@ -35,9 +35,6 @@ export default function Navigation() {
           <Link href="/portal" className="rounded-full border border-slate-300 px-5 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
             {t("nav.signIn") || "Already a guest? Sign in!"}
           </Link>
-          <Link href="/book" className="rounded-full bg-garden px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#3c5a35]">
-            {t("nav.bookDirect")}
-          </Link>
         </div>
       </div>
     </header>

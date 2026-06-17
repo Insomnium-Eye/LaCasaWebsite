@@ -9,6 +9,7 @@ export type Unit = {
   nightlyRate: number;
   weeklyRate: number;
   monthlyRate: number;
+  airbnbUrl?: string;
   displayImage?: string;
   galleryImages?: string[];
 };
@@ -25,6 +26,7 @@ export const units: Unit[] = [
     nightlyRate: 1500,
     weeklyRate: 10500,
     monthlyRate: 45000,
+    airbnbUrl: "https://www.airbnb.com/rooms/1702322410862536247?guests=1&adults=1&s=67&unique_share_id=cfc3dff4-51a6-4d49-9c5f-47b539e8ca5b",
     displayImage: "/imgs/OaxacaPicture_7.jpg",
     galleryImages: ["/imgs/OaxacaPicture_8.jpg", "/imgs/OaxacaPicture_9.jpg"]
   },
@@ -38,7 +40,8 @@ export const units: Unit[] = [
     terrace: "Private veranda with garden access",
     nightlyRate: 2000,
     weeklyRate: 14000,
-    monthlyRate: 60000
+    monthlyRate: 60000,
+    airbnbUrl: "https://www.airbnb.com/rooms/1702417529255850388?guests=1&adults=1&s=67&unique_share_id=295241b4-053b-4393-a59b-4a58eae29e38"
   },
   {
     slug: "main-bedroom",
@@ -50,6 +53,7 @@ export const units: Unit[] = [
     terrace: "Shared terrace nearby",
     nightlyRate: 1500,
     weeklyRate: 10500,
-    monthlyRate: 45000
+    monthlyRate: 45000,
+    airbnbUrl: "https://www.airbnb.com/rooms/1702419818538938394?guests=1&adults=1&s=67&unique_share_id=69f850f1-2d03-441d-b0ed-b316286848a7"
   },
 ];

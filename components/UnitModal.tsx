@@ -3,8 +3,6 @@
 import { useEffect, useState } from 'react';
 import { Unit } from '../data/units';
 import { useLanguage } from '../contexts/LanguageContext';
-import { formatPrice } from '../lib/currency';
-import BookingModal from './BookingModal';
 
 interface UnitModalProps {
   unit: Unit | null;
@@ -12,8 +10,7 @@ interface UnitModalProps {
 }
 
 export default function UnitModal({ unit, onClose }: UnitModalProps) {
-  const { t, language } = useLanguage();
-  const [showBooking, setShowBooking] = useState(false);
+  const { t } = useLanguage();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -98,28 +95,16 @@ export default function UnitModal({ unit, onClose }: UnitModalProps) {
             </div>
           </div>
 
-          {/* Price and Book Button */}
+          {/* Check Availability */}
           <div className="pt-4 border-t border-slate-200">
-            <div className="space-y-3 mb-6">
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-semibold text-slate-900">{t('unitModal.nightlyRate')}</span>
-                <span className="text-lg font-semibold text-slate-900">{formatPrice(unit.nightlyRate, language)}/{t('book.priceUnit.night')}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-semibold text-slate-900">{t('unitModal.weeklyRate')}</span>
-                <span className="text-lg font-semibold text-slate-900">{formatPrice(unit.weeklyRate, language)}/{t('book.priceUnit.week')}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-semibold text-slate-900">{t('unitModal.monthlyRate')}</span>
-                <span className="text-lg font-semibold text-slate-900">{formatPrice(unit.monthlyRate, language)}/{t('book.priceUnit.month')}</span>
-              </div>
-            </div>
-            <button
-              onClick={() => setShowBooking(true)}
-              className="w-full rounded-full bg-terracotta px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#b55e47]"
+            <a
+              href={unit.airbnbUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full rounded-full bg-terracotta px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-[#b55e47]"
             >
-              {t('unitModal.bookNow')}
-            </button>
+              {t('home.checkAvailability')}
+            </a>
           </div>
         </div>
       </div>
@@ -145,14 +130,6 @@ export default function UnitModal({ unit, onClose }: UnitModalProps) {
         </div>
       )}
 
-      {/* Booking Modal */}
-      {showBooking && (
-        <BookingModal 
-          unit={unit} 
-          onClose={() => setShowBooking(false)} 
-          onBackToUnit={() => setShowBooking(false)}
-        />
-      )}
     </div>
   );
 }

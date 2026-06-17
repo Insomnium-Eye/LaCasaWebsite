@@ -10,7 +10,6 @@ import GalleryModal from "../components/GalleryModal";
 import ContactModal from "../components/ContactModal";
 import DisclaimerModal from "../components/DisclaimerModal";
 import { useLanguage } from "../contexts/LanguageContext";
-import { formatPrice } from "../lib/currency";
 
 export default function HomePage() {
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
@@ -18,7 +17,7 @@ export default function HomePage() {
   const [galleryIndex, setGalleryIndex] = useState(0);
   const [contactOpen, setContactOpen] = useState(false);
   const [disclaimerOpen, setDisclaimerOpen] = useState(false);
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
 
   // Show disclaimer modal on first visit
   useEffect(() => {
@@ -69,10 +68,7 @@ export default function HomePage() {
             <Link href="/tours" className="hidden rounded-full border border-slate-600 px-5 py-2 text-sm font-semibold text-slate-300 transition hover:border-slate-400 hover:text-white sm:inline-flex">
               {t("nav.tours")}
             </Link>
-            <Link href="/book" className="rounded-full bg-garden px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#3c5a35]">
-              {t("nav.bookDirect")}
-            </Link>
-          </div>
+            </div>
         </div>
       </header>
       <div className="relative mx-auto max-w-7xl px-6 pb-20 pt-6 lg:px-8">
@@ -86,9 +82,6 @@ export default function HomePage() {
             {t("home.description")}
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/book" className="inline-flex items-center justify-center rounded-full bg-terracotta px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-200 transition hover:bg-[#b55e47]">
-              {t("home.bookNow")}
-            </Link>
             <Link href="/about" className="inline-flex items-center justify-center rounded-full bg-garden px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-200 transition hover:bg-garden/80">
               {t("home.aboutLaCasa")}
             </Link>
@@ -163,16 +156,9 @@ export default function HomePage() {
                 <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-300">{t(`units.items.${unit.slug}.type`)}</p>
                 <h3 className="text-2xl font-semibold text-slate-100">{t(`units.items.${unit.slug}.name`)}</h3>
                 <p className="text-slate-300">{t(`units.items.${unit.slug}.summary`)}</p>
-                <div className="space-y-1">
-                  {unit.nightlyRate > 0 && (
-                    <p className="text-lg font-semibold text-slate-100">{formatPrice(unit.nightlyRate, language)}/{t('book.priceUnit.night')}</p>
-                  )}
-                  <p className="text-sm text-slate-300">{formatPrice(unit.weeklyRate, language)}/{t('book.priceUnit.week')}</p>
-                  <p className="text-sm text-slate-300">{formatPrice(unit.monthlyRate, language)}/{t('book.priceUnit.month')}</p>
-                </div>
-                <Link href={`/book?unit=${unit.slug}`} className="inline-flex items-center rounded-full bg-terracotta px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#b55e47]">
+                <a href={unit.airbnbUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center rounded-full bg-terracotta px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#b55e47]" onClick={(e) => e.stopPropagation()}>
                   {t("home.checkAvailability")}
-                </Link>
+                </a>
               </div>
             </article>
           ))}

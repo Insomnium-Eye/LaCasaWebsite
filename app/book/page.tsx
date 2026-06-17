@@ -102,9 +102,9 @@ export default function BookPage() {
 
 
   const calculatePricing = useMemo(() => {
-    const effectiveNightlyRate = selectedUnit.nightlyRate > 0
-      ? selectedUnit.nightlyRate
-      : selectedUnit.weeklyRate / 7;
+    const nightlyRate = selectedUnit.nightlyRate ?? 0;
+    const weeklyRate = selectedUnit.weeklyRate ?? 0;
+    const effectiveNightlyRate = nightlyRate > 0 ? nightlyRate : weeklyRate / 7;
     if (!nights || effectiveNightlyRate === 0) return { base: 0, discount: 0, subtotal: 0, iva: 0, ish: 0, total: 0 };
 
     const base = nights * effectiveNightlyRate;
@@ -121,7 +121,7 @@ export default function BookPage() {
     const total = subtotal + iva + ish;
 
     return { base, discount, subtotal, iva, ish, total };
-  }, [nights, selectedUnit.nightlyRate, selectedUnit.weeklyRate]);
+  }, [nights, selectedUnit.nightlyRate, selectedUnit.weeklyRate]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Convert MXN totals to USD for deposit calc and API storage
   const totalUsd    = rate > 0 ? Math.floor(calculatePricing.total    / rate) : 0;
@@ -129,8 +129,10 @@ export default function BookPage() {
 
   const depositResult = useMemo(() => {
     if (!nights || totalUsd === 0) return null;
+    const nr = selectedUnit.nightlyRate ?? 0;
+    const wr = selectedUnit.weeklyRate ?? 0;
     const effectiveNightlyRateUsd = rate > 0
-      ? (selectedUnit.nightlyRate > 0 ? selectedUnit.nightlyRate : selectedUnit.weeklyRate / 7) / rate
+      ? (nr > 0 ? nr : wr / 7) / rate
       : 0;
     const booking: BookingDetails = {
       nights,
@@ -318,9 +320,9 @@ export default function BookPage() {
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-300">{t('book.rateSummary')}</p>
             <p className="mt-4 text-slate-200">{`${t(`units.items.${selectedUnit.slug}.name`)} · ${selectedUnit.capacity} ${t('book.guests')}`}</p>
             <div className="mt-6 space-y-3 text-slate-200">
-              {(selectedUnit.nightlyRate > 0 || selectedUnit.weeklyRate > 0) && (
+              {((selectedUnit.nightlyRate ?? 0) > 0 || (selectedUnit.weeklyRate ?? 0) > 0) && (
                 <>
-                  <p>{`${t('book.nightlyRate')}: ${formatPrice(selectedUnit.nightlyRate > 0 ? selectedUnit.nightlyRate : selectedUnit.weeklyRate / 7, language, rate)}`}</p>
+                  <p>{`${t('book.nightlyRate')}: ${formatPrice((selectedUnit.nightlyRate ?? 0) > 0 ? selectedUnit.nightlyRate! : (selectedUnit.weeklyRate ?? 0) / 7, language, rate)}`}</p>
                   <p>{`${t('book.nights')}: ${nights || 0}`}</p>
                   <p>{`${t('book.baseAmount')}: ${formatPrice(calculatePricing.base, language, rate)}`}</p>
                   {calculatePricing.discount > 0 && (

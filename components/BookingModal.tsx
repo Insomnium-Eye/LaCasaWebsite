@@ -51,11 +51,11 @@ export default function BookingModal({ unit, onClose, onBackToUnit }: BookingMod
 
     switch (bookingPeriod) {
       case 'nightly':
-        return diffDays * unit.nightlyRate;
+        return diffDays * (unit.nightlyRate ?? 0);
       case 'weekly':
-        return Math.ceil(diffDays / 7) * unit.weeklyRate;
+        return Math.ceil(diffDays / 7) * (unit.weeklyRate ?? 0);
       case 'monthly':
-        return Math.ceil(diffDays / 30) * unit.monthlyRate;
+        return Math.ceil(diffDays / 30) * (unit.monthlyRate ?? 0);
       default:
         return 0;
     }
@@ -125,9 +125,9 @@ export default function BookingModal({ unit, onClose, onBackToUnit }: BookingMod
                 onChange={(e) => setBookingPeriod(e.target.value as 'nightly' | 'weekly' | 'monthly')}
                 className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 p-3 text-slate-900 outline-none focus:border-terracotta focus:ring-2 focus:ring-terracotta/20"
               >
-                <option value="nightly">{`${t('book.periods.nightly')} (${unit.nightlyRate}/${t('book.priceUnit.night')})`}</option>
-                <option value="weekly">{`${t('book.periods.weekly')} (${unit.weeklyRate}/${t('book.priceUnit.week')})`}</option>
-                <option value="monthly">{`${t('book.periods.monthly')} (${unit.monthlyRate}/${t('book.priceUnit.month')})`}</option>
+                <option value="nightly">{`${t('book.periods.nightly')} (${unit.nightlyRate ?? '—'}/${t('book.priceUnit.night')})`}</option>
+                <option value="weekly">{`${t('book.periods.weekly')} (${unit.weeklyRate ?? '—'}/${t('book.priceUnit.week')})`}</option>
+                <option value="monthly">{`${t('book.periods.monthly')} (${unit.monthlyRate ?? '—'}/${t('book.priceUnit.month')})`}</option>
               </select>
             </label>
             <label className="block">

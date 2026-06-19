@@ -180,10 +180,6 @@ export default function HomePage() {
             <span className="text-lg shrink-0">🐾</span>
             <p>{t('book.propertyNotes.pets')}</p>
           </div>
-          <div className="rounded-3xl border border-slate-700 bg-[#241a13]/90 p-5 flex gap-3 text-sm text-amber-200/90">
-            <span className="text-lg shrink-0">🏠</span>
-            <p>{t('book.propertyNotes.entireHouse')}</p>
-          </div>
         </div>
       </section>
 

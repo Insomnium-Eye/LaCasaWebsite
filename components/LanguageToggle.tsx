@@ -2,7 +2,7 @@
 
 import { useLanguage } from '../contexts/LanguageContext';
 
-const WA_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '';
+const WA_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '3606312344';
 
 function WhatsAppIcon() {
   return (

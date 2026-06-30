@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-const imageUrls = Array.from({ length: 21 }, (_, index) => `/imgs/OaxacaPicture_${index + 1}.jpg`);
+const imageUrls = Array.from({ length: 19 }, (_, index) => `/imgs/OaxacaPicture_${index + 1}.jpg`);
 
 export default function BackgroundSlideshow() {
   const [activeIndex, setActiveIndex] = useState(0);

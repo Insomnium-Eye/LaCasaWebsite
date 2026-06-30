@@ -28,7 +28,7 @@ export default function HomePage() {
     }
   }, []);
 
-  const galleryImages = Array.from({ length: 21 }, (_, index) => `/imgs/OaxacaPicture_${index + 1}.jpg`);
+  const galleryImages = Array.from({ length: 19 }, (_, index) => `/imgs/OaxacaPicture_${index + 1}.jpg`);
 
   const features = [
     {

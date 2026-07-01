@@ -103,7 +103,6 @@ export const translations = {
         { title: "Easy access", description: "Minutes from the city center and all Oaxaca attractions." },
         { title: "In-unit kitchen appliances", description: "Each bungalow and room includes a private mini-fridge and electric grill for your convenience." },
         { title: "Central location", description: "Steps away from key local landmarks:", links: [{ label: "Parque Colosio", url: "https://maps.app.goo.gl/TmZEkTz5xDzEoaPJ8" }, { label: "Pitico", url: "https://maps.app.goo.gl/sDCUbT7W9ZWtYfoe8" }, { label: "Templo San Felipe", url: "https://maps.app.goo.gl/Fi2zM5yPohuGBfPi9" }] },
-        { title: "Ozone water filtration", description: "An ozone water filtering system provides clean, purified drinking water throughout the property." },
         { title: "Local transportation service", description: "Arrange convenient rides to the Airport, Zócalo, Monte Albán, and other tourist hotspots for a small fee." }
       ]
     },
@@ -710,7 +709,6 @@ export const translations = {
         { title: "Fácil acceso", description: "Minutos al centro de la ciudad y todas las atracciones de Oaxaca." },
         { title: "Electrodomésticos en cada unidad", description: "Cada bungalow y habitación incluye minirefrigerador privado y parrilla eléctrica para tu comodidad." },
         { title: "Ubicación céntrica", description: "A pasos de puntos de referencia locales importantes:", links: [{ label: "Parque Colosio", url: "https://maps.app.goo.gl/TmZEkTz5xDzEoaPJ8" }, { label: "Pitico", url: "https://maps.app.goo.gl/sDCUbT7W9ZWtYfoe8" }, { label: "Templo San Felipe", url: "https://maps.app.goo.gl/Fi2zM5yPohuGBfPi9" }] },
-        { title: "Filtración de agua por ozono", description: "Un sistema de filtración de agua por ozono proporciona agua potable limpia y purificada en toda la propiedad." },
         { title: "Servicio de transporte local", description: "Organiza paseos convenientes al Aeropuerto, Zócalo, Monte Albán y otros puntos turísticos por un pequeño costo." }
       ]
     },

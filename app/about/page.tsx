@@ -7,7 +7,7 @@ import BackgroundSlideshow from '../../components/BackgroundSlideshow';
 export default function AboutPage() {
   const { t } = useLanguage();
   const highlights = t('about.highlights') as string[];
-  const features = t('about.features') as Array<{ title: string; description: string }>;
+  const features = t('about.features') as Array<{ title: string; description: string; links?: Array<{ label: string; url: string }> }>;
 
   return (
     <div className="relative overflow-hidden bg-black text-white min-h-screen">
@@ -37,6 +37,17 @@ export default function AboutPage() {
           <div key={item.title} className="rounded-4xl border border-slate-700 bg-[#241a13]/90 p-8 shadow-sm shadow-black/10">
             <h3 className="text-xl font-semibold text-white">{item.title}</h3>
             <p className="mt-3 text-slate-200">{item.description}</p>
+            {item.links && (
+              <ul className="mt-2 space-y-1">
+                {item.links.map((link) => (
+                  <li key={link.url}>
+                    <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:text-amber-300 underline text-sm">
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         ))}
       </section>

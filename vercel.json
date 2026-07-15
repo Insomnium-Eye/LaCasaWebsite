@@ -7,6 +7,10 @@
     {
       "path": "/api/cron/checkout-reminder",
       "schedule": "0 16 * * *"
+    },
+    {
+      "path": "/api/cron/expire-checkouts",
+      "schedule": "0 7 * * *"
     }
   ]
 }

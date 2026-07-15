@@ -26,6 +26,9 @@ export const findReservationByIdentifier = async (
     rows = await sql<Reservation[]>`
       SELECT * FROM reservations WHERE phone = ${identifier} AND status IN ('confirmed', 'checked_in') LIMIT 1`;
   } else {
+    // '0000' is a retired-key sentinel (set once a guest has checked out) and must
+    // never authenticate — it can be shared by many past reservations.
+    if (identifier === '0000') return null;
     rows = await sql<Reservation[]>`
       SELECT * FROM reservations WHERE digital_key = ${identifier} AND status IN ('confirmed', 'checked_in') LIMIT 1`;
   }

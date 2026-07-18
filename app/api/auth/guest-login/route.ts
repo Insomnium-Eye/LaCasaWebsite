@@ -60,6 +60,37 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Admin bypass — never hits the DB
+    const adminCode = process.env.ADMIN_PORTAL_CODE || '0723';
+    if (trimmed === adminCode) {
+      const token = generateGuestJWT({
+        reservationId: 'admin',
+        guestName: 'Admin',
+        email: '',
+        unitName: '',
+        checkIn: '',
+        checkOut: '',
+        nightsRemaining: 0,
+        nightlyRate: 0,
+        isAdmin: true,
+      });
+      return NextResponse.json({
+        success: true,
+        data: {
+          reservationId: 'admin',
+          guestName: 'Admin',
+          email: '',
+          unitName: '',
+          checkIn: '',
+          checkOut: '',
+          nightsRemaining: 0,
+          nightlyRate: 0,
+          isAdmin: true,
+          token,
+        },
+      }, { status: 200 });
+    }
+
     const type = detectIdentifierType(trimmed);
     const normalized = normalizeIdentifier(trimmed, type);
 

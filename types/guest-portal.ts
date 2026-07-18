@@ -16,6 +16,7 @@ export interface GuestSession {
   nightsRemaining: number;
   nightlyRate: number;
   token: string; // JWT
+  isAdmin?: boolean;
 }
 
 export interface Reservation {

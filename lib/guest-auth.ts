@@ -11,6 +11,7 @@ export const generateGuestJWT = (session: Omit<GuestSession, 'token'>): string =
       guestName: session.guestName,
       email: session.email,
       unitName: session.unitName,
+      isAdmin: session.isAdmin ?? false,
     },
     JWT_SECRET,
     { expiresIn: `${JWT_EXPIRY_HOURS}h` }

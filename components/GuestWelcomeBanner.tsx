@@ -14,6 +14,25 @@ const GuestWelcomeBanner = ({ session, onLogout, onTransportRequest }: GuestWelc
 
   if (!session) return null;
 
+  if (session.isAdmin) {
+    return (
+      <div className="bg-gradient-to-r from-amber-700 to-orange-600 text-white p-6 shadow-lg rounded-lg">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold">Admin Portal</h2>
+            <p className="text-amber-100 text-sm mt-1">Logged in as administrator — no reservation attached</p>
+          </div>
+          <button
+            onClick={onLogout}
+            className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg font-medium transition-colors"
+          >
+            {t('portal.signOut')}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const locale = language === 'es' ? 'es-MX' : 'en-US';
 
   // Resolve slug from session field (new logins) or by matching stored English name (cached sessions)

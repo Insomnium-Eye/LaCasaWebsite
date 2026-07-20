@@ -43,13 +43,15 @@ const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: Transport
   const { rate } = useUsdToMxn();
 
   const [destinationId, setDestinationId] = useState('');
-  const [datetime, setDatetime] = useState('');
+  const [date, setDate] = useState('');
+  const [time, setTime] = useState('');
+  const datetime = date && time ? `${date}T${time}` : '';
 
   useEffect(() => {
     if (prefill) {
       setDestinationId(prefill.destinationId);
-      // Pre-fill date with 09:00 default — user only needs to adjust the time
-      setDatetime(prefill.date + 'T09:00');
+      setDate(prefill.date);
+      setTime('09:00');
       onPrefillConsumed?.();
     }
   }, [prefill]);
@@ -125,7 +127,8 @@ const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: Transport
 
       setSuccess(true);
       setDestinationId('');
-      setDatetime('');
+      setDate('');
+      setTime('');
       setPassengers(1);
       setRoundTrip(false);
       setNotes('');
@@ -172,23 +175,39 @@ const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: Transport
           )}
         </div>
 
-        {/* Date/Time */}
-        <div>
-          <label htmlFor="datetime" className="block text-sm font-medium text-gray-700 mb-2">
-            {t('portal.transportRequest.date')} &amp; {t('portal.transportRequest.time')} <span className="text-red-500">*</span>
-          </label>
-          <DateInput
-            id="datetime"
-            type="datetime-local"
-            value={datetime}
-            onChange={setDatetime}
-            language={language}
-            min={minDatetime}
-            max={maxDatetime}
-            required
-            disabled={loading}
-            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-amber-600 transition-colors disabled:bg-gray-100"
-          />
+        {/* Date/Time — split into two inputs for reliable cross-browser calendar/time pickers */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-2">
+              {t('portal.transportRequest.date')} <span className="text-red-500">*</span>
+            </label>
+            <DateInput
+              id="date"
+              type="date"
+              value={date}
+              onChange={setDate}
+              language={language}
+              min={minDatetime.slice(0, 10)}
+              max={maxDatetime.slice(0, 10)}
+              required
+              disabled={loading}
+              className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-amber-600 transition-colors disabled:bg-gray-100"
+            />
+          </div>
+          <div>
+            <label htmlFor="time" className="block text-sm font-medium text-gray-700 mb-2">
+              {t('portal.transportRequest.time')} <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="time"
+              type="time"
+              value={time}
+              onChange={(e) => setTime(e.target.value)}
+              required
+              disabled={loading}
+              className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-amber-600 transition-colors disabled:bg-gray-100"
+            />
+          </div>
         </div>
 
         {/* Passengers & Round Trip */}

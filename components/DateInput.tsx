@@ -38,7 +38,7 @@ export default function DateInput({
 }: DateInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // English: plain native input — browser opens picker on click natively, no JS needed
+  // English: native input; showPicker() makes the entire field area clickable (not just the icon)
   if (language !== 'es') {
     return (
       <input
@@ -51,17 +51,22 @@ export default function DateInput({
         disabled={disabled}
         required={required}
         className={className}
+        onClick={(e) => {
+          if (!disabled) {
+            try { (e.currentTarget as HTMLInputElement).showPicker(); } catch (_) {}
+          }
+        }}
       />
     );
   }
 
-  // Spanish: show formatted DD/MM/AAAA overlay with a transparent native input underneath.
-  // The native input has NO pointer-events-none so real clicks reach it and open the picker.
+  // Spanish: formatted DD/MM/AAAA overlay with a transparent native input underneath.
+  // pointer-events-none is removed from the native input so real clicks open the picker.
   const wrapperClass = (className ?? '').replace(/\bfocus:/g, 'focus-within:');
 
   return (
     <div className={`relative ${wrapperClass} ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
-      {/* Formatted overlay — purely visual, non-interactive */}
+      {/* Formatted overlay — visual only */}
       <div className="pointer-events-none flex items-center justify-between gap-2 w-full">
         <span className={value ? '' : 'text-gray-400'}>
           {value ? isoToDisplay(value, type) : PLACEHOLDER[type]}

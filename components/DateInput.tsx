@@ -39,8 +39,9 @@ export default function DateInput({
   value, onChange, language, type = 'date', min, max, disabled, required, className, id,
 }: DateInputProps) {
   const selected = toDate(value);
-  const minDate = min ? toDate(min) : undefined;
-  const maxDate = max ? toDate(max) : undefined;
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const minDate = min ? toDate(min) ?? today : today;
+  const maxDate = max ? toDate(max) ?? undefined : undefined;
   const showTime = type === 'datetime-local';
 
   const locale = language === 'es' ? 'es' : undefined;

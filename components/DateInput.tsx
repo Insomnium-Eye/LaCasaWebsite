@@ -38,11 +38,8 @@ export default function DateInput({
 }: DateInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // English: plain native input — browser opens picker on click natively, no JS needed
   if (language !== 'es') {
-    // English: native input, but programmatically call showPicker() on any click so
-    // clicking the text area (not just the small calendar icon) opens the picker.
-    // Per spec, showPicker() is a no-op if the picker is already open, so clicking
-    // the calendar icon natively (which opens it) then firing showPicker() is safe.
     return (
       <input
         id={id}
@@ -54,30 +51,17 @@ export default function DateInput({
         disabled={disabled}
         required={required}
         className={className}
-        onClick={(e) => {
-          if (!disabled) {
-            try { (e.currentTarget as HTMLInputElement).showPicker(); } catch (_) {}
-          }
-        }}
       />
     );
   }
 
-  // Spanish mode: the wrapper div owns all clicks. The native input is invisible
-  // (opacity-0, pointer-events-none) so it never intercepts clicks itself — only the
-  // wrapper does, which then calls showPicker() once per click with no conflicts.
+  // Spanish: show formatted DD/MM/AAAA overlay with a transparent native input underneath.
+  // The native input has NO pointer-events-none so real clicks reach it and open the picker.
   const wrapperClass = (className ?? '').replace(/\bfocus:/g, 'focus-within:');
 
   return (
-    <div
-      className={`relative ${wrapperClass} ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
-      onClick={() => {
-        if (!disabled) {
-          try { inputRef.current?.showPicker(); } catch (_) {}
-        }
-      }}
-    >
-      {/* Formatted overlay — DD/MM/AAAA display, non-interactive */}
+    <div className={`relative ${wrapperClass} ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
+      {/* Formatted overlay — purely visual, non-interactive */}
       <div className="pointer-events-none flex items-center justify-between gap-2 w-full">
         <span className={value ? '' : 'text-gray-400'}>
           {value ? isoToDisplay(value, type) : PLACEHOLDER[type]}
@@ -88,7 +72,7 @@ export default function DateInput({
         </svg>
       </div>
 
-      {/* Native input: invisible but present for value binding, onChange, and form validation */}
+      {/* Native input: covers full area, invisible but fully clickable */}
       <input
         ref={inputRef}
         id={id}
@@ -100,7 +84,7 @@ export default function DateInput({
         disabled={disabled}
         required={required}
         tabIndex={-1}
-        className="absolute inset-0 w-full h-full opacity-0 pointer-events-none"
+        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
       />
     </div>
   );

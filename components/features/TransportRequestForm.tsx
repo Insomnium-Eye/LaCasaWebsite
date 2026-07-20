@@ -56,8 +56,23 @@ const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: Transport
   const [roundTrip, setRoundTrip] = useState(false);
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const PAYMENT_METHODS = [
+    { id: 'clabe',   icon: '🏦', label: 'CLABE (Mexican Bank Transfer)', detail: '002610702365656432', sub: 'Rosa Elena Duran Ramirez', note: 'SPEI transfer — include your travel date in the concept field.' },
+    { id: 'paypal',  icon: '🅿️', label: 'PayPal',    detail: 'insomnium-eye@live.com', note: 'Include your travel date in the payment note.' },
+    { id: 'cashapp', icon: '💵', label: 'Cash App',  detail: '$DavidGPiper',            note: 'Include your travel date in the note.' },
+    { id: 'venmo',   icon: '💙', label: 'Venmo',     detail: '@David-Piper-73',         note: 'Include your travel date in the note.' },
+  ];
+
+  function copyToClipboard(text: string, id: string) {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    });
+  }
 
   if (!session) return null;
 
@@ -96,7 +111,7 @@ const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: Transport
     if (!selectedDest) return;
     setLoading(true);
     setError(null);
-    setSuccess(false);
+    setShowPayment(false);
 
     try {
       const response = await fetch('/api/requests/transport', {
@@ -122,13 +137,12 @@ const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: Transport
         return;
       }
 
-      setSuccess(true);
+      setShowPayment(true);
       setDestinationId('');
       setDatetime('');
       setPassengers(1);
       setRoundTrip(false);
       setNotes('');
-      setTimeout(() => setSuccess(false), 5000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -203,7 +217,7 @@ const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: Transport
               disabled={loading}
               className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-amber-600 transition-colors disabled:bg-gray-100"
             >
-              {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+              {[1, 2, 3, 4, 5, 6, 7].map((n) => (
                 <option key={n} value={n}>
                   {n} {n === 1 ? t('portal.transportRequest.person') : t('portal.transportRequest.people')}
                 </option>
@@ -272,15 +286,10 @@ const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: Transport
           </div>
         )}
 
-        {/* Error & Success */}
+        {/* Error */}
         {error && (
           <div className="p-4 bg-red-50 border-l-4 border-red-500 rounded">
             <p className="text-sm text-red-700">{error}</p>
-          </div>
-        )}
-        {success && (
-          <div className="p-4 bg-green-50 border-l-4 border-green-500 rounded">
-            <p className="text-sm text-green-700">✓ {t('portal.transportRequest.success')}</p>
           </div>
         )}
 
@@ -300,6 +309,57 @@ const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: Transport
           )}
         </button>
       </form>
+
+      {/* Payment screen — shown after successful booking */}
+      {showPayment && (
+        <div className="mt-8 space-y-4">
+          <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
+            <p className="text-green-800 font-semibold text-lg">✓ Transport Booked!</p>
+            <p className="text-green-700 text-sm mt-1">
+              Your request is confirmed. Please complete payment using one of the methods below.
+            </p>
+          </div>
+
+          <p className="text-slate-700 font-semibold text-center">Choose your payment method:</p>
+
+          <div className="space-y-3">
+            {PAYMENT_METHODS.map((m) => (
+              <div key={m.id} className="border-2 border-slate-200 rounded-xl p-4 hover:border-amber-400 transition-colors">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="text-2xl flex-shrink-0">{m.icon}</span>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-slate-900 text-sm">{m.label}</p>
+                      <p className="text-amber-700 font-mono font-bold truncate">{m.detail}</p>
+                      {m.sub && <p className="text-slate-500 text-xs">{m.sub}</p>}
+                      <p className="text-slate-500 text-xs mt-0.5">{m.note}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => copyToClipboard(m.detail, m.id)}
+                    className="flex-shrink-0 px-3 py-1.5 text-xs font-semibold border-2 border-amber-600 text-amber-700 rounded-lg hover:bg-amber-600 hover:text-white transition-colors"
+                  >
+                    {copiedId === m.id ? '✓ Copied' : 'Copy'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg">
+            <p className="text-sm text-amber-900">
+              <span className="font-semibold">Important:</span> Always include your travel date in the payment note so we can match it to your booking.
+            </p>
+          </div>
+
+          <button
+            onClick={() => setShowPayment(false)}
+            className="w-full px-6 py-3 bg-gradient-to-r from-amber-700 to-orange-600 hover:from-amber-800 hover:to-orange-700 text-white rounded-lg font-semibold transition-colors"
+          >
+            Done
+          </button>
+        </div>
+      )}
     </div>
   );
 };

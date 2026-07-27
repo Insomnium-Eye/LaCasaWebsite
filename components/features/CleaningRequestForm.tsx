@@ -34,30 +34,29 @@ const CleaningRequestForm = ({ session }: CleaningRequestFormProps) => {
     setSuccess(false);
 
     try {
-      const response = await fetch('/api/requests/cleaning', {
+      const response = await fetch('/api/requests/notify', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${session.token}`,
         },
         body: JSON.stringify({
-          date,
-          notes: notes || undefined,
+          type: 'cleaning',
+          fields: {
+            'Requested Date': date,
+            'Notes': notes || '',
+          },
         }),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        setError(data.error || t('portal.cleaningRequest.submit'));
+        setError('Failed to send request. Please try again.');
         return;
       }
 
       setSuccess(true);
       setDate('');
       setNotes('');
-
-      // Show success message
       setTimeout(() => setSuccess(false), 5000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');

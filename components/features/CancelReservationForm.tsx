@@ -37,22 +37,23 @@ const CancelReservationForm = ({ session }: CancelReservationFormProps) => {
     setSuccess(false);
 
     try {
-      const response = await fetch('/api/requests/cancellation', {
+      const response = await fetch('/api/requests/notify', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${session.token}`,
         },
         body: JSON.stringify({
-          reason,
-          explanation: explanation || undefined,
+          type: 'cancel',
+          fields: {
+            'Reason': reason,
+            'Details': explanation || '',
+          },
         }),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        setError(data.error || 'Failed to submit cancellation request');
+        setError('Failed to send request. Please try again.');
         return;
       }
 
@@ -60,7 +61,6 @@ const CancelReservationForm = ({ session }: CancelReservationFormProps) => {
       setReason('');
       setExplanation('');
       setConfirmationStep(false);
-
       setTimeout(() => setSuccess(false), 5000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');

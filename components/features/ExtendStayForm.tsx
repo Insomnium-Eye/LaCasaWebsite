@@ -81,28 +81,31 @@ const ExtendStayForm = ({ session }: ExtendStayFormProps) => {
     setSuccess(false);
 
     try {
-      const response = await fetch('/api/requests/extend-stay', {
+      const response = await fetch('/api/requests/notify', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${session.token}`,
         },
         body: JSON.stringify({
-          requestedCheckout: newCheckout,
+          type: 'extend',
+          fields: {
+            'Current Check-out': currentCheckoutIso,
+            'Requested Check-out': newCheckout,
+            'Extra Nights': String(extraNights),
+            'Estimated Cost': `$${calculatedCost.toFixed(2)} USD`,
+          },
         }),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        setError(data.error || 'Failed to request extension');
+        setError('Failed to send request. Please try again.');
         return;
       }
 
       setSuccess(true);
       setNewCheckout('');
       setCalculatedCost(0);
-
       setTimeout(() => setSuccess(false), 5000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');

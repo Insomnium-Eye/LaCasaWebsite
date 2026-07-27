@@ -83,18 +83,24 @@ export default function MaintenanceRequestForm({ session }: Props) {
         imageMime = imageFile.type;
       }
 
-      const res = await fetch('/api/requests/maintenance', {
+      const res = await fetch('/api/requests/notify', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${session!.token}`,
         },
-        body: JSON.stringify({ category, description, imageBase64, imageName, imageMime }),
+        body: JSON.stringify({
+          type: 'maintenance',
+          fields: {
+            'Category': category,
+            'Description': description,
+            'Photo attached': imageBase64 ? 'Yes' : 'No',
+          },
+        }),
       });
 
-      const data = await res.json();
       if (!res.ok) {
-        setError(data.error ?? (language === 'es' ? 'Error al enviar. Intenta de nuevo.' : 'Failed to submit. Please try again.'));
+        setError(language === 'es' ? 'Error al enviar. Intenta de nuevo.' : 'Failed to submit. Please try again.');
         return;
       }
 

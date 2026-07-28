@@ -61,8 +61,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Admin bypass — never hits the DB
-    const adminCode = process.env.ADMIN_PORTAL_CODE || '0723';
-    if (trimmed === adminCode) {
+    const adminCode = process.env.ADMIN_PORTAL_CODE;
+    if (adminCode && trimmed === adminCode) {
       const token = generateGuestJWT({
         reservationId: 'admin',
         guestName: 'Admin',

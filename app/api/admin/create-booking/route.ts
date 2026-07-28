@@ -26,7 +26,10 @@ async function generateUniquePin(): Promise<string> {
 }
 
 export async function POST(request: NextRequest) {
-  const adminCode = process.env.ADMIN_PORTAL_CODE || '0723';
+  const adminCode = process.env.ADMIN_PORTAL_CODE;
+  if (!adminCode) {
+    return NextResponse.json({ error: 'Admin access not configured' }, { status: 503 });
+  }
 
   let body: Record<string, string>;
   try {

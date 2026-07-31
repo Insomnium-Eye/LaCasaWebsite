@@ -1,23 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSql } from '@/lib/db';
 import { Resend } from 'resend';
+import { generateUniquePin, getReturningGuestInfo } from '@/lib/reservation-helpers';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-
-async function generateUniquePin(): Promise<string> {
-  const sql = getSql();
-  for (let i = 0; i < 20; i++) {
-    const pin = String(Math.floor(1000 + Math.random() * 9000));
-    const [existing] = await sql<{ id: string }[]>`
-      SELECT id FROM reservations
-      WHERE digital_key = ${pin}
-        AND check_out > CURRENT_DATE
-      LIMIT 1
-    `;
-    if (!existing) return pin;
-  }
-  throw new Error('Could not generate unique PIN');
-}
 
 function xmlExtract(xml: string, tag: string): string {
   const m = xml.match(new RegExp(`<${tag}[^>]*>([^<]*)<\\/${tag}>`, 'i'));
@@ -166,7 +152,10 @@ export async function POST(request: NextRequest) {
 
   try {
     const sql = getSql();
-    const pin = await generateUniquePin();
+    const emailVal = parsed.email || null;
+    const { pin: returningPin, bookingCount } = await getReturningGuestInfo(emailVal, parsed.firstName, parsed.lastName);
+    const pin = returningPin ?? await generateUniquePin();
+    const isReturning = bookingCount > 1;
 
     const nights = Math.round(
       (new Date(parsed.checkOut).getTime() - new Date(parsed.checkIn).getTime()) /
@@ -176,15 +165,15 @@ export async function POST(request: NextRequest) {
       ? parseFloat((parsed.totalPaid / nights).toFixed(2))
       : 0;
 
-    const [row] = await sql<{ id: string; digital_key: string }[]>`
+    await sql`
       INSERT INTO reservations
         (guest_first_name, guest_last_name, email, digital_key,
          unit_id, unit_name, check_in, check_out,
-         nightly_rate, total_paid, source, status)
+         nightly_rate, total_paid, source, status, booking_count)
       VALUES
         (${parsed.firstName},
          ${parsed.lastName || ''},
-         ${parsed.email || null},
+         ${emailVal},
          ${pin},
          'unknown',
          'La Casa Oaxaca',
@@ -193,11 +182,10 @@ export async function POST(request: NextRequest) {
          ${nightlyRate},
          ${parsed.totalPaid},
          'booking_com',
-         'confirmed')
-      RETURNING id, digital_key
+         'confirmed',
+         ${bookingCount})
     `;
 
-    // Send PIN to admin
     if (process.env.RESEND_API_KEY) {
       await resend.emails.send({
         from: 'La Casa Oaxaca <onboarding@resend.dev>',
@@ -205,12 +193,13 @@ export async function POST(request: NextRequest) {
         subject: `🔑 PIN assigned: ${parsed.firstName} ${parsed.lastName} (${parsed.checkIn})`,
         html: `
           <div style="font-family:sans-serif;max-width:600px;">
-            <h2 style="color:#8d4a3f;">Booking.com Reservation — PIN Assigned</h2>
+            <h2 style="color:#8d4a3f;">Booking.com Reservation — PIN Assigned${isReturning ? ' 🎉 Returning Guest' : ''}</h2>
             <table style="width:100%;border-collapse:collapse;margin:16px 0;">
-              <tr><td style="padding:8px;color:#555;width:140px;">Guest</td><td style="padding:8px;font-weight:bold;">${parsed.firstName} ${parsed.lastName}</td></tr>
+              <tr><td style="padding:8px;color:#555;width:160px;">Guest</td><td style="padding:8px;font-weight:bold;">${parsed.firstName} ${parsed.lastName}</td></tr>
               <tr style="background:#f9f9f9;"><td style="padding:8px;color:#555;">Check-in</td><td style="padding:8px;">${parsed.checkIn}</td></tr>
               <tr><td style="padding:8px;color:#555;">Check-out</td><td style="padding:8px;">${parsed.checkOut}</td></tr>
-              <tr style="background:#fff3cd;"><td style="padding:8px;color:#555;">🔑 Door PIN</td><td style="padding:8px;font-size:1.5em;font-weight:bold;letter-spacing:0.3em;">${pin}</td></tr>
+              <tr style="background:#f9f9f9;"><td style="padding:8px;color:#555;">Stay #</td><td style="padding:8px;">${bookingCount === 1 ? 'First visit' : `Visit #${bookingCount}`}</td></tr>
+              <tr style="background:#fff3cd;"><td style="padding:8px;color:#555;">🔑 Door PIN</td><td style="padding:8px;font-size:1.5em;font-weight:bold;letter-spacing:0.3em;">${pin}${isReturning ? ' (same as before)' : ''}</td></tr>
             </table>
           </div>
         `,

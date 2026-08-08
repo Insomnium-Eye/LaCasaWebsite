@@ -9,10 +9,12 @@ import ThingsToDoSection from "../components/ThingsToDoSection";
 import GalleryModal from "../components/GalleryModal";
 import ContactModal from "../components/ContactModal";
 import DisclaimerModal from "../components/DisclaimerModal";
+import LeaseApplicationModal from "../components/LeaseApplicationModal";
 import { useLanguage } from "../contexts/LanguageContext";
 
 export default function HomePage() {
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
+  const [applyUnit, setApplyUnit] = useState<Unit | null>(null);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [galleryIndex, setGalleryIndex] = useState(0);
   const [contactOpen, setContactOpen] = useState(false);
@@ -156,9 +158,12 @@ export default function HomePage() {
                 <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-300">{t(`units.items.${unit.slug}.type`)}</p>
                 <h3 className="text-2xl font-semibold text-slate-100">{t(`units.items.${unit.slug}.name`)}</h3>
                 <p className="text-slate-300">{t(`units.items.${unit.slug}.summary`)}</p>
-                <a href={unit.airbnbUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center rounded-full bg-terracotta px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#b55e47]" onClick={(e) => e.stopPropagation()}>
+                <button
+                  className="inline-flex items-center rounded-full bg-terracotta px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#b55e47]"
+                  onClick={(e) => { e.stopPropagation(); setApplyUnit(unit); }}
+                >
                   {t("home.checkAvailability")}
-                </a>
+                </button>
               </div>
             </article>
           ))}
@@ -194,6 +199,7 @@ export default function HomePage() {
       )}
       <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} />
       <DisclaimerModal open={disclaimerOpen} onClose={() => setDisclaimerOpen(false)} />
+      {applyUnit && <LeaseApplicationModal unit={applyUnit} onClose={() => setApplyUnit(null)} />}
       </div>
     </div>
   );

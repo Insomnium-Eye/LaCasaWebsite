@@ -6,10 +6,7 @@ export type Unit = {
   capacity: number;
   bathroom: string;
   terrace: string;
-  nightlyRate?: number;
-  weeklyRate?: number;
-  monthlyRate?: number;
-  airbnbUrl?: string;
+  monthlyRateMXN: number;
   displayImage?: string;
   galleryImages?: string[];
 };
@@ -23,7 +20,7 @@ export const units: Unit[] = [
     capacity: 2,
     bathroom: "En-suite bathroom",
     terrace: "Private veranda with garden access",
-    airbnbUrl: "https://www.airbnb.com/rooms/1702322410862536247?guests=1&adults=1&s=67&unique_share_id=cfc3dff4-51a6-4d49-9c5f-47b539e8ca5b",
+    monthlyRateMXN: 17000,
     displayImage: "/imgs/Bungalow1/Exterior1.jpg",
     galleryImages: [
       "/imgs/Bungalow1/Exterior2.jpg",
@@ -43,7 +40,7 @@ export const units: Unit[] = [
     capacity: 2,
     bathroom: "En-suite bathroom",
     terrace: "Private veranda with garden access",
-    airbnbUrl: "https://www.airbnb.com/rooms/1702417529255850388?guests=1&adults=1&s=67&unique_share_id=295241b4-053b-4393-a59b-4a58eae29e38",
+    monthlyRateMXN: 20000,
     displayImage: "/imgs/Bungalow2/Exterior1.jpg",
     galleryImages: [
       "/imgs/Bungalow2/Bed1.jpg",
@@ -60,7 +57,7 @@ export const units: Unit[] = [
     capacity: 2,
     bathroom: "En-suite bathroom",
     terrace: "Shared terrace nearby",
-    airbnbUrl: "https://www.airbnb.com/rooms/1702419818538938394?guests=1&adults=1&s=67&unique_share_id=69f850f1-2d03-441d-b0ed-b316286848a7",
+    monthlyRateMXN: 8000,
     displayImage: "/imgs/Room/Exterior1.jpg",
     galleryImages: [
       "/imgs/Room/Exterior2.jpg",

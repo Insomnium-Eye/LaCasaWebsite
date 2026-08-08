@@ -5,6 +5,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { formatDate } from '../lib/date';
 import DateInput from './DateInput';
 import { Unit } from '../data/units';
+import useUsdToMxn from '../hooks/useUsdToMxn';
 
 interface BookingModalProps {
   unit: Unit;
@@ -26,10 +27,12 @@ function daysBetween(start: string, end: string) {
 
 export default function BookingModal({ unit, onClose, onBackToUnit }: BookingModalProps) {
   const { t, language } = useLanguage();
+  const { rate } = useUsdToMxn();
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
-  const [bookingPeriod, setBookingPeriod] = useState<'nightly' | 'weekly' | 'monthly'>('nightly');
+  const [bookingPeriod, setBookingPeriod] = useState<'nightly' | 'weekly' | 'monthly'>('monthly');
   const [showEscrow, setShowEscrow] = useState(false);
+  const monthlyRateUSD = rate > 0 ? Math.floor(unit.monthlyRateMXN / rate) : 0;
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -51,11 +54,11 @@ export default function BookingModal({ unit, onClose, onBackToUnit }: BookingMod
 
     switch (bookingPeriod) {
       case 'nightly':
-        return diffDays * (unit.nightlyRate ?? 0);
+        return diffDays * (monthlyRateUSD / 30);
       case 'weekly':
-        return Math.ceil(diffDays / 7) * (unit.weeklyRate ?? 0);
+        return Math.ceil(diffDays / 7) * (monthlyRateUSD / 4);
       case 'monthly':
-        return Math.ceil(diffDays / 30) * (unit.monthlyRate ?? 0);
+        return Math.ceil(diffDays / 30) * monthlyRateUSD;
       default:
         return 0;
     }
@@ -125,9 +128,7 @@ export default function BookingModal({ unit, onClose, onBackToUnit }: BookingMod
                 onChange={(e) => setBookingPeriod(e.target.value as 'nightly' | 'weekly' | 'monthly')}
                 className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 p-3 text-slate-900 outline-none focus:border-terracotta focus:ring-2 focus:ring-terracotta/20"
               >
-                <option value="nightly">{`${t('book.periods.nightly')} (${unit.nightlyRate ?? '—'}/${t('book.priceUnit.night')})`}</option>
-                <option value="weekly">{`${t('book.periods.weekly')} (${unit.weeklyRate ?? '—'}/${t('book.priceUnit.week')})`}</option>
-                <option value="monthly">{`${t('book.periods.monthly')} (${unit.monthlyRate ?? '—'}/${t('book.priceUnit.month')})`}</option>
+                <option value="monthly">{`${t('book.periods.monthly')} ($${monthlyRateUSD.toLocaleString()} USD/${t('book.priceUnit.month')})`}</option>
               </select>
             </label>
             <label className="block">

@@ -5,12 +5,12 @@ export const translations = {
       about: "About",
       amenities: "Amenities",
       units: "Units",
-      book: "Book",
+      book: "Lease",
       gallery: "Gallery",
       faq: "FAQ",
       contact: "Contact",
       tours: "Tours",
-      bookDirect: "Book direct",
+      bookDirect: "Inquire to Lease",
       backToHome: "← Back to Home",
       guestSignIn: "Already a guest? Sign in!"
     },
@@ -20,10 +20,10 @@ export const translations = {
       description: "La Casa Oaxaca is perfectly placed to explore one of Mexico's most culturally rich cities and its surrounding wonders — from ancient ruins to candlelit festivals.",
     },
     home: {
-      directBooking: "Direct Booking",
+      directBooking: "Long-Term Rental",
       title: "La Casa Oaxaca — Private bungalows and a garden retreat in San Felipe del Agua.",
-      description: "Experience a calm, authentic stay with private verandas, fruit orchard views, and contactless direct booking.",
-      bookNow: "Book Now",
+      description: "Live in a calm, authentic setting with private verandas, fruit orchard views, and modern comforts. Minimum 1-year lease.",
+      bookNow: "Inquire Now",
       aboutLaCasa: "About La Casa",
       galleryButton: "View Gallery",
       contactButton: "Contact Us",
@@ -49,9 +49,9 @@ export const translations = {
         }
       ],
       availableUnits: "Available Units",
-      chooseStay: "Choose your private stay",
+      chooseStay: "Choose your unit",
       seeAllUnits: "See all units →",
-      checkAvailability: "Check availability",
+      checkAvailability: "Inquire",
       galleryTitle: "Property gallery",
       prev: "Previous",
       next: "Next",
@@ -81,7 +81,7 @@ export const translations = {
         capacity: "Capacity:",
         bathroom: "Bathroom:",
         terrace: "Terrace:",
-        bookNow: "Book Now",
+        bookNow: "Inquire",
         guests: "guests"
       }
     },
@@ -89,12 +89,12 @@ export const translations = {
       heading: "About La Casa",
       title: "A timeless retreat nestled in San Felipe del Agua.",
       description: "La Casa blends Oaxacan adobe-inspired design, private gardens, and modern comfort. Each unit offers a quiet, intimate atmosphere framed by landscaped grounds and fruit trees.",
-      highlightsTitle: "Why guests choose us",
+      highlightsTitle: "Why tenants choose us",
       highlights: [
-        "Direct booking with personalized service.",
+        "Direct leasing with personalized service.",
         "Private parking, contactless digital locks, and mosquito-protected sleeping areas with bed nets surrounding every bed.",
         "Authentic garden living with nearby cultural attractions.",
-        "Exclusive access to mountain hikes only available to locals and our guests."
+        "Exclusive access to mountain hikes only available to locals and our residents."
       ],
       features: [
         { title: "Traditional style", description: "Warm textures, calm tones, and indoor/outdoor flow." },
@@ -108,8 +108,8 @@ export const translations = {
     },
     amenities: {
       heading: "Amenities",
-      title: "Comfort and convenience at every stay.",
-      description: "Enjoy thoughtfully selected features designed for privacy, relaxation, and a superior direct-booking experience.",
+      title: "Comfort and convenience for your long-term home.",
+      description: "Enjoy thoughtfully selected features designed for privacy, relaxation, and a comfortable year-round living experience.",
       items: [
         "Mature fruit orchards with mango, guava, avocado and lemon",
         "Stargazing bathtub with retractable roof",
@@ -126,13 +126,13 @@ export const translations = {
     contact: {
       heading: "Contact",
       title: "Get in touch with La Casa.",
-      description: "Send us your message or reservation request. You can also reach out directly via WhatsApp or email.",
+      description: "Send us your message or lease inquiry. You can also reach out directly via WhatsApp or email.",
       formName: "Name",
       formNamePlaceholder: "Your name",
       formEmail: "Email",
       formEmailPlaceholder: "you@example.com",
       formMessage: "Message",
-      formMessagePlaceholder: "Tell us about your trip",
+      formMessagePlaceholder: "Tell us about yourself and which unit you're interested in",
       formButton: "Send message",
       captchaLabel: "I'm not a robot",
       sending: "Sending…",
@@ -147,11 +147,11 @@ export const translations = {
     },
     faq: {
       heading: "FAQs",
-      title: "Questions most guests ask.",
+      title: "Common questions from prospective tenants.",
       items: [
-        { question: "How do I book directly?", answer: "Use the booking page to select dates, unit, and guest details." },
-        { question: "What is your cancellation policy?", answer: "Cancellations are accepted up to 7 days before arrival for a full refund. Please contact us for any changes." },
-        { question: "Is transport available?", answer: "We can help arrange transportation to the Zócalo, Monte Albán, and other local destinations for an extra service fee." },
+        { question: "What is the minimum lease term?", answer: "All leases are a minimum of one year. We do not offer short-term or vacation rentals." },
+        { question: "What is required to move in?", answer: "Two months upfront: one month as a refundable security deposit, plus the first month's rent. This is due before receiving your access code." },
+        { question: "What utilities are included?", answer: "Each unit has its own mini-fridge and electric grill. Please contact us for details on what utilities are included in your specific lease." },
         { question: "Are there mosquito protections?", answer: "Yes. Each unit has mosquito bed nets surrounding every bed, and our water storage is treated with Mosquito Dunks BCI for year-round prevention." }
       ]
     },
@@ -169,19 +169,19 @@ export const translations = {
       ]
     },
     book: {
-      heading: "Bookings",
-      title: "Reserve your stay.",
-      description: "Select your unit, choose dates, and see your savings right away. After booking, your confirmation will include a digital access code.",
+      heading: "Lease Inquiry",
+      title: "Inquire about a long-term lease.",
+      description: "Fill in the form below and we'll get back to you with availability and next steps. All leases are a minimum of 1 year. Move-in requires 2 months upfront: 1 month security deposit + first month's rent.",
       name: "Name",
       email: "Email",
       phone: "Phone",
-      contactNote: "Email is required. Phone number is optional — provide it to receive booking updates via WhatsApp.",
-      unit: "Unit",
-      guests: "Guests",
-      checkIn: "Check-in",
+      contactNote: "Email is required. Phone number is optional — provide it to receive updates via WhatsApp.",
+      unit: "Unit of Interest",
+      guests: "Occupants",
+      checkIn: "Preferred Move-In Date",
       checkOut: "Check-out",
-      requestDetails: "Request booking details",
-      validationError: "Please fill in all required fields and ensure check-out is after check-in.",
+      requestDetails: "Send Inquiry",
+      validationError: "Please fill in all required fields.",
       entireHouseMinNightsError: "Entire house bookings must be at least 7 nights (one full week).",
       rateSummary: "Rate summary",
       selectedUnitInfo: "{unit} · {capacity} guests",
@@ -200,20 +200,20 @@ export const translations = {
       propertyNotes: {
         title: "Good to know",
         parking: "Rentals are private, but the parking area is shared. The office space (12 ft from Bungalow 1) is home to one of the hosts.",
-        pets: "Two cats and one small French poodle live on the property and roam freely, but never enter the rentals. Guests are expected to treat them kindly.",
-        wildlife: "Local wildlife includes squirrels, occasional possums, frogs, lizards, and harmless spiders. Guests are expected to respect them.",
+        pets: "Two cats and one small French poodle live on the property and roam freely, but never enter the rentals. Tenants are expected to treat them kindly.",
+        wildlife: "Local wildlife includes squirrels, occasional possums, frogs, lizards, and harmless spiders. Tenants are expected to respect them.",
         entireHouse: "When booking the entire house, both hosts and all pets vacate for the full duration of your stay.",
       },
-      discountsTitle: "Stay discounts",
-      discount7nights: "10% off for stays of 7 nights or more.",
-      discount28nights: "25% off for stays of 28 nights or more.",
+      discountsTitle: "Monthly Rates",
+      discount7nights: "Bungalow 2 (Magic Moon): $1,140 USD / $20,000 MXN per month.",
+      discount28nights: "Bungalow 1 (Sun of My Heart): $970 USD / $17,000 MXN per month.",
       rulesTitle: "House Rules",
       rule: {
         noSmoking: "No smoking anywhere on the property.",
         noParties: "No parties or large gatherings.",
-        extraGuest: "Additional overnight guests must be reported to the host in advance.",
-        extraGuestFee: "Fee per extra guest: 1,000 MXN/night · 700 MXN (7+ nights) · 400 MXN (28+ nights).",
-        beRespectful: "Be respectful of the hosts, other guests, wildlife, and their space.",
+        extraGuest: "Additional occupants must be disclosed and agreed upon before signing.",
+        extraGuestFee: "Main Residence Bedroom (Blessed Land): $450 USD / $8,000 MXN per month.",
+        beRespectful: "Be respectful of the hosts, other tenants, wildlife, and their space.",
         camera: "There is a security camera at the front gate.",
       },
       deposit: {
@@ -304,11 +304,11 @@ export const translations = {
     },
     units: {
       heading: "Available units",
-      title: "Your private bungalow and bedroom.",
-      description: "Select the unit that fits your stay and check availability instantly with direct booking savings.",
+      title: "Private bungalows and a room for long-term lease.",
+      description: "Choose the unit that fits your lifestyle. Minimum 1-year lease. Send us an inquiry and we'll get back to you.",
       capacityLabel: "Capacity:",
-      guestsLabel: "guests",
-      checkAvailability: "Check availability",
+      guestsLabel: "occupants",
+      checkAvailability: "Inquire",
       items: {
         "bungalow-1": {
           name: "Sun of My Heart",
@@ -344,12 +344,12 @@ export const translations = {
       galleryTitle: "Gallery",
       nightlyRate: "Nightly Rate",
       weeklyRate: "Weekly Rate",
-      monthlyRate: "Monthly Rate",
-      bookNow: "Book Now",
+      monthlyRate: "Monthly Rent",
+      bookNow: "Inquire",
       capacity: "Capacity:",
       bathroom: "Bathroom:",
       terrace: "Terrace:",
-      guests: "guests"
+      guests: "occupants"
     },
     bookingModal: {
       bookUnit: "Book {unit}",
@@ -611,12 +611,12 @@ export const translations = {
       about: "Acerca de",
       amenities: "Comodidades",
       units: "Unidades",
-      book: "Reservar",
+      book: "Arrendar",
       gallery: "Galería",
       faq: "Preguntas Frecuentes",
       contact: "Contacto",
       tours: "Tours",
-      bookDirect: "Reservar directo",
+      bookDirect: "Consultar Arriendo",
       backToHome: "← Volver al Inicio",
       guestSignIn: "¿Ya eres huésped? ¡Inicia sesión!"
     },
@@ -626,10 +626,10 @@ export const translations = {
       description: "La Casa Oaxaca está perfectamente ubicada para explorar una de las ciudades más ricas culturalmente de México y sus maravillas alrededor — desde ruinas antiguas hasta festivales con velas.",
     },
     home: {
-      directBooking: "Reserva Directa",
+      directBooking: "Arrendamiento",
       title: "La Casa Oaxaca — Bungalows privados y un retiro de jardín en San Felipe del Agua.",
-      description: "Experimenta una estadía tranquila y auténtica con terrazas privadas, vistas a huertos frutales y reservas directas sin contacto.",
-      bookNow: "Reservar Ahora",
+      description: "Vive en un ambiente tranquilo y auténtico con terrazas privadas, vistas a huertos frutales y comodidades modernas. Arrendamiento mínimo de 1 año.",
+      bookNow: "Consultar Ahora",
       aboutLaCasa: "Acerca de La Casa",
       galleryButton: "Ver Galería",
       contactButton: "Contáctanos",
@@ -655,9 +655,9 @@ export const translations = {
         }
       ],
       availableUnits: "Unidades Disponibles",
-      chooseStay: "Elige tu estadía privada",
+      chooseStay: "Elige tu unidad",
       seeAllUnits: "Ver todas las unidades →",
-      checkAvailability: "Verificar disponibilidad",
+      checkAvailability: "Consultar",
       galleryTitle: "Galería de la propiedad",
       prev: "Anterior",
       next: "Siguiente",
@@ -687,20 +687,20 @@ export const translations = {
         capacity: "Capacidad:",
         bathroom: "Baño:",
         terrace: "Terraza:",
-        bookNow: "Reservar Ahora",
-        guests: "huéspedes"
+        bookNow: "Consultar",
+        guests: "ocupantes"
       }
     },
     about: {
       heading: "Acerca de La Casa",
       title: "Un refugio atemporal en San Felipe del Agua.",
       description: "La Casa fusiona diseño inspirado en adobe oaxaqueño, jardines privados y comodidad moderna. Cada unidad ofrece un ambiente tranquilo e íntimo enmarcado por áreas ajardinadas y árboles frutales.",
-      highlightsTitle: "Por qué los huéspedes nos eligen",
+      highlightsTitle: "Por qué los inquilinos nos eligen",
       highlights: [
-        "Reserva directa con servicio personalizado.",
+        "Arrendamiento directo con servicio personalizado.",
         "Estacionamiento privado, cerraduras digitales sin contacto y áreas de descanso protegidas con mosquiteros alrededor de cada cama.",
         "Vida auténtica en el jardín con atracciones culturales cercanas.",
-        "Acceso exclusivo a caminatas en la montaña, disponibles solo para locales y nuestros huéspedes."
+        "Acceso exclusivo a caminatas en la montaña, disponibles solo para locales y nuestros residentes."
       ],
       features: [
         { title: "Estilo tradicional", description: "Texturas cálidas, tonos tranquilos y flujo interior/exterior." },
@@ -714,8 +714,8 @@ export const translations = {
     },
     amenities: {
       heading: "Comodidades",
-      title: "Comodidad y conveniencia en cada estadía.",
-      description: "Disfruta de servicios cuidadosamente seleccionados para privacidad, relajación y una experiencia superior de reserva directa.",
+      title: "Comodidad y conveniencia para tu hogar a largo plazo.",
+      description: "Disfruta de servicios cuidadosamente seleccionados para privacidad, relajación y una experiencia de vida cómoda durante todo el año.",
       items: [
         "Huertos maduros con mango, guayaba, aguacate y limón",
         "Tina para observar las estrellas con techo retráctil",
@@ -732,13 +732,13 @@ export const translations = {
     contact: {
       heading: "Contacto",
       title: "Ponte en contacto con La Casa.",
-      description: "Envíanos tu mensaje o solicitud de reserva. También puedes contactarnos directamente por WhatsApp o correo electrónico.",
+      description: "Envíanos tu mensaje o consulta de arrendamiento. También puedes contactarnos directamente por WhatsApp o correo electrónico.",
       formName: "Nombre",
       formNamePlaceholder: "Tu nombre",
       formEmail: "Correo electrónico",
       formEmailPlaceholder: "you@example.com",
       formMessage: "Mensaje",
-      formMessagePlaceholder: "Cuéntanos sobre tu viaje",
+      formMessagePlaceholder: "Cuéntanos sobre ti y en qué unidad estás interesado/a",
       formButton: "Enviar mensaje",
       captchaLabel: "No soy un robot",
       sending: "Enviando…",
@@ -753,11 +753,11 @@ export const translations = {
     },
     faq: {
       heading: "Preguntas Frecuentes",
-      title: "Preguntas que más hacen los huéspedes.",
+      title: "Preguntas frecuentes de posibles inquilinos.",
       items: [
-        { question: "¿Cómo hago una reserva directa?", answer: "Usa la página de reservas para seleccionar fechas, unidad y número de huéspedes." },
-        { question: "¿Cuál es su política de cancelación?", answer: "Las cancelaciones se aceptan hasta 7 días antes de la llegada para un reembolso completo. Por favor contáctanos para cualquier cambio." },
-        { question: "¿Hay transporte disponible?", answer: "Podemos ayudar a organizar transporte al Zócalo, Monte Albán y otros destinos locales por un costo extra." },
+        { question: "¿Cuál es el plazo mínimo del arrendamiento?", answer: "Todos los contratos son de mínimo un año. No ofrecemos rentas de corta duración ni vacacionales." },
+        { question: "¿Qué se requiere para mudarse?", answer: "Dos meses por adelantado: un mes de depósito de seguridad reembolsable más el primer mes de renta. Esto es necesario antes de recibir el código de acceso." },
+        { question: "¿Qué servicios están incluidos?", answer: "Cada unidad cuenta con minirefrigerador y parrilla eléctrica. Contáctanos para conocer los detalles de qué servicios están incluidos en tu contrato." },
         { question: "¿Hay protección contra mosquitos?", answer: "Sí. Cada unidad tiene mosquiteros alrededor de cada cama, y el almacenamiento de agua se trata con Mosquito Dunks BCI para prevención todo el año." }
       ]
     },
@@ -775,20 +775,20 @@ export const translations = {
       ]
     },
     book: {
-      heading: "Reservas",
-      title: "Reserva tu estadía.",
-      description: "Selecciona tu unidad, elige fechas y observa tus ahorros de inmediato. Después de reservar, tu confirmación incluirá un código de acceso digital.",
+      heading: "Consulta de Arrendamiento",
+      title: "Consulta sobre un contrato a largo plazo.",
+      description: "Completa el formulario a continuación y nos pondremos en contacto contigo con disponibilidad y próximos pasos. Todos los contratos son de mínimo 1 año. La mudanza requiere 2 meses por adelantado: 1 mes de depósito de seguridad + primer mes de renta.",
       name: "Nombre",
       email: "Correo electrónico",
       phone: "Teléfono",
       contactNote: "El correo electrónico es obligatorio. El teléfono es opcional — ingrésalo para recibir actualizaciones por WhatsApp.",
-      unit: "Unidad",
+      unit: "Unidad de Interés",
       bookingPeriod: "Período de reserva",
-      guests: "Huéspedes",
-      checkIn: "Entrada",
+      guests: "Ocupantes",
+      checkIn: "Fecha de Mudanza Preferida",
       checkOut: "Salida",
-      requestDetails: "Solicitar detalles de reserva",
-      validationError: "Por favor complete todos los campos requeridos y asegúrese de que la salida sea después de la entrada.",
+      requestDetails: "Enviar Consulta",
+      validationError: "Por favor complete todos los campos requeridos.",
       entireHouseMinNightsError: "Las reservas de la casa completa deben ser de al menos 7 noches (una semana completa).",
       rateSummary: "Resumen de tarifas",
       selectedUnitInfo: "{unit} · {capacity} huéspedes",
@@ -809,20 +809,20 @@ export const translations = {
       propertyNotes: {
         title: "Bueno saberlo",
         parking: "Los alojamientos son privados, pero el estacionamiento es compartido. La oficina (a 3.7 m del Bungalow 1) es el hogar de uno de los anfitriones.",
-        pets: "Dos gatos y un pequeño caniche francés viven en la propiedad y deambulan libremente, pero nunca entran a los alojamientos. Se espera que los huéspedes los traten con amabilidad.",
-        wildlife: "La fauna local incluye ardillas, zarigüeyas ocasionales, ranas, lagartijas y arañas inofensivas. Se espera que los huéspedes las respeten.",
+        pets: "Dos gatos y un pequeño caniche francés viven en la propiedad y deambulan libremente, pero nunca entran a los alojamientos. Se espera que los inquilinos los traten con amabilidad.",
+        wildlife: "La fauna local incluye ardillas, zarigüeyas ocasionales, ranas, lagartijas y arañas inofensivas. Se espera que los inquilinos las respeten.",
         entireHouse: "Al reservar la casa completa, ambos anfitriones y todas las mascotas desalojan durante el tiempo reservado.",
       },
-      discountsTitle: "Descuentos por estadía",
-      discount7nights: "10% de descuento en estadías de 7 noches o más.",
-      discount28nights: "25% de descuento en estadías de 28 noches o más.",
+      discountsTitle: "Tarifas Mensuales",
+      discount7nights: "Bungalow 2 (Luna Mágica): $1,140 USD / $20,000 MXN al mes.",
+      discount28nights: "Bungalow 1 (Sol de mi Corazón): $970 USD / $17,000 MXN al mes.",
       rulesTitle: "Reglas de la Casa",
       rule: {
         noSmoking: "No se permite fumar en ninguna parte de la propiedad.",
         noParties: "No se permiten fiestas ni reuniones numerosas.",
-        extraGuest: "Los huéspedes adicionales que se queden a dormir deben informarse al anfitrión con anticipación.",
-        extraGuestFee: "Cargo por huésped extra: 1,000 MXN/noche · 700 MXN (7+ noches) · 400 MXN (28+ noches).",
-        beRespectful: "Sé respetuoso con los anfitriones, otros huéspedes, la fauna y sus espacios.",
+        extraGuest: "Los ocupantes adicionales deben declararse y acordarse antes de firmar el contrato.",
+        extraGuestFee: "Habitación principal (Tierra Bendita): $450 USD / $8,000 MXN al mes.",
+        beRespectful: "Sé respetuoso con los anfitriones, otros inquilinos, la fauna y sus espacios.",
         camera: "Hay una cámara de seguridad en la puerta principal.",
       },
       deposit: {
@@ -913,11 +913,11 @@ export const translations = {
     },
     units: {
       heading: "Unidades disponibles",
-      title: "Tu bungalow privado y habitación.",
-      description: "Selecciona la unidad que se ajuste a tu estadía y verifica disponibilidad al instante con ahorro por reserva directa.",
+      title: "Bungalows privados y habitación para arrendamiento a largo plazo.",
+      description: "Elige la unidad que se adapte a tu estilo de vida. Contrato mínimo de 1 año. Envíanos una consulta y te responderemos.",
       capacityLabel: "Capacidad:",
-      guestsLabel: "huéspedes",
-      checkAvailability: "Ver disponibilidad",
+      guestsLabel: "ocupantes",
+      checkAvailability: "Consultar",
       items: {
         "bungalow-1": {
           name: "Sol de mi Corazón",
@@ -953,12 +953,12 @@ export const translations = {
       galleryTitle: "Galería",
       nightlyRate: "Tarifa nocturna",
       weeklyRate: "Tarifa semanal",
-      monthlyRate: "Tarifa mensual",
-      bookNow: "Reservar Ahora",
+      monthlyRate: "Renta Mensual",
+      bookNow: "Consultar",
       capacity: "Capacidad:",
       bathroom: "Baño:",
       terrace: "Terraza:",
-      guests: "huéspedes"
+      guests: "ocupantes"
     },
     bookingModal: {
       bookUnit: "Reservar {unit}",

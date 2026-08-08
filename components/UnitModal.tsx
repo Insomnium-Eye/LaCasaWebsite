@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { Unit } from '../data/units';
 import { useLanguage } from '../contexts/LanguageContext';
+import useUsdToMxn from '../hooks/useUsdToMxn';
+import LeaseApplicationModal from './LeaseApplicationModal';
 
 interface UnitModalProps {
   unit: Unit | null;
@@ -11,7 +13,9 @@ interface UnitModalProps {
 
 export default function UnitModal({ unit, onClose }: UnitModalProps) {
   const { t } = useLanguage();
+  const { rate } = useUsdToMxn();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [showApply, setShowApply] = useState(false);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -95,16 +99,23 @@ export default function UnitModal({ unit, onClose }: UnitModalProps) {
             </div>
           </div>
 
-          {/* Check Availability */}
+          {/* Monthly Pricing */}
           <div className="pt-4 border-t border-slate-200">
-            <a
-              href={unit.airbnbUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+            <div className="mb-4 rounded-xl bg-slate-50 px-5 py-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{t('unitModal.monthlyRate')}</p>
+              <p className="mt-1 text-2xl font-semibold text-slate-900">
+                ${rate > 0 ? Math.floor(unit.monthlyRateMXN / rate).toLocaleString() : '—'}
+                <span className="text-base font-normal text-slate-500"> USD/mo</span>
+              </p>
+              <p className="text-sm text-slate-500">${unit.monthlyRateMXN.toLocaleString()} MXN/mes</p>
+              <p className="mt-2 text-xs text-slate-400">Deposit: 2 months upfront (security + first month)</p>
+            </div>
+            <button
+              onClick={() => setShowApply(true)}
               className="block w-full rounded-full bg-terracotta px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-[#b55e47]"
             >
-              {t('home.checkAvailability')}
-            </a>
+              {t('unitModal.bookNow')}
+            </button>
           </div>
         </div>
       </div>
@@ -130,6 +141,9 @@ export default function UnitModal({ unit, onClose }: UnitModalProps) {
         </div>
       )}
 
+      {showApply && (
+        <LeaseApplicationModal unit={unit} onClose={() => setShowApply(false)} />
+      )}
     </div>
   );
 }

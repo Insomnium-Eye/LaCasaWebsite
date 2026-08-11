@@ -49,7 +49,9 @@ export default function LeaseApplicationForm({ defaultUnit, onSuccess, dark }: P
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const selectedUnit = units.find((u) => u.slug === form.unitSlug) ?? units[0];
-  const liveUsd = rate > 0 ? Math.floor(selectedUnit.monthlyRateMXN / rate) : '—';
+  const liveUsd = rate > 0 ? Math.floor(selectedUnit.monthlyRateMXN / rate) : null;
+  const depositMXN = Math.round(selectedUnit.monthlyRateMXN * 1.5);
+  const depositUSD = rate > 0 ? Math.floor(depositMXN / rate) : null;
 
   const set = (key: string, value: string) =>
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -142,11 +144,31 @@ export default function LeaseApplicationForm({ defaultUnit, onSuccess, dark }: P
             );
           })}
         </select>
-        <p className={`mt-1.5 text-xs ${dark ? 'text-slate-400' : 'text-slate-500'}`}>
-          {es
-            ? `Renta mensual: $${typeof liveUsd === 'number' ? liveUsd.toLocaleString() : liveUsd} USD — depósito: 2 meses por adelantado`
-            : `Monthly rent: $${typeof liveUsd === 'number' ? liveUsd.toLocaleString() : liveUsd} USD — deposit: 2 months upfront`}
-        </p>
+        {/* Lease terms box */}
+        <div className={`mt-3 rounded-xl border p-4 space-y-2 text-xs ${
+          dark ? 'border-amber-700/50 bg-amber-900/20 text-amber-300' : 'border-amber-300 bg-amber-50 text-amber-800'
+        }`}>
+          <p className="font-semibold uppercase tracking-wide text-[10px] opacity-70">
+            {es ? 'Términos del arrendamiento' : 'Lease terms'}
+          </p>
+          <div className="space-y-1.5">
+            <p>
+              <span className="font-semibold">{es ? 'Depósito al aprobar:' : 'Deposit upon approval:'}</span>{' '}
+              {es
+                ? `1 mes + ½ mes = $${depositMXN.toLocaleString()} MXN${depositUSD ? ` (~$${depositUSD.toLocaleString()} USD)` : ''}`
+                : `1 month + ½ month = $${depositMXN.toLocaleString()} MXN${depositUSD ? ` (~$${depositUSD.toLocaleString()} USD)` : ''}`}
+            </p>
+            <p>
+              <span className="font-semibold">{es ? 'Renta mensual:' : 'Monthly rent:'}</span>{' '}
+              ${selectedUnit.monthlyRateMXN.toLocaleString()} MXN{liveUsd ? ` (~$${liveUsd.toLocaleString()} USD)` : ''}{' '}
+              — <span className="font-semibold">{es ? 'vence el 1º de cada mes' : 'due on the 1st of every month'}</span>
+            </p>
+            <p>
+              <span className="font-semibold">{es ? 'Plazo mínimo:' : 'Minimum term:'}</span>{' '}
+              {es ? '1 año' : '1 year'}
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Name + Email */}

@@ -69,11 +69,28 @@ export default function BookPage() {
           })}
         </div>
 
-        {/* Deposit notice */}
-        <div className="mb-10 rounded-3xl border border-amber-700/50 bg-amber-900/20 px-6 py-4 text-amber-200 text-sm">
-          {language === "es"
-            ? `Mudanza requiere 2 meses por adelantado: depósito de seguridad + primer mes de renta. Mínimo 1 año de contrato.`
-            : `Move-in requires 2 months upfront: security deposit + first month's rent. Minimum 1-year lease.`}
+        {/* Lease terms notice */}
+        <div className="mb-10 rounded-3xl border border-amber-700/50 bg-amber-900/20 px-6 py-5 text-amber-200 text-sm space-y-2">
+          <p className="font-semibold text-amber-100 text-xs uppercase tracking-wider">
+            {language === "es" ? "Términos del arrendamiento" : "Lease terms"}
+          </p>
+          <ul className="space-y-1">
+            <li>
+              <span className="font-semibold">{language === "es" ? "Depósito al ser aprobado:" : "Deposit upon approval:"}</span>
+              {" "}
+              {language === "es"
+                ? `1 mes + ½ mes de renta = $${Math.round(selectedUnit.monthlyRateMXN * 1.5).toLocaleString()} MXN${rate > 0 ? ` (~$${Math.floor(selectedUnit.monthlyRateMXN * 1.5 / rate).toLocaleString()} USD)` : ""}`
+                : `1 month + ½ month = $${Math.round(selectedUnit.monthlyRateMXN * 1.5).toLocaleString()} MXN${rate > 0 ? ` (~$${Math.floor(selectedUnit.monthlyRateMXN * 1.5 / rate).toLocaleString()} USD)` : ""}`}
+            </li>
+            <li>
+              <span className="font-semibold">{language === "es" ? "Renta mensual vence:" : "Rent due:"}</span>
+              {" "}{language === "es" ? "el 1º de cada mes" : "the 1st of every month"}
+            </li>
+            <li>
+              <span className="font-semibold">{language === "es" ? "Plazo mínimo:" : "Minimum lease:"}</span>
+              {" "}1 {language === "es" ? "año" : "year"}
+            </li>
+          </ul>
         </div>
 
         <div className="grid gap-10 lg:grid-cols-[1.4fr_0.8fr]">

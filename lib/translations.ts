@@ -150,7 +150,7 @@ export const translations = {
       title: "Common questions from prospective tenants.",
       items: [
         { question: "What is the minimum lease term?", answer: "All leases are a minimum of one year. We do not offer short-term or vacation rentals." },
-        { question: "What is required to move in?", answer: "Two months upfront: one month as a refundable security deposit, plus the first month's rent. This is due before receiving your access code." },
+        { question: "What is required to move in?", answer: "Upon approval, a deposit of 1 month + ½ month's rent is required (1.5× your monthly rate). Rent is then due on the 1st of every month." },
         { question: "What utilities are included?", answer: "Each unit has its own mini-fridge and electric grill. Please contact us for details on what utilities are included in your specific lease." },
         { question: "Are there mosquito protections?", answer: "Yes. Each unit has mosquito bed nets surrounding every bed, and our water storage is treated with Mosquito Dunks BCI for year-round prevention." }
       ]
@@ -171,7 +171,7 @@ export const translations = {
     book: {
       heading: "Lease Inquiry",
       title: "Inquire about a long-term lease.",
-      description: "Fill in the form below and we'll get back to you with availability and next steps. All leases are a minimum of 1 year. Move-in requires 2 months upfront: 1 month security deposit + first month's rent.",
+      description: "Fill in the form below and we'll get back to you with availability and next steps. All leases are a minimum of 1 year. Upon approval, a deposit of 1 month + ½ month is required. Rent is due on the 1st of every month.",
       name: "Name",
       email: "Email",
       phone: "Phone",
@@ -756,7 +756,7 @@ export const translations = {
       title: "Preguntas frecuentes de posibles inquilinos.",
       items: [
         { question: "¿Cuál es el plazo mínimo del arrendamiento?", answer: "Todos los contratos son de mínimo un año. No ofrecemos rentas de corta duración ni vacacionales." },
-        { question: "¿Qué se requiere para mudarse?", answer: "Dos meses por adelantado: un mes de depósito de seguridad reembolsable más el primer mes de renta. Esto es necesario antes de recibir el código de acceso." },
+        { question: "¿Qué se requiere para mudarse?", answer: "Al ser aprobado, se requiere un depósito de 1 mes + ½ mes de renta (1.5× tu renta mensual). La renta se paga el 1º de cada mes a partir de entonces." },
         { question: "¿Qué servicios están incluidos?", answer: "Cada unidad cuenta con minirefrigerador y parrilla eléctrica. Contáctanos para conocer los detalles de qué servicios están incluidos en tu contrato." },
         { question: "¿Hay protección contra mosquitos?", answer: "Sí. Cada unidad tiene mosquiteros alrededor de cada cama, y el almacenamiento de agua se trata con Mosquito Dunks BCI para prevención todo el año." }
       ]
@@ -777,7 +777,7 @@ export const translations = {
     book: {
       heading: "Consulta de Arrendamiento",
       title: "Consulta sobre un contrato a largo plazo.",
-      description: "Completa el formulario a continuación y nos pondremos en contacto contigo con disponibilidad y próximos pasos. Todos los contratos son de mínimo 1 año. La mudanza requiere 2 meses por adelantado: 1 mes de depósito de seguridad + primer mes de renta.",
+      description: "Completa el formulario a continuación y nos pondremos en contacto contigo con disponibilidad y próximos pasos. Todos los contratos son de mínimo 1 año. Al ser aprobado, se requiere 1 mes + ½ mes de depósito. La renta vence el 1º de cada mes.",
       name: "Nombre",
       email: "Correo electrónico",
       phone: "Teléfono",

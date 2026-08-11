@@ -114,7 +114,15 @@ export default function UnitModal({ unit, onClose }: UnitModalProps) {
               </p>
               <p className="text-sm text-slate-500">${unit.monthlyRateMXN.toLocaleString()} MXN/mes</p>
               <div className="mt-3 space-y-1">
-                <p className="text-xs text-slate-400">Deposit: 2 months upfront (security + first month)</p>
+                <p className="text-xs text-slate-500">
+                  Deposit upon approval: 1 month + ½ month
+                  {' = '}
+                  <span className="font-semibold text-slate-700">
+                    ${Math.round(unit.monthlyRateMXN * 1.5).toLocaleString()} MXN
+                    {rate > 0 ? ` (~$${Math.floor(unit.monthlyRateMXN * 1.5 / rate).toLocaleString()} USD)` : ''}
+                  </span>
+                </p>
+                <p className="text-xs text-slate-500">Rent due the <span className="font-semibold text-slate-700">1st of every month</span></p>
                 <p className="text-xs font-semibold text-amber-600">Minimum lease: 1 year</p>
               </div>
             </div>

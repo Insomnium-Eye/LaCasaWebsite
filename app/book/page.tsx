@@ -53,8 +53,13 @@ export default function BookPage() {
                 <p className="text-xs uppercase tracking-[0.18em] text-slate-400">
                   {t(`units.items.${unit.slug}.type`)}
                 </p>
-                <p className="mt-1 font-semibold text-slate-100">{t(`units.items.${unit.slug}.name`)}</p>
-                <p className="mt-3 text-xl font-semibold text-white">
+                <div className="flex items-center justify-between gap-2 mt-1">
+                  <p className="font-semibold text-slate-100">{t(`units.items.${unit.slug}.name`)}</p>
+                  <span className="rounded-full bg-garden/20 px-2 py-0.5 text-xs font-semibold text-green-300 whitespace-nowrap">
+                    Avail. {unit.availableFrom}
+                  </span>
+                </div>
+                <p className="mt-2 text-xl font-semibold text-white">
                   ${usd}
                   <span className="text-sm font-normal text-slate-400"> USD/mo</span>
                 </p>

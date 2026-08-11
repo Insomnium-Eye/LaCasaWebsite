@@ -102,8 +102,13 @@ export default function UnitModal({ unit, onClose }: UnitModalProps) {
           {/* Monthly Pricing */}
           <div className="pt-4 border-t border-slate-200">
             <div className="mb-4 rounded-xl bg-slate-50 px-5 py-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{t('unitModal.monthlyRate')}</p>
-              <p className="mt-1 text-2xl font-semibold text-slate-900">
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{t('unitModal.monthlyRate')}</p>
+                <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-700">
+                  Available {unit.availableFrom}
+                </span>
+              </div>
+              <p className="text-2xl font-semibold text-slate-900">
                 ${rate > 0 ? Math.floor(unit.monthlyRateMXN / rate).toLocaleString() : '—'}
                 <span className="text-base font-normal text-slate-500"> USD/mo</span>
               </p>

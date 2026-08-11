@@ -155,7 +155,12 @@ export default function HomePage() {
                 )}
               </div>
               <div className="mt-6 space-y-3">
-                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-300">{t(`units.items.${unit.slug}.type`)}</p>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-300">{t(`units.items.${unit.slug}.type`)}</p>
+                  <span className="rounded-full bg-garden/20 px-2.5 py-0.5 text-xs font-semibold text-green-300 whitespace-nowrap">
+                    Available {unit.availableFrom}
+                  </span>
+                </div>
                 <h3 className="text-2xl font-semibold text-slate-100">{t(`units.items.${unit.slug}.name`)}</h3>
                 <p className="text-slate-300">{t(`units.items.${unit.slug}.summary`)}</p>
                 <button

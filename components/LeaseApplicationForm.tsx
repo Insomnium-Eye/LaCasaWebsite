@@ -137,7 +137,7 @@ export default function LeaseApplicationForm({ defaultUnit, onSuccess, dark }: P
             const usd = rate > 0 ? Math.floor(u.monthlyRateMXN / rate) : '—';
             return (
               <option key={u.slug} value={u.slug}>
-                {u.name} — ${typeof usd === 'number' ? usd.toLocaleString() : usd} USD / ${u.monthlyRateMXN.toLocaleString()} MXN
+                {u.name} — ${typeof usd === 'number' ? usd.toLocaleString() : usd} USD — Avail. {u.availableFrom}
               </option>
             );
           })}

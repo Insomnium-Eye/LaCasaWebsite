@@ -50,8 +50,13 @@ export default function UnitsPage() {
                 </ul>
                 {/* Monthly pricing */}
                 <div className="rounded-xl bg-slate-800/60 px-4 py-3">
-                  <p className="text-xs uppercase tracking-[0.14em] text-slate-400">{t('unitModal.monthlyRate')}</p>
-                  <p className="mt-0.5 text-lg font-semibold text-white">
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <p className="text-xs uppercase tracking-[0.14em] text-slate-400">{t('unitModal.monthlyRate')}</p>
+                    <span className="rounded-full bg-garden/20 px-2.5 py-0.5 text-xs font-semibold text-green-300">
+                      Available {unit.availableFrom}
+                    </span>
+                  </div>
+                  <p className="text-lg font-semibold text-white">
                     ${usd} <span className="text-sm font-normal text-slate-400">USD/mo</span>
                   </p>
                   <p className="text-xs text-slate-400">${unit.monthlyRateMXN.toLocaleString()} MXN</p>

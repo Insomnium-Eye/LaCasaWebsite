@@ -163,12 +163,15 @@ export default function HomePage() {
                 </div>
                 <h3 className="text-2xl font-semibold text-slate-100">{t(`units.items.${unit.slug}.name`)}</h3>
                 <p className="text-slate-300">{t(`units.items.${unit.slug}.summary`)}</p>
-                <button
-                  className="inline-flex items-center rounded-full bg-terracotta px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#b55e47]"
-                  onClick={(e) => { e.stopPropagation(); setApplyUnit(unit); }}
-                >
-                  {t("home.checkAvailability")}
-                </button>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <button
+                    className="inline-flex items-center rounded-full bg-terracotta px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#b55e47]"
+                    onClick={(e) => { e.stopPropagation(); setApplyUnit(unit); }}
+                  >
+                    {t("home.checkAvailability")}
+                  </button>
+                  <span className="text-xs text-slate-400">1-year minimum lease</span>
+                </div>
               </div>
             </article>
           ))}

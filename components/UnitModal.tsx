@@ -113,7 +113,10 @@ export default function UnitModal({ unit, onClose }: UnitModalProps) {
                 <span className="text-base font-normal text-slate-500"> USD/mo</span>
               </p>
               <p className="text-sm text-slate-500">${unit.monthlyRateMXN.toLocaleString()} MXN/mes</p>
-              <p className="mt-2 text-xs text-slate-400">Deposit: 2 months upfront (security + first month)</p>
+              <div className="mt-3 space-y-1">
+                <p className="text-xs text-slate-400">Deposit: 2 months upfront (security + first month)</p>
+                <p className="text-xs font-semibold text-amber-600">Minimum lease: 1 year</p>
+              </div>
             </div>
             <button
               onClick={() => setShowApply(true)}

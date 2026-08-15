@@ -1,14 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { units, Unit } from "../data/units";
 import BackgroundSlideshow from "../components/BackgroundSlideshow";
 import UnitModal from "../components/UnitModal";
 import ThingsToDoSection from "../components/ThingsToDoSection";
 import GalleryModal from "../components/GalleryModal";
 import ContactModal from "../components/ContactModal";
-import DisclaimerModal from "../components/DisclaimerModal";
 import LeaseApplicationModal from "../components/LeaseApplicationModal";
 import { useLanguage } from "../contexts/LanguageContext";
 
@@ -18,17 +17,7 @@ export default function HomePage() {
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [galleryIndex, setGalleryIndex] = useState(0);
   const [contactOpen, setContactOpen] = useState(false);
-  const [disclaimerOpen, setDisclaimerOpen] = useState(false);
   const { t } = useLanguage();
-
-  // Show disclaimer modal on first visit
-  useEffect(() => {
-    const hasSeenDisclaimer = localStorage.getItem("hasSeenDisclaimer");
-    if (!hasSeenDisclaimer) {
-      setDisclaimerOpen(true);
-      localStorage.setItem("hasSeenDisclaimer", "true");
-    }
-  }, []);
 
   const galleryImages = Array.from({ length: 19 }, (_, index) => `/imgs/OaxacaPicture_${index + 1}.jpg`);
 
@@ -206,7 +195,6 @@ export default function HomePage() {
         />
       )}
       <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} />
-      <DisclaimerModal open={disclaimerOpen} onClose={() => setDisclaimerOpen(false)} />
       {applyUnit && <LeaseApplicationModal unit={applyUnit} onClose={() => setApplyUnit(null)} />}
       </div>
     </div>

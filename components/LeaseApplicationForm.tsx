@@ -40,9 +40,6 @@ export default function LeaseApplicationForm({ defaultUnit, onSuccess, dark }: P
     phone: '',
     phoneDialCode: '+52',
     unitSlug: defaultUnit?.slug ?? units[0].slug,
-    refName: '',
-    refAffiliation: '',
-    refContact: '',
     notes: '',
   });
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
@@ -61,9 +58,6 @@ export default function LeaseApplicationForm({ defaultUnit, onSuccess, dark }: P
     if (!form.name.trim()) e.name = es ? 'Requerido' : 'Required';
     if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(form.email))
       e.email = es ? 'Correo inválido' : 'Invalid email';
-    if (!form.refName.trim()) e.refName = es ? 'Requerido' : 'Required';
-    if (!form.refAffiliation.trim()) e.refAffiliation = es ? 'Requerido' : 'Required';
-    if (!form.refContact.trim()) e.refContact = es ? 'Requerido' : 'Required';
     return e;
   };
 
@@ -89,9 +83,6 @@ export default function LeaseApplicationForm({ defaultUnit, onSuccess, dark }: P
           unitName: selectedUnit.name,
           monthlyMxn: selectedUnit.monthlyRateMXN.toLocaleString(),
           monthlyUsd: typeof liveUsd === 'number' ? liveUsd.toLocaleString() : liveUsd,
-          refName: form.refName,
-          refAffiliation: form.refAffiliation,
-          refContact: form.refContact,
           notes: form.notes,
         }),
       });
@@ -248,60 +239,6 @@ export default function LeaseApplicationForm({ defaultUnit, onSuccess, dark }: P
               }`}
             />
           </div>
-        </div>
-      </div>
-
-      {/* Reference section */}
-      <div className={`rounded-2xl border p-5 space-y-4 ${
-        dark ? 'border-slate-600 bg-slate-800/60' : 'border-slate-200 bg-slate-50'
-      }`}>
-        <div>
-          <p className={`text-sm font-semibold uppercase tracking-[0.14em] ${dark ? 'text-slate-300' : 'text-slate-600'}`}>
-            {es ? 'Referencia Personal' : 'Personal Reference'}
-          </p>
-          <p className={`text-xs mt-1 ${dark ? 'text-slate-400' : 'text-slate-500'}`}>
-            {es
-              ? 'Alguien que nos pueda dar referencias sobre ti (no familiar directo)'
-              : 'Someone who can vouch for you (not an immediate family member)'}
-          </p>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label className={labelClass(dark)}>
-              {es ? 'Nombre' : 'Name'} <span className="text-red-500">*</span>
-            </label>
-            <input
-              value={form.refName}
-              onChange={(e) => set('refName', e.target.value)}
-              className={inputClass(dark)}
-              placeholder={es ? 'Nombre de tu referencia' : "Reference's name"}
-            />
-            {err('refName')}
-          </div>
-          <div>
-            <label className={labelClass(dark)}>
-              {es ? 'Relación / Organización' : 'Affiliation / Relationship'} <span className="text-red-500">*</span>
-            </label>
-            <input
-              value={form.refAffiliation}
-              onChange={(e) => set('refAffiliation', e.target.value)}
-              className={inputClass(dark)}
-              placeholder={es ? 'Ej. Empleador, colega, vecino…' : 'e.g. Employer, colleague, neighbor…'}
-            />
-            {err('refAffiliation')}
-          </div>
-        </div>
-        <div>
-          <label className={labelClass(dark)}>
-            {es ? 'Correo o teléfono de contacto' : 'Contact email or phone'} <span className="text-red-500">*</span>
-          </label>
-          <input
-            value={form.refContact}
-            onChange={(e) => set('refContact', e.target.value)}
-            className={inputClass(dark)}
-            placeholder={es ? 'correo@ejemplo.com o +52 555…' : 'email@example.com or +1 555…'}
-          />
-          {err('refContact')}
         </div>
       </div>
 

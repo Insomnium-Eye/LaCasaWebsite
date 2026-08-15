@@ -5,9 +5,9 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: Request) {
   const body = await request.json() as Record<string, string>;
-  const { name, email, nationality, phone, unitName, monthlyMxn, monthlyUsd, refName, refAffiliation, refContact, notes } = body;
+  const { name, email, nationality, phone, unitName, monthlyMxn, monthlyUsd, notes } = body;
 
-  if (!name?.trim() || !email?.trim() || !refName?.trim() || !refAffiliation?.trim() || !refContact?.trim()) {
+  if (!name?.trim() || !email?.trim()) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
   }
 
@@ -38,13 +38,6 @@ export async function POST(request: Request) {
           <table style="width:100%;border-collapse:collapse;">
             <tr><td style="padding:6px 0;color:#666;width:140px;">Unit</td><td style="padding:6px 0;font-weight:bold;">${unitName}</td></tr>
             <tr><td style="padding:6px 0;color:#666;">Monthly Rent</td><td style="padding:6px 0;">$${monthlyUsd} USD / $${monthlyMxn} MXN</td></tr>
-          </table>
-
-          <h3 style="color:#444;border-bottom:1px solid #eee;padding-bottom:6px;margin-top:20px;">Reference</h3>
-          <table style="width:100%;border-collapse:collapse;">
-            <tr><td style="padding:6px 0;color:#666;width:140px;">Name</td><td style="padding:6px 0;">${refName}</td></tr>
-            <tr><td style="padding:6px 0;color:#666;">Affiliation</td><td style="padding:6px 0;">${refAffiliation}</td></tr>
-            <tr><td style="padding:6px 0;color:#666;">Email / Phone</td><td style="padding:6px 0;">${refContact}</td></tr>
           </table>
 
           ${notes ? `

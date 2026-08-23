@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Unit } from '../data/units';
 import { useLanguage } from '../contexts/LanguageContext';
 import useUsdToMxn from '../hooks/useUsdToMxn';
+import useAvailability from '../hooks/useAvailability';
 import LeaseApplicationModal from './LeaseApplicationModal';
 
 interface UnitModalProps {
@@ -14,6 +15,7 @@ interface UnitModalProps {
 export default function UnitModal({ unit, onClose }: UnitModalProps) {
   const { t } = useLanguage();
   const { rate } = useUsdToMxn();
+  const { availability, loading: availLoading } = useAvailability(unit?.slug ?? '');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [showApply, setShowApply] = useState(false);
 
@@ -99,33 +101,66 @@ export default function UnitModal({ unit, onClose }: UnitModalProps) {
             </div>
           </div>
 
-          {/* Monthly Pricing */}
-          <div className="pt-4 border-t border-slate-200">
-            <div className="mb-4 rounded-xl bg-slate-50 px-5 py-4">
-              <div className="flex items-center justify-between gap-2 mb-1">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{t('unitModal.monthlyRate')}</p>
-                <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-700">
-                  Available {unit.availableFrom}
-                </span>
+          {/* Rental Options */}
+          <div className="pt-4 border-t border-slate-200 space-y-3">
+            {/* Short-term */}
+            <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Short-term · Airbnb</p>
+                {availLoading
+                  ? <span className="text-xs text-slate-400">—</span>
+                  : availability?.shortTerm
+                    ? <span className={`flex items-center gap-1 text-xs font-semibold ${/now/i.test(availability.shortTerm) ? 'text-green-600' : 'text-amber-600'}`}>
+                        <span className={`h-1.5 w-1.5 rounded-full ${/now/i.test(availability.shortTerm) ? 'bg-green-500' : 'bg-amber-500'}`} />
+                        {availability.shortTerm}
+                      </span>
+                    : null
+                }
               </div>
-              <p className="text-2xl font-semibold text-slate-900">
-                ${rate > 0 ? Math.floor(unit.monthlyRateMXN / rate).toLocaleString() : '—'}
-                <span className="text-base font-normal text-slate-500"> USD/mo</span>
-              </p>
-              <p className="text-sm text-slate-500">${unit.monthlyRateMXN.toLocaleString()} MXN/mes</p>
-              <div className="mt-3 space-y-1">
-                <p className="text-xs text-slate-500">
-                  Deposit upon approval: 1 month + ½ month
-                  {' = '}
-                  <span className="font-semibold text-slate-700">
-                    ${Math.round(unit.monthlyRateMXN * 1.5).toLocaleString()} MXN
-                    {rate > 0 ? ` (~$${Math.floor(unit.monthlyRateMXN * 1.5 / rate).toLocaleString()} USD)` : ''}
-                  </span>
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-lg font-semibold text-slate-900">
+                  ${unit.shortTermMin}–${unit.shortTermMax}
+                  <span className="text-sm font-normal text-slate-500"> USD/night</span>
                 </p>
-                <p className="text-xs text-slate-500">Rent due the <span className="font-semibold text-slate-700">1st of every month</span></p>
-                <p className="text-xs font-semibold text-amber-600">Minimum lease: 1 year</p>
+                <a
+                  href={unit.airbnbUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs font-semibold text-terracotta hover:text-[#b55e47] transition"
+                >
+                  Book on Airbnb ↗
+                </a>
+              </div>
+              <p className="mt-1 text-xs text-slate-400">Nightly rate based on demand, before discounts.</p>
+            </div>
+
+            {/* Long-term */}
+            <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Long-term · 1-year lease</p>
+                {availLoading
+                  ? <span className="text-xs text-slate-400">—</span>
+                  : availability?.longTerm
+                    ? <span className={`flex items-center gap-1 text-xs font-semibold ${/now/i.test(availability.longTerm) ? 'text-green-600' : 'text-amber-700'}`}>
+                        <span className={`h-1.5 w-1.5 rounded-full ${/now/i.test(availability.longTerm) ? 'bg-green-500' : 'bg-amber-500'}`} />
+                        {availability.longTerm}
+                      </span>
+                    : null
+                }
+              </div>
+              <p className="text-lg font-semibold text-slate-900">
+                ${unit.monthlyRateMXN.toLocaleString()}
+                <span className="text-sm font-normal text-slate-500"> MXN/mo</span>
+                <span className="ml-2 text-sm font-normal text-slate-400">
+                  {rate > 0 ? `(~$${Math.floor(unit.monthlyRateMXN / rate).toLocaleString()} USD)` : ''}
+                </span>
+              </p>
+              <div className="mt-2 space-y-0.5 text-xs text-slate-500">
+                <p>Deposit: 1 month + ½ = <span className="font-semibold text-slate-700">${Math.round(unit.monthlyRateMXN * 1.5).toLocaleString()} MXN</span></p>
+                <p>Rent due the <span className="font-semibold text-slate-700">1st of every month</span></p>
               </div>
             </div>
+
             <button
               onClick={() => setShowApply(true)}
               className="block w-full rounded-full bg-terracotta px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-[#b55e47]"

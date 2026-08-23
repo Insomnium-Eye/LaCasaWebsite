@@ -33,6 +33,13 @@ export default function BookPage() {
           <p className="text-sm uppercase tracking-[0.24em] text-slate-300">{t("book.heading")}</p>
           <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">{t("book.title")}</h1>
           <p className="max-w-2xl text-lg leading-8 text-slate-200">{t("book.description")}</p>
+          <p className="text-sm text-slate-400">
+            Looking for a short stay?{' '}
+            <Link href="/units" className="text-terracotta hover:text-[#b55e47] font-semibold">
+              View all units
+            </Link>
+            {' '}for Airbnb links and nightly rates.
+          </p>
         </div>
 
         {/* Unit Pricing Cards */}
@@ -53,12 +60,7 @@ export default function BookPage() {
                 <p className="text-xs uppercase tracking-[0.18em] text-slate-400">
                   {t(`units.items.${unit.slug}.type`)}
                 </p>
-                <div className="flex items-center justify-between gap-2 mt-1">
-                  <p className="font-semibold text-slate-100">{t(`units.items.${unit.slug}.name`)}</p>
-                  <span className="rounded-full bg-garden/20 px-2 py-0.5 text-xs font-semibold text-green-300 whitespace-nowrap">
-                    Avail. {unit.availableFrom}
-                  </span>
-                </div>
+                <p className="font-semibold text-slate-100 mt-1">{t(`units.items.${unit.slug}.name`)}</p>
                 <p className="mt-2 text-xl font-semibold text-white">
                   ${usd}
                   <span className="text-sm font-normal text-slate-400"> USD/mo</span>

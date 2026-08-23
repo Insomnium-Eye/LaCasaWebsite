@@ -7,7 +7,9 @@ export type Unit = {
   bathroom: string;
   terrace: string;
   monthlyRateMXN: number;
-  availableFrom: string;
+  shortTermMin: number;
+  shortTermMax: number;
+  airbnbUrl: string;
   displayImage?: string;
   galleryImages?: string[];
 };
@@ -21,8 +23,10 @@ export const units: Unit[] = [
     capacity: 2,
     bathroom: "En-suite bathroom",
     terrace: "Private veranda with garden access",
-    monthlyRateMXN: 17000,
-    availableFrom: "Nov 1",
+    monthlyRateMXN: 15000,
+    shortTermMin: 55,
+    shortTermMax: 115,
+    airbnbUrl: "https://airbnb.com/h/oaxaca-rental-bungalow1",
     displayImage: "/imgs/Bungalow1/Exterior1.jpg",
     galleryImages: [
       "/imgs/Bungalow1/Exterior2.jpg",
@@ -43,7 +47,9 @@ export const units: Unit[] = [
     bathroom: "En-suite bathroom",
     terrace: "Private veranda with garden access",
     monthlyRateMXN: 20000,
-    availableFrom: "Sep 1",
+    shortTermMin: 65,
+    shortTermMax: 125,
+    airbnbUrl: "https://airbnb.com/h/oaxaca-rental-bungalow2",
     displayImage: "/imgs/Bungalow2/Exterior1.jpg",
     galleryImages: [
       "/imgs/Bungalow2/Bed1.jpg",
@@ -61,7 +67,9 @@ export const units: Unit[] = [
     bathroom: "En-suite bathroom",
     terrace: "Shared terrace nearby",
     monthlyRateMXN: 10000,
-    availableFrom: "Dec 1",
+    shortTermMin: 40,
+    shortTermMax: 100,
+    airbnbUrl: "https://airbnb.com/h/oaxaca-rental-room1",
     displayImage: "/imgs/Room/Exterior1.jpg",
     galleryImages: [
       "/imgs/Room/Exterior2.jpg",

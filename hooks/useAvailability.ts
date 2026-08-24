@@ -23,7 +23,7 @@ export default function useAvailability(slug: string) {
     let cancelled = false;
     setLoading(true);
 
-    fetch(`/api/availability/${slug}`)
+    fetch(`/api/airbnb-availability/${slug}`)
       .then(r => (r.ok ? r.json() : null))
       .then((d: Availability | null) => {
         if (cancelled || !d) return;

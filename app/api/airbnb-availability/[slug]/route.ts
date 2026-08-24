@@ -99,9 +99,9 @@ function computeAvailability(events: { start: Date; end: Date }[]) {
 
 export async function GET(
   _req: Request,
-  context: { params: { slug: string } }
+  context: { params: Promise<{ slug: string }> }
 ) {
-  const { slug } = context.params;
+  const { slug } = await context.params;
   const envKey = ICAL_ENV[slug];
   const icalUrl = envKey ? process.env[envKey] : undefined;
 

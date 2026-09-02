@@ -9,7 +9,7 @@ export const translations = {
       gallery: "Gallery",
       faq: "FAQ",
       contact: "Contact",
-      tours: "Tours",
+      tours: "Rides",
       bookDirect: "Inquire to Lease",
       backToHome: "← Back to Home",
       guestSignIn: "Already a guest? Sign in!"
@@ -22,7 +22,7 @@ export const translations = {
     home: {
       directBooking: "Long-Term Rental",
       title: "La Casa Oaxaca — Private bungalows and a garden retreat in San Felipe del Agua.",
-      description: "Live in a calm, authentic setting with private verandas, fruit orchard views, and modern comforts. Minimum 1-year lease.",
+      description: "Live in a calm, authentic setting with private verandas, fruit orchard views, and modern comforts.",
       bookNow: "Inquire Now",
       aboutLaCasa: "About La Casa",
       galleryButton: "View Gallery",
@@ -149,7 +149,7 @@ export const translations = {
       heading: "FAQs",
       title: "Common questions from prospective tenants.",
       items: [
-        { question: "What is the minimum lease term?", answer: "All leases are a minimum of one year. We do not offer short-term or vacation rentals." },
+        { question: "What rental terms are available?", answer: "We offer flexible options: short-term nightly stays via Airbnb, or direct monthly leases ranging from 1 month to 12 months. Longer terms receive better rates." },
         { question: "What is required to move in?", answer: "Upon approval, a deposit of 1 month + ½ month's rent is required (1.5× your monthly rate). Rent is then due on the 1st of every month." },
         { question: "What utilities are included?", answer: "Each unit has its own mini-fridge and electric grill. Please contact us for details on what utilities are included in your specific lease." },
         { question: "Are there mosquito protections?", answer: "Yes. Each unit has mosquito bed nets surrounding every bed, and our water storage is treated with Mosquito Dunks BCI for year-round prevention." }
@@ -305,7 +305,7 @@ export const translations = {
     units: {
       heading: "Available units",
       title: "Private bungalows and a room for long-term lease.",
-      description: "Choose the unit that fits your lifestyle. Minimum 1-year lease. Send us an inquiry and we'll get back to you.",
+      description: "Choose the unit that fits your lifestyle. Short-term via Airbnb, or monthly lease from 1 to 12 months. Send us an inquiry and we'll get back to you.",
       capacityLabel: "Capacity:",
       guestsLabel: "occupants",
       checkAvailability: "Inquire",
@@ -615,7 +615,7 @@ export const translations = {
       gallery: "Galería",
       faq: "Preguntas Frecuentes",
       contact: "Contacto",
-      tours: "Tours",
+      tours: "Rides",
       bookDirect: "Consultar Arriendo",
       backToHome: "← Volver al Inicio",
       guestSignIn: "¿Ya eres huésped? ¡Inicia sesión!"

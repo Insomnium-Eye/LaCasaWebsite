@@ -32,7 +32,7 @@ export default function UnitsPage() {
             </div>
             <div className="inline-flex items-center gap-2 rounded-full border border-amber-700/60 bg-amber-900/25 px-4 py-2 text-sm text-amber-300">
               <span className="h-2 w-2 rounded-full bg-amber-400" />
-              Long-term leases available — 1-year minimum, fixed monthly rate
+              Long-term leases available — fixed monthly rate
             </div>
           </div>
         </div>

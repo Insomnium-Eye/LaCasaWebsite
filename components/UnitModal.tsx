@@ -13,7 +13,8 @@ interface UnitModalProps {
 }
 
 export default function UnitModal({ unit, onClose }: UnitModalProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const es = language === 'es';
   const { rate } = useUsdToMxn();
   const { availability, loading: availLoading } = useAvailability(unit?.slug ?? '');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -119,8 +120,10 @@ export default function UnitModal({ unit, onClose }: UnitModalProps) {
               </div>
               <div className="flex items-center justify-between gap-2">
                 <p className="text-lg font-semibold text-slate-900">
-                  ${unit.shortTermMin}–${unit.shortTermMax}
-                  <span className="text-sm font-normal text-slate-500"> USD/night</span>
+                  {es && rate > 0
+                    ? <>${Math.round(unit.shortTermMin * rate).toLocaleString()}–${Math.round(unit.shortTermMax * rate).toLocaleString()}<span className="text-sm font-normal text-slate-500"> MXN/noche</span></>
+                    : <>${unit.shortTermMin}–${unit.shortTermMax}<span className="text-sm font-normal text-slate-500"> USD/night</span></>
+                  }
                 </p>
                 <a
                   href={unit.airbnbUrl}
@@ -164,10 +167,10 @@ export default function UnitModal({ unit, onClose }: UnitModalProps) {
                         {tier.label}
                       </span>
                       <span className={`flex-1 ${isAnnual ? 'text-slate-900' : 'text-slate-700'}`}>
-                        ${mxn.toLocaleString()} MXN
-                        <span className={`ml-1 text-xs font-normal ${isAnnual ? 'text-slate-500' : 'text-slate-400'}`}>
-                          (~${usd} USD)
-                        </span>
+                        {es
+                          ? <>${mxn.toLocaleString()} <span className={`text-xs font-normal ${isAnnual ? 'text-slate-500' : 'text-slate-400'}`}>MXN</span></>
+                          : <>${usd} <span className={`text-xs font-normal ${isAnnual ? 'text-slate-500' : 'text-slate-400'}`}>USD</span></>
+                        }
                       </span>
                       <span className={`shrink-0 text-xs font-semibold ${isAnnual ? 'text-amber-600' : 'text-slate-400'}`}>
                         {tier.badge}

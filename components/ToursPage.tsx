@@ -122,7 +122,7 @@ export default function ToursContent() {
             🚗 La Casa Oaxaca
           </p>
           <h1 className="text-4xl sm:text-5xl font-bold text-white leading-tight mb-4">
-            {es ? 'Tours Privados y Traslados' : 'Private Driving Tours & Transfers'}
+            {es ? 'Rides y Traslados Privados' : 'Private Rides & Transfers'}
           </h1>
           <p className="text-lg text-slate-300 max-w-2xl">
             {es
@@ -154,7 +154,7 @@ export default function ToursContent() {
             <div className="rounded-2xl bg-[#1a0f0a]/90 p-5">
               <p className="text-sm font-semibold text-slate-400 mb-2">❌ {es ? 'No incluye' : 'We do NOT provide'}</p>
               <p className="text-sm text-slate-300">
-                {es ? 'Hospedaje, comidas ni tours guiados — solo transporte y apoyo excelentes.' : 'Accommodation, meals, or guided tours — just excellent transport and support.'}
+                {es ? 'Hospedaje, comidas ni rides guiados — solo transporte y apoyo excelentes.' : 'Accommodation, meals, or guided excursions — just excellent transport and support.'}
               </p>
             </div>
           </div>
@@ -193,10 +193,10 @@ export default function ToursContent() {
         <section className="space-y-6">
           <div>
             <h2 className="text-2xl font-bold text-white mb-1">
-              {es ? 'Paquetes de Varios Días a Puerto Escondido' : 'Multi-Day Tour Packages to Puerto Escondido'}
+              {es ? 'Paquetes de Varios Días a Puerto Escondido' : 'Multi-Day Ride Packages to Puerto Escondido'}
             </h2>
             <p className="text-slate-300 font-medium mb-1">
-              {es ? '2 Noches / 3 Días — Escape a la Playa' : '2-Night / 3-Day Beach Escape – Highlights Tour'}
+              {es ? '2 Noches / 3 Días — Escape a la Playa' : '2-Night / 3-Day Beach Escape – Highlights Trip'}
             </p>
             <p className="text-slate-400 text-sm">
               {es
@@ -230,7 +230,7 @@ export default function ToursContent() {
           <div className="grid gap-6 sm:grid-cols-2">
             <div className="rounded-3xl border border-slate-700 bg-[#241a13]/90 p-6 space-y-5">
               <div>
-                <span className="text-xs font-semibold uppercase tracking-widest text-slate-400">Tour A</span>
+                <span className="text-xs font-semibold uppercase tracking-widest text-slate-400">Ride A</span>
                 <h3 className="text-lg font-bold text-white mt-1">
                   {es ? 'Playas Tranquilas y Familiares' : 'Calm & Family-Friendly Beaches'}
                 </h3>
@@ -246,7 +246,7 @@ export default function ToursContent() {
             </div>
             <div className="rounded-3xl border border-slate-700 bg-[#241a13]/90 p-6 space-y-5">
               <div>
-                <span className="text-xs font-semibold uppercase tracking-widest text-slate-400">Tour B</span>
+                <span className="text-xs font-semibold uppercase tracking-widest text-slate-400">Ride B</span>
                 <h3 className="text-lg font-bold text-white mt-1">
                   {es ? 'Playas Vibrantes y de Surf' : 'Vibrant & Surf Beaches'}
                 </h3>
@@ -267,7 +267,7 @@ export default function ToursContent() {
         <section className="rounded-3xl border border-slate-700 bg-[#241a13]/90 p-6 space-y-4">
           <h3 className="font-bold text-white text-lg">{es ? 'Suplementos' : 'Supplements'}</h3>
           <ul className="space-y-2.5 text-sm text-slate-300">
-            <li className="flex gap-3"><span>🌊</span><span>{es ? 'Tour de bioluminiscencia en lancha: 800–1,500 MXN por persona (reservar por separado).' : 'Bioluminescence boat tour: 800–1,500 MXN per person (book separately).'}</span></li>
+            <li className="flex gap-3"><span>🌊</span><span>{es ? 'Ride de bioluminiscencia en lancha: 800–1,500 MXN por persona (reservar por separado).' : 'Bioluminescence boat ride: 800–1,500 MXN per person (book separately).'}</span></li>
             <li className="flex gap-3"><span>📅</span><span>{es ? 'Ajustes personalizados o noches adicionales: cotización a petición.' : 'Custom adjustments or extra nights: Quoted on request.'}</span></li>
           </ul>
         </section>
@@ -290,8 +290,8 @@ export default function ToursContent() {
           </h2>
           <p className="text-slate-300 max-w-xl mx-auto">
             {es
-              ? 'Completa el formulario de reserva o escríbenos con tus fechas, tamaño de grupo y tour preferido.'
-              : 'Fill out the booking form or message us with your dates, group size, and preferred tour.'}
+              ? 'Completa el formulario de reserva o escríbenos con tus fechas, tamaño de grupo y ride preferido.'
+              : 'Fill out the booking form or message us with your dates, group size, and preferred ride.'}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
             <Link href="/book" className="inline-flex items-center justify-center rounded-full bg-terracotta px-7 py-3 text-sm font-semibold text-white transition hover:bg-[#b55e47]">

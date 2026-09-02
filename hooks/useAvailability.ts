@@ -24,13 +24,15 @@ export default function useAvailability(slug: string) {
     setLoading(true);
 
     fetch(`/api/airbnb-availability/${slug}`)
-      .then(r => (r.ok ? r.json() : null))
+      .then(r => r.json())
       .then((d: Availability | null) => {
         if (cancelled || !d) return;
         cache[slug] = { data: d, ts: Date.now() };
         setAvailability(d);
       })
-      .catch(() => {})
+      .catch(() => {
+        if (!cancelled) setAvailability({ shortTerm: 'Check Airbnb', longTerm: 'Contact us' });
+      })
       .finally(() => {
         if (!cancelled) setLoading(false);
       });

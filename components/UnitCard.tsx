@@ -25,7 +25,8 @@ function AvailBadge({ label }: { label: string | null }) {
 }
 
 export default function UnitCard({ unit, onSelect, onInquire, showDetails }: Props) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const es = language === 'es';
   const { rate } = useUsdToMxn();
   const { availability, loading } = useAvailability(unit.slug);
 
@@ -79,8 +80,10 @@ export default function UnitCard({ unit, onSelect, onInquire, showDetails }: Pro
           </div>
           <div className="flex items-center justify-between gap-2">
             <p className="text-sm font-semibold text-white">
-              ${unit.shortTermMin}–${unit.shortTermMax}
-              <span className="font-normal text-slate-400"> USD/night</span>
+              {es && rate > 0
+                ? <>${Math.round(unit.shortTermMin * rate).toLocaleString()}–${Math.round(unit.shortTermMax * rate).toLocaleString()}<span className="font-normal text-slate-400"> MXN/noche</span></>
+                : <>${unit.shortTermMin}–${unit.shortTermMax}<span className="font-normal text-slate-400"> USD/night</span></>
+              }
             </p>
             <Link
               href={unit.airbnbUrl}
@@ -118,7 +121,10 @@ export default function UnitCard({ unit, onSelect, onInquire, showDetails }: Pro
                     {tier.label}
                   </span>
                   <span className={`flex-1 font-semibold ${isAnnual ? 'text-white' : 'text-slate-300'}`}>
-                    ${mxn.toLocaleString()} <span className="font-normal text-slate-500">MXN/mo</span>
+                    {es
+                      ? <>${mxn.toLocaleString()} <span className="font-normal text-slate-500">MXN/mo</span></>
+                      : <>${rate > 0 ? Math.floor(mxn / rate).toLocaleString() : '—'} <span className="font-normal text-slate-500">USD/mo</span></>
+                    }
                   </span>
                   <span className={`shrink-0 font-semibold ${isAnnual ? 'text-amber-300' : 'text-slate-500'}`}>
                     {tier.badge}

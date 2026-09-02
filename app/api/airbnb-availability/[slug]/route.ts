@@ -106,10 +106,8 @@ export async function GET(
   const icalUrl = envKey ? process.env[envKey] : undefined;
 
   if (!icalUrl) {
-    return NextResponse.json(
-      { error: 'No calendar configured for this unit' },
-      { status: 404 }
-    );
+    // iCal not yet configured — return a graceful fallback so UI stays informative
+    return NextResponse.json({ shortTerm: 'Check Airbnb', longTerm: 'Contact us', configured: false });
   }
 
   try {

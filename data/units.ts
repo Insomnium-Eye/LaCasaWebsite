@@ -30,19 +30,21 @@ export const units: Unit[] = [
     capacity: 2,
     bathroom: "En-suite bathroom",
     terrace: "Private veranda with garden access",
-    monthlyRateMXN: 15000,
+    monthlyRateMXN: 17000,
     shortTermMin: 55,
     shortTermMax: 115,
     airbnbUrl: "https://airbnb.com/h/oaxaca-rental-bungalow1",
-    displayImage: "/imgs/Bungalow1/Exterior1.jpg",
+    displayImage: "/imgs/Bungalow1/Main.jpg",
     galleryImages: [
+      "/imgs/Bungalow1/Exterior1.jpg",
       "/imgs/Bungalow1/Exterior2.jpg",
       "/imgs/Bungalow1/Exterior3.jpg",
-      "/imgs/Bungalow1/Bed1.jpg",
-      "/imgs/Bungalow1/Bed2.jpg",
-      "/imgs/Bungalow1/Bathroom1.jpg",
-      "/imgs/Bungalow1/Kitchenette1.jpg",
-      "/imgs/Bungalow1/Kitchenette2.jpg"
+      "/imgs/Bungalow1/Exterior4.jpg",
+      "/imgs/Bungalow1/bathroom.jpg",
+      "/imgs/Bungalow1/bed1.jpg",
+      "/imgs/Bungalow1/bed2.jpg",
+      "/imgs/Bungalow1/kitchenette1.jpg",
+      "/imgs/Bungalow1/kitchennete2.jpg"
     ]
   },
   {
@@ -57,12 +59,13 @@ export const units: Unit[] = [
     shortTermMin: 65,
     shortTermMax: 125,
     airbnbUrl: "https://airbnb.com/h/oaxaca-rental-bungalow2",
-    displayImage: "/imgs/Bungalow2/Exterior1.jpg",
+    displayImage: "/imgs/Bungalow2/Main.jpg",
     galleryImages: [
-      "/imgs/Bungalow2/Bed1.jpg",
+      "/imgs/Bungalow2/Exterior1.jpg",
       "/imgs/Bungalow2/Bathroom1.jpg",
-      "/imgs/Bungalow2/Kitchennette1.jpg",
-      "/imgs/Bungalow2/Table1.jpg"
+      "/imgs/Bungalow2/Bed1.jpg",
+      "/imgs/Bungalow2/Table1.jpg",
+      "/imgs/Bungalow2/QqWao.jpg"
     ]
   },
   {
@@ -73,18 +76,18 @@ export const units: Unit[] = [
     capacity: 2,
     bathroom: "En-suite bathroom",
     terrace: "Shared terrace nearby",
-    monthlyRateMXN: 10000,
+    monthlyRateMXN: 8000,
     shortTermMin: 40,
     shortTermMax: 100,
     airbnbUrl: "https://airbnb.com/h/oaxaca-rental-room1",
-    displayImage: "/imgs/Room/Exterior1.jpg",
+    displayImage: "/imgs/Room/Main.jpg",
     galleryImages: [
-      "/imgs/Room/Exterior2.jpg",
+      "/imgs/Room/exterior1.jpg",
       "/imgs/Room/Exterior3.jpg",
-      "/imgs/Room/Bed1.jpg",
-      "/imgs/Room/Bed2.jpg",
-      "/imgs/Room/Bathroom1.jpg",
-      "/imgs/Room/Kitchenette.jpg"
+      "/imgs/Room/bathroom.jpg",
+      "/imgs/Room/bed1.jpg",
+      "/imgs/Room/bed2.jpg",
+      "/imgs/Room/kitchen.jpg"
     ]
   },
 ];

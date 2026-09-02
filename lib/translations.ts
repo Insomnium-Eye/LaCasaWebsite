@@ -615,7 +615,7 @@ export const translations = {
       gallery: "Galería",
       faq: "Preguntas Frecuentes",
       contact: "Contacto",
-      tours: "Rides",
+      tours: "Paseos",
       bookDirect: "Consultar Arriendo",
       backToHome: "← Volver al Inicio",
       guestSignIn: "¿Ya eres huésped? ¡Inicia sesión!"
@@ -628,7 +628,7 @@ export const translations = {
     home: {
       directBooking: "Arrendamiento",
       title: "La Casa Oaxaca — Bungalows privados y un retiro de jardín en San Felipe del Agua.",
-      description: "Vive en un ambiente tranquilo y auténtico con terrazas privadas, vistas a huertos frutales y comodidades modernas. Arrendamiento mínimo de 1 año.",
+      description: "Vive en un ambiente tranquilo y auténtico con terrazas privadas, vistas a huertos frutales y comodidades modernas.",
       bookNow: "Consultar Ahora",
       aboutLaCasa: "Acerca de La Casa",
       galleryButton: "Ver Galería",
@@ -755,7 +755,7 @@ export const translations = {
       heading: "Preguntas Frecuentes",
       title: "Preguntas frecuentes de posibles inquilinos.",
       items: [
-        { question: "¿Cuál es el plazo mínimo del arrendamiento?", answer: "Todos los contratos son de mínimo un año. No ofrecemos rentas de corta duración ni vacacionales." },
+        { question: "¿Qué opciones de arrendamiento están disponibles?", answer: "Ofrecemos opciones flexibles: estadías nocturnas de corto plazo vía Airbnb, o arrendamientos mensuales directos de 1 a 12 meses. Los plazos más largos tienen mejores tarifas." },
         { question: "¿Qué se requiere para mudarse?", answer: "Al ser aprobado, se requiere un depósito de 1 mes + ½ mes de renta (1.5× tu renta mensual). La renta se paga el 1º de cada mes a partir de entonces." },
         { question: "¿Qué servicios están incluidos?", answer: "Cada unidad cuenta con minirefrigerador y parrilla eléctrica. Contáctanos para conocer los detalles de qué servicios están incluidos en tu contrato." },
         { question: "¿Hay protección contra mosquitos?", answer: "Sí. Cada unidad tiene mosquiteros alrededor de cada cama, y el almacenamiento de agua se trata con Mosquito Dunks BCI para prevención todo el año." }
@@ -777,7 +777,7 @@ export const translations = {
     book: {
       heading: "Consulta de Arrendamiento",
       title: "Consulta sobre un contrato a largo plazo.",
-      description: "Completa el formulario a continuación y nos pondremos en contacto contigo con disponibilidad y próximos pasos. Todos los contratos son de mínimo 1 año. Al ser aprobado, se requiere 1 mes + ½ mes de depósito. La renta vence el 1º de cada mes.",
+      description: "Completa el formulario a continuación y nos pondremos en contacto contigo con disponibilidad y próximos pasos. Al ser aprobado, se requiere 1 mes + ½ mes de depósito. La renta vence el 1º de cada mes.",
       name: "Nombre",
       email: "Correo electrónico",
       phone: "Teléfono",
@@ -914,7 +914,7 @@ export const translations = {
     units: {
       heading: "Unidades disponibles",
       title: "Bungalows privados y habitación para arrendamiento a largo plazo.",
-      description: "Elige la unidad que se adapte a tu estilo de vida. Contrato mínimo de 1 año. Envíanos una consulta y te responderemos.",
+      description: "Elige la unidad que se adapte a tu estilo de vida. Corto plazo vía Airbnb, o arrendamiento mensual de 1 a 12 meses. Envíanos una consulta y te responderemos.",
       capacityLabel: "Capacidad:",
       guestsLabel: "ocupantes",
       checkAvailability: "Consultar",

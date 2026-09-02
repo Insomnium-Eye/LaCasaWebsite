@@ -72,9 +72,11 @@ export default function UnitCard({ unit, onSelect, onInquire, showDetails }: Pro
         {/* Short-term */}
         <div className="rounded-2xl border border-slate-700/60 bg-slate-800/40 px-4 py-3 space-y-2">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Short-term · Airbnb</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
+              {es ? 'Corto plazo · Airbnb' : 'Short-term · Airbnb'}
+            </p>
             {loading
-              ? <span className="text-xs text-slate-600">loading…</span>
+              ? <span className="text-xs text-slate-600">{es ? 'cargando…' : 'loading…'}</span>
               : <AvailBadge label={availability?.nightly ?? null} />
             }
           </div>
@@ -92,15 +94,19 @@ export default function UnitCard({ unit, onSelect, onInquire, showDetails }: Pro
               className="text-xs font-semibold text-terracotta hover:text-[#b55e47] shrink-0 transition"
               onClick={(e) => e.stopPropagation()}
             >
-              View on Airbnb ↗
+              {es ? 'Ver en Airbnb ↗' : 'View on Airbnb ↗'}
             </Link>
           </div>
-          <p className="text-xs text-slate-500">Nightly rate varies by demand, before discounts.</p>
+          <p className="text-xs text-slate-500">
+            {es ? 'Tarifa nocturna varía según demanda, antes de descuentos.' : 'Nightly rate varies by demand, before discounts.'}
+          </p>
         </div>
 
         {/* Monthly lease — tiered */}
         <div className="rounded-2xl border border-amber-900/40 bg-amber-950/20 px-4 py-3 space-y-2.5">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-400/80">Monthly lease</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-400/80">
+            {es ? 'Arrendamiento mensual' : 'Monthly lease'}
+          </p>
 
           <div className="space-y-1.5">
             {LEASE_TIERS.map((tier) => {
@@ -141,7 +147,7 @@ export default function UnitCard({ unit, onSelect, onInquire, showDetails }: Pro
               className="rounded-full bg-terracotta px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-[#b55e47] shrink-0"
               onClick={onInquire}
             >
-              Inquire
+              {es ? 'Consultar' : 'Inquire'}
             </button>
           </div>
         </div>

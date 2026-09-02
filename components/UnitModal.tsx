@@ -107,7 +107,9 @@ export default function UnitModal({ unit, onClose }: UnitModalProps) {
             {/* Short-term */}
             <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
               <div className="flex items-center justify-between gap-2 mb-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Short-term · Airbnb</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                  {es ? 'Corto plazo · Airbnb' : 'Short-term · Airbnb'}
+                </p>
                 {availLoading
                   ? <span className="text-xs text-slate-400">—</span>
                   : availability?.nightly
@@ -131,15 +133,19 @@ export default function UnitModal({ unit, onClose }: UnitModalProps) {
                   rel="noopener noreferrer"
                   className="text-xs font-semibold text-terracotta hover:text-[#b55e47] transition"
                 >
-                  Book on Airbnb ↗
+                  {es ? 'Reservar en Airbnb ↗' : 'Book on Airbnb ↗'}
                 </a>
               </div>
-              <p className="mt-1 text-xs text-slate-400">Nightly rate based on demand, before discounts.</p>
+              <p className="mt-1 text-xs text-slate-400">
+                {es ? 'Tarifa nocturna según demanda, antes de descuentos.' : 'Nightly rate based on demand, before discounts.'}
+              </p>
             </div>
 
             {/* Monthly lease — tiered */}
             <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700 mb-3">Monthly lease</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700 mb-3">
+                {es ? 'Arrendamiento mensual' : 'Monthly lease'}
+              </p>
 
               {/* Tier table */}
               <div className="space-y-2">
@@ -182,8 +188,8 @@ export default function UnitModal({ unit, onClose }: UnitModalProps) {
               </div>
 
               <div className="mt-3 pt-3 border-t border-amber-200 space-y-0.5 text-xs text-slate-500">
-                <p>Deposit upon approval: 1 month + ½ = <span className="font-semibold text-slate-700">${Math.round(unit.monthlyRateMXN * 1.5).toLocaleString()} MXN</span></p>
-                <p>Rent due the <span className="font-semibold text-slate-700">1st of every month</span></p>
+                <p>{es ? 'Depósito al aprobarse: 1 mes + ½ = ' : 'Deposit upon approval: 1 month + ½ = '}<span className="font-semibold text-slate-700">${Math.round(unit.monthlyRateMXN * 1.5).toLocaleString()} MXN</span></p>
+                <p>{es ? <>Renta a pagar el <span className="font-semibold text-slate-700">1° de cada mes</span></> : <>Rent due the <span className="font-semibold text-slate-700">1st of every month</span></>}</p>
               </div>
             </div>
 

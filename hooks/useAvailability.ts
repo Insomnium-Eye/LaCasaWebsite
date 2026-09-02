@@ -3,11 +3,13 @@
 import { useEffect, useState } from 'react';
 
 export type Availability = {
-  shortTerm: string;
-  longTerm: string;
+  nightly: string;
+  oneToThree: string;
+  threeToSix: string;
+  sixToTwelve: string;
+  annual: string;
 };
 
-// Module-level cache so repeated calls within the same page load don't re-fetch
 const cache: Record<string, { data: Availability; ts: number }> = {};
 const CACHE_TTL = 60 * 60 * 1000;
 
@@ -31,11 +33,11 @@ export default function useAvailability(slug: string) {
         setAvailability(d);
       })
       .catch(() => {
-        if (!cancelled) setAvailability({ shortTerm: 'Check Airbnb', longTerm: 'Contact us' });
+        if (!cancelled) setAvailability({
+          nightly: '—', oneToThree: '—', threeToSix: '—', sixToTwelve: '—', annual: '—',
+        });
       })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
+      .finally(() => { if (!cancelled) setLoading(false); });
 
     return () => { cancelled = true; };
   }, [slug]);

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Unit, LEASE_TIERS } from '../data/units';
 import { useLanguage } from '../contexts/LanguageContext';
 import useUsdToMxn from '../hooks/useUsdToMxn';
-import useAvailability from '../hooks/useAvailability';
+import useAvailability, { Availability } from '../hooks/useAvailability';
 import LeaseApplicationModal from './LeaseApplicationModal';
 
 interface UnitModalProps {
@@ -110,10 +110,10 @@ export default function UnitModal({ unit, onClose }: UnitModalProps) {
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Short-term · Airbnb</p>
                 {availLoading
                   ? <span className="text-xs text-slate-400">—</span>
-                  : availability?.shortTerm
-                    ? <span className={`flex items-center gap-1 text-xs font-semibold ${/now/i.test(availability.shortTerm) ? 'text-green-600' : 'text-amber-600'}`}>
-                        <span className={`h-1.5 w-1.5 rounded-full ${/now/i.test(availability.shortTerm) ? 'bg-green-500' : 'bg-amber-500'}`} />
-                        {availability.shortTerm}
+                  : availability?.nightly
+                    ? <span className={`flex items-center gap-1 text-xs font-semibold ${/now/i.test(availability.nightly) ? 'text-green-600' : 'text-amber-600'}`}>
+                        <span className={`h-1.5 w-1.5 rounded-full ${/now/i.test(availability.nightly) ? 'bg-green-500' : 'bg-amber-500'}`} />
+                        {availability.nightly}
                       </span>
                     : null
                 }
@@ -139,18 +139,7 @@ export default function UnitModal({ unit, onClose }: UnitModalProps) {
 
             {/* Monthly lease — tiered */}
             <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
-              <div className="flex items-center justify-between gap-2 mb-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Monthly lease</p>
-                {availLoading
-                  ? <span className="text-xs text-slate-400">—</span>
-                  : availability?.longTerm
-                    ? <span className={`flex items-center gap-1 text-xs font-semibold ${/now/i.test(availability.longTerm) ? 'text-green-600' : 'text-amber-700'}`}>
-                        <span className={`h-1.5 w-1.5 rounded-full ${/now/i.test(availability.longTerm) ? 'bg-green-500' : 'bg-amber-500'}`} />
-                        {availability.longTerm}
-                      </span>
-                    : null
-                }
-              </div>
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700 mb-3">Monthly lease</p>
 
               {/* Tier table */}
               <div className="space-y-2">
@@ -158,23 +147,35 @@ export default function UnitModal({ unit, onClose }: UnitModalProps) {
                   const mxn = Math.round(unit.monthlyRateMXN * tier.multiplier);
                   const usd = rate > 0 ? Math.floor(mxn / rate).toLocaleString() : '—';
                   const isAnnual = tier.multiplier === 1;
+                  const tierAvail = availability?.[tier.availKey as keyof Availability] ?? null;
+                  const isNow = tierAvail ? /now/i.test(tierAvail) : false;
                   return (
                     <div
                       key={tier.label}
-                      className={`flex items-center gap-3 text-sm ${isAnnual ? 'pt-2 border-t border-amber-200 font-semibold' : ''}`}
+                      className={`text-sm ${isAnnual ? 'pt-2 border-t border-amber-200 font-semibold' : ''}`}
                     >
-                      <span className={`w-24 shrink-0 text-xs ${isAnnual ? 'text-amber-800' : 'text-slate-500'}`}>
-                        {tier.label}
-                      </span>
-                      <span className={`flex-1 ${isAnnual ? 'text-slate-900' : 'text-slate-700'}`}>
-                        {es
-                          ? <>${mxn.toLocaleString()} <span className={`text-xs font-normal ${isAnnual ? 'text-slate-500' : 'text-slate-400'}`}>MXN</span></>
-                          : <>${usd} <span className={`text-xs font-normal ${isAnnual ? 'text-slate-500' : 'text-slate-400'}`}>USD</span></>
-                        }
-                      </span>
-                      <span className={`shrink-0 text-xs font-semibold ${isAnnual ? 'text-amber-600' : 'text-slate-400'}`}>
-                        {tier.badge}
-                      </span>
+                      <div className="flex items-center gap-3">
+                        <span className={`w-24 shrink-0 text-xs ${isAnnual ? 'text-amber-800' : 'text-slate-500'}`}>
+                          {tier.label}
+                        </span>
+                        <span className={`flex-1 ${isAnnual ? 'text-slate-900' : 'text-slate-700'}`}>
+                          {es
+                            ? <>${mxn.toLocaleString()} <span className={`text-xs font-normal ${isAnnual ? 'text-slate-500' : 'text-slate-400'}`}>MXN/mo</span></>
+                            : <>${usd} <span className={`text-xs font-normal ${isAnnual ? 'text-slate-500' : 'text-slate-400'}`}>USD/mo</span></>
+                          }
+                        </span>
+                        <span className={`shrink-0 text-xs font-semibold ${isAnnual ? 'text-amber-600' : 'text-slate-400'}`}>
+                          {tier.badge}
+                        </span>
+                      </div>
+                      {!availLoading && tierAvail && (
+                        <div className="pl-24 mt-0.5">
+                          <span className={`flex items-center gap-1 text-xs font-semibold ${isNow ? 'text-green-600' : 'text-amber-600'}`}>
+                            <span className={`h-1.5 w-1.5 rounded-full flex-shrink-0 ${isNow ? 'bg-green-500' : 'bg-amber-500'}`} />
+                            {tierAvail}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   );
                 })}

@@ -20,7 +20,18 @@ export default function HomePage() {
   const [contactOpen, setContactOpen] = useState(false);
   const { t } = useLanguage();
 
-  const galleryImages = Array.from({ length: 19 }, (_, index) => `/imgs/OaxacaPicture_${index + 1}.jpg`);
+  const galleryImages = [
+    '/imgs/OaxacaPicture_1.jpg',
+    '/imgs/OaxacaPicture_2.jpg',
+    '/imgs/OaxacaPicture_3.jpg',
+    '/imgs/OaxacaPicture_4.jpg',
+    '/imgs/OaxacaPicture_5.jpg',
+    '/imgs/OaxacaPicture_6.jpg',
+    '/imgs/OaxacaPicture_7.png',
+    '/imgs/OaxacaPicture_8.jpg',
+    '/imgs/OaxacaPicture_9.jpg',
+    '/imgs/OaxacaPicture_10.jpg',
+  ];
 
   const features = [
     {

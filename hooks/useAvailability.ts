@@ -14,14 +14,22 @@ const cache: Record<string, { data: Availability; ts: number }> = {};
 const CACHE_TTL = 60 * 60 * 1000;
 
 export default function useAvailability(slug: string) {
-  const cached = cache[slug];
-  const [availability, setAvailability] = useState<Availability | null>(
-    cached && Date.now() - cached.ts < CACHE_TTL ? cached.data : null
-  );
-  const [loading, setLoading] = useState(!availability);
+  const getInitial = () => {
+    if (!slug) return null;
+    const cached = cache[slug];
+    return cached && Date.now() - cached.ts < CACHE_TTL ? cached.data : null;
+  };
+  const [availability, setAvailability] = useState<Availability | null>(getInitial);
+  const [loading, setLoading] = useState(() => !getInitial());
 
   useEffect(() => {
-    if (availability) return;
+    if (!slug) return;
+    const cached = cache[slug];
+    if (cached && Date.now() - cached.ts < CACHE_TTL) {
+      setAvailability(cached.data);
+      setLoading(false);
+      return;
+    }
     let cancelled = false;
     setLoading(true);
 

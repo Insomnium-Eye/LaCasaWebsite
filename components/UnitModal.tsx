@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Unit } from '../data/units';
+import { Unit, LEASE_TIERS } from '../data/units';
 import { useLanguage } from '../contexts/LanguageContext';
 import useUsdToMxn from '../hooks/useUsdToMxn';
 import useAvailability from '../hooks/useAvailability';
@@ -134,10 +134,10 @@ export default function UnitModal({ unit, onClose }: UnitModalProps) {
               <p className="mt-1 text-xs text-slate-400">Nightly rate based on demand, before discounts.</p>
             </div>
 
-            {/* Long-term */}
+            {/* Monthly lease — tiered */}
             <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
-              <div className="flex items-center justify-between gap-2 mb-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Long-term · 1-year lease</p>
+              <div className="flex items-center justify-between gap-2 mb-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">Monthly lease</p>
                 {availLoading
                   ? <span className="text-xs text-slate-400">—</span>
                   : availability?.longTerm
@@ -148,15 +148,37 @@ export default function UnitModal({ unit, onClose }: UnitModalProps) {
                     : null
                 }
               </div>
-              <p className="text-lg font-semibold text-slate-900">
-                ${unit.monthlyRateMXN.toLocaleString()}
-                <span className="text-sm font-normal text-slate-500"> MXN/mo</span>
-                <span className="ml-2 text-sm font-normal text-slate-400">
-                  {rate > 0 ? `(~$${Math.floor(unit.monthlyRateMXN / rate).toLocaleString()} USD)` : ''}
-                </span>
-              </p>
-              <div className="mt-2 space-y-0.5 text-xs text-slate-500">
-                <p>Deposit: 1 month + ½ = <span className="font-semibold text-slate-700">${Math.round(unit.monthlyRateMXN * 1.5).toLocaleString()} MXN</span></p>
+
+              {/* Tier table */}
+              <div className="space-y-2">
+                {LEASE_TIERS.map((tier) => {
+                  const mxn = Math.round(unit.monthlyRateMXN * tier.multiplier);
+                  const usd = rate > 0 ? Math.floor(mxn / rate).toLocaleString() : '—';
+                  const isAnnual = tier.multiplier === 1;
+                  return (
+                    <div
+                      key={tier.label}
+                      className={`flex items-center gap-3 text-sm ${isAnnual ? 'pt-2 border-t border-amber-200 font-semibold' : ''}`}
+                    >
+                      <span className={`w-24 shrink-0 text-xs ${isAnnual ? 'text-amber-800' : 'text-slate-500'}`}>
+                        {tier.label}
+                      </span>
+                      <span className={`flex-1 ${isAnnual ? 'text-slate-900' : 'text-slate-700'}`}>
+                        ${mxn.toLocaleString()} MXN
+                        <span className={`ml-1 text-xs font-normal ${isAnnual ? 'text-slate-500' : 'text-slate-400'}`}>
+                          (~${usd} USD)
+                        </span>
+                      </span>
+                      <span className={`shrink-0 text-xs font-semibold ${isAnnual ? 'text-amber-600' : 'text-slate-400'}`}>
+                        {tier.badge}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="mt-3 pt-3 border-t border-amber-200 space-y-0.5 text-xs text-slate-500">
+                <p>Deposit upon approval: 1 month + ½ = <span className="font-semibold text-slate-700">${Math.round(unit.monthlyRateMXN * 1.5).toLocaleString()} MXN</span></p>
                 <p>Rent due the <span className="font-semibold text-slate-700">1st of every month</span></p>
               </div>
             </div>

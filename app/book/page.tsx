@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { units, Unit } from "../../data/units";
+import { units, Unit, LEASE_TIERS } from "../../data/units";
 import { useLanguage } from "../../contexts/LanguageContext";
 import BackgroundSlideshow from "../../components/BackgroundSlideshow";
 import LeaseApplicationForm from "../../components/LeaseApplicationForm";
@@ -72,25 +72,47 @@ export default function BookPage() {
         </div>
 
         {/* Lease terms notice */}
-        <div className="mb-10 rounded-3xl border border-amber-700/50 bg-amber-900/20 px-6 py-5 text-amber-200 text-sm space-y-2">
+        <div className="mb-10 rounded-3xl border border-amber-700/50 bg-amber-900/20 px-6 py-5 text-amber-200 text-sm space-y-4">
           <p className="font-semibold text-amber-100 text-xs uppercase tracking-wider">
-            {language === "es" ? "Términos del arrendamiento" : "Lease terms"}
+            {language === "es" ? "Tarifas por plazo — " : "Rates by lease term — "}
+            {t(`units.items.${selectedUnit.slug}.name`)}
           </p>
-          <ul className="space-y-1">
+
+          {/* Tier table */}
+          <div className="space-y-2">
+            {LEASE_TIERS.map((tier) => {
+              const mxn = Math.round(selectedUnit.monthlyRateMXN * tier.multiplier);
+              const usd = rate > 0 ? Math.floor(mxn / rate).toLocaleString() : '—';
+              const isAnnual = tier.multiplier === 1;
+              return (
+                <div key={tier.label} className={`flex items-center gap-3 ${isAnnual ? 'pt-2 border-t border-amber-700/40 font-semibold text-amber-100' : 'text-amber-200'}`}>
+                  <span className="w-28 shrink-0 text-xs">{tier.label}</span>
+                  <span className="flex-1">
+                    ${mxn.toLocaleString()} MXN
+                    <span className="ml-1 text-xs font-normal text-amber-300/70">(~${usd} USD)</span>
+                    <span className="ml-1 text-xs font-normal text-amber-400/70">/ mo</span>
+                  </span>
+                  <span className={`shrink-0 text-xs font-semibold ${isAnnual ? 'text-amber-300' : 'text-amber-400/60'}`}>
+                    {tier.badge}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
+          <ul className="space-y-1 text-amber-200/80 pt-1 border-t border-amber-700/30">
             <li>
-              <span className="font-semibold">{language === "es" ? "Depósito al ser aprobado:" : "Deposit upon approval:"}</span>
+              <span className="font-semibold text-amber-100">
+                {language === "es" ? "Depósito al ser aprobado:" : "Deposit upon approval:"}
+              </span>
               {" "}
-              {language === "es"
-                ? `1 mes + ½ mes de renta = $${Math.round(selectedUnit.monthlyRateMXN * 1.5).toLocaleString()} MXN${rate > 0 ? ` (~$${Math.floor(selectedUnit.monthlyRateMXN * 1.5 / rate).toLocaleString()} USD)` : ""}`
-                : `1 month + ½ month = $${Math.round(selectedUnit.monthlyRateMXN * 1.5).toLocaleString()} MXN${rate > 0 ? ` (~$${Math.floor(selectedUnit.monthlyRateMXN * 1.5 / rate).toLocaleString()} USD)` : ""}`}
+              {`1 month + ½ = $${Math.round(selectedUnit.monthlyRateMXN * 1.5).toLocaleString()} MXN${rate > 0 ? ` (~$${Math.floor(selectedUnit.monthlyRateMXN * 1.5 / rate).toLocaleString()} USD)` : ""}`}
             </li>
             <li>
-              <span className="font-semibold">{language === "es" ? "Renta mensual vence:" : "Rent due:"}</span>
+              <span className="font-semibold text-amber-100">
+                {language === "es" ? "Renta mensual vence:" : "Rent due:"}
+              </span>
               {" "}{language === "es" ? "el 1º de cada mes" : "the 1st of every month"}
-            </li>
-            <li>
-              <span className="font-semibold">{language === "es" ? "Plazo mínimo:" : "Minimum lease:"}</span>
-              {" "}1 {language === "es" ? "año" : "year"}
             </li>
           </ul>
         </div>

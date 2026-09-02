@@ -1,3 +1,10 @@
+export const LEASE_TIERS = [
+  { label: '1–3 months', term: 'mid-term',  multiplier: 1.15, badge: '+15%',     note: 'Mid-term' },
+  { label: '3–6 months', term: 'long-term', multiplier: 1.10, badge: '+10%',     note: 'Long-term' },
+  { label: '6–12 months', term: 'long-term', multiplier: 1.05, badge: '+5%',    note: 'Long-term' },
+  { label: '12 months',  term: 'annual',    multiplier: 1.00, badge: '★ best',  note: 'Annual' },
+] as const;
+
 export type Unit = {
   slug: string;
   name: string;

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Unit } from '../data/units';
+import { Unit, LEASE_TIERS } from '../data/units';
 import { useLanguage } from '../contexts/LanguageContext';
 import useAvailability from '../hooks/useAvailability';
 import useUsdToMxn from '../hooks/useUsdToMxn';
@@ -28,7 +28,6 @@ export default function UnitCard({ unit, onSelect, onInquire, showDetails }: Pro
   const { t } = useLanguage();
   const { rate } = useUsdToMxn();
   const { availability, loading } = useAvailability(unit.slug);
-  const monthlyUsd = rate > 0 ? Math.floor(unit.monthlyRateMXN / rate).toLocaleString() : '—';
 
   return (
     <article
@@ -96,23 +95,41 @@ export default function UnitCard({ unit, onSelect, onInquire, showDetails }: Pro
           <p className="text-xs text-slate-500">Nightly rate varies by demand, before discounts.</p>
         </div>
 
-        {/* Long-term */}
-        <div className="rounded-2xl border border-amber-900/40 bg-amber-950/20 px-4 py-3 space-y-2">
+        {/* Monthly lease — tiered */}
+        <div className="rounded-2xl border border-amber-900/40 bg-amber-950/20 px-4 py-3 space-y-2.5">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-400/80">Long-term · 1-year lease</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-400/80">Monthly lease</p>
             {loading
               ? <span className="text-xs text-slate-600">loading…</span>
               : <AvailBadge label={availability?.longTerm ?? null} />
             }
           </div>
-          <div className="flex items-center justify-between gap-2">
-            <div>
-              <p className="text-sm font-semibold text-white">
-                ${unit.monthlyRateMXN.toLocaleString()}
-                <span className="font-normal text-slate-400"> MXN/mo</span>
-              </p>
-              <p className="text-xs text-slate-500">${monthlyUsd} USD · fixed rate</p>
-            </div>
+
+          <div className="space-y-1.5">
+            {LEASE_TIERS.map((tier) => {
+              const mxn = Math.round(unit.monthlyRateMXN * tier.multiplier);
+              const isAnnual = tier.multiplier === 1;
+              return (
+                <div
+                  key={tier.label}
+                  className={`flex items-center gap-2 text-xs ${isAnnual ? 'pt-1.5 border-t border-amber-900/40' : ''}`}
+                >
+                  <span className={`w-20 shrink-0 ${isAnnual ? 'text-amber-200 font-semibold' : 'text-slate-400'}`}>
+                    {tier.label}
+                  </span>
+                  <span className={`flex-1 font-semibold ${isAnnual ? 'text-white' : 'text-slate-300'}`}>
+                    ${mxn.toLocaleString()} <span className="font-normal text-slate-500">MXN/mo</span>
+                  </span>
+                  <span className={`shrink-0 font-semibold ${isAnnual ? 'text-amber-300' : 'text-slate-500'}`}>
+                    {tier.badge}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="flex items-center justify-between pt-0.5">
+            <p className="text-xs text-slate-500">Base = 12-month annual rate</p>
             <button
               className="rounded-full bg-terracotta px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-[#b55e47] shrink-0"
               onClick={onInquire}

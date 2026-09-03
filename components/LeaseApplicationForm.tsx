@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Unit, units } from '../data/units';
 import { useLanguage } from '../contexts/LanguageContext';
 import useUsdToMxn from '../hooks/useUsdToMxn';
 import { COUNTRIES, countryFlag } from '../data/countryCodes';
+import useGeoDialCode from '../hooks/useGeoDialCode';
 
 interface Props {
   defaultUnit?: Unit | null;
@@ -28,27 +29,45 @@ const optionalBadge = (dark?: boolean, es?: boolean) => (
   </span>
 );
 
+function daysBetween(a: string, b: string) {
+  if (!a || !b) return null;
+  const ms = new Date(b).getTime() - new Date(a).getTime();
+  return Math.round(ms / 864e5);
+}
+
+const today = new Date().toISOString().split('T')[0];
+
 export default function LeaseApplicationForm({ defaultUnit, onSuccess, dark }: Props) {
   const { language } = useLanguage();
   const { rate } = useUsdToMxn();
   const es = language === 'es';
+  const { dialCode: geoDialCode, ready: geoReady } = useGeoDialCode();
 
   const [form, setForm] = useState({
     name: '',
     email: '',
-    nationality: '',
     phone: '',
     phoneDialCode: '+52',
     unitSlug: defaultUnit?.slug ?? units[0].slug,
+    checkIn: '',
+    checkOut: '',
     notes: '',
   });
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  useEffect(() => {
+    if (geoReady) setForm(prev => ({ ...prev, phoneDialCode: geoDialCode }));
+  }, [geoReady, geoDialCode]);
+
   const selectedUnit = units.find((u) => u.slug === form.unitSlug) ?? units[0];
   const liveUsd = rate > 0 ? Math.floor(selectedUnit.monthlyRateMXN / rate) : null;
   const depositMXN = Math.round(selectedUnit.monthlyRateMXN * 1.5);
   const depositUSD = rate > 0 ? Math.floor(depositMXN / rate) : null;
+
+  const stayDays = daysBetween(form.checkIn, form.checkOut);
+  const stayTooShort = stayDays !== null && stayDays < 30;
+  const stayValid = stayDays !== null && stayDays >= 30;
 
   const set = (key: string, value: string) =>
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -58,16 +77,19 @@ export default function LeaseApplicationForm({ defaultUnit, onSuccess, dark }: P
     if (!form.name.trim()) e.name = es ? 'Requerido' : 'Required';
     if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(form.email))
       e.email = es ? 'Correo inválido' : 'Invalid email';
+    if (!form.checkIn) e.checkIn = es ? 'Requerido' : 'Required';
+    if (!form.checkOut) e.checkOut = es ? 'Requerido' : 'Required';
+    if (stayTooShort)
+      e.checkOut = es
+        ? 'La estadía mínima es de 1 mes para arrendamiento mensual.'
+        : 'Minimum stay is 1 month for a monthly lease.';
     return e;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const errs = validate();
-    if (Object.keys(errs).length) {
-      setErrors(errs);
-      return;
-    }
+    if (Object.keys(errs).length) { setErrors(errs); return; }
     setErrors({});
     setStatus('sending');
 
@@ -78,9 +100,11 @@ export default function LeaseApplicationForm({ defaultUnit, onSuccess, dark }: P
         body: JSON.stringify({
           name: form.name,
           email: form.email,
-          nationality: form.nationality,
           phone: form.phone ? `${form.phoneDialCode} ${form.phone}` : '',
           unitName: selectedUnit.name,
+          checkIn: form.checkIn,
+          checkOut: form.checkOut,
+          stayDays,
           monthlyMxn: selectedUnit.monthlyRateMXN.toLocaleString(),
           monthlyUsd: typeof liveUsd === 'number' ? liveUsd.toLocaleString() : liveUsd,
           notes: form.notes,
@@ -154,10 +178,6 @@ export default function LeaseApplicationForm({ defaultUnit, onSuccess, dark }: P
               ${selectedUnit.monthlyRateMXN.toLocaleString()} MXN{liveUsd ? ` (~$${liveUsd.toLocaleString()} USD)` : ''}{' '}
               — <span className="font-semibold">{es ? 'vence el 1º de cada mes' : 'due on the 1st of every month'}</span>
             </p>
-            <p>
-              <span className="font-semibold">{es ? 'Plazo mínimo:' : 'Minimum term:'}</span>{' '}
-              {es ? '1 año' : '1 year'}
-            </p>
           </div>
         </div>
       </div>
@@ -191,55 +211,118 @@ export default function LeaseApplicationForm({ defaultUnit, onSuccess, dark }: P
         </div>
       </div>
 
-      {/* Nationality + Phone */}
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <label className={labelClass(dark)}>
-            {es ? 'Nacionalidad' : 'Nationality'}
-            {optionalBadge(dark, es)}
-          </label>
+      {/* Phone */}
+      <div>
+        <label className={labelClass(dark)}>
+          {es ? 'Teléfono' : 'Phone'}
+          {optionalBadge(dark, es)}
+        </label>
+        <div className={`mt-2 flex w-full rounded-2xl border overflow-hidden transition ${
+          dark
+            ? 'border-slate-600 bg-slate-800 focus-within:border-terracotta focus-within:ring-2 focus-within:ring-terracotta/20'
+            : 'border-slate-300 bg-slate-50 focus-within:border-garden focus-within:ring-2 focus-within:ring-garden/20'
+        }`}>
+          <select
+            value={form.phoneDialCode}
+            onChange={(e) => set('phoneDialCode', e.target.value)}
+            className={`flex-shrink-0 border-r px-3 py-3 text-xs outline-none cursor-pointer ${
+              dark ? 'bg-slate-700 border-slate-600 text-white' : 'bg-slate-100 border-slate-300 text-slate-900'
+            }`}
+          >
+            {COUNTRIES.map((c) => (
+              <option key={c.iso} value={c.dialCode}>
+                {countryFlag(c.iso)} {c.dialCode}
+              </option>
+            ))}
+          </select>
           <input
-            value={form.nationality}
-            onChange={(e) => set('nationality', e.target.value)}
-            className={inputClass(dark)}
-            placeholder={es ? 'Ej. Mexicana, Estadounidense…' : 'e.g. American, Mexican…'}
+            type="tel"
+            value={form.phone}
+            onChange={(e) => set('phone', e.target.value.replace(/\D/g, '').slice(0, 12))}
+            inputMode="numeric"
+            placeholder="555 555 5555"
+            className={`min-w-0 flex-1 bg-transparent px-3 py-3 text-sm outline-none ${
+              dark ? 'text-white placeholder-slate-400' : 'text-slate-900'
+            }`}
           />
         </div>
-        <div>
-          <label className={labelClass(dark)}>
-            {es ? 'Teléfono' : 'Phone'}
-            {optionalBadge(dark, es)}
-          </label>
-          <div className={`mt-2 flex w-full rounded-2xl border overflow-hidden transition ${
-            dark
-              ? 'border-slate-600 bg-slate-800 focus-within:border-terracotta focus-within:ring-2 focus-within:ring-terracotta/20'
-              : 'border-slate-300 bg-slate-50 focus-within:border-garden focus-within:ring-2 focus-within:ring-garden/20'
-          }`}>
-            <select
-              value={form.phoneDialCode}
-              onChange={(e) => set('phoneDialCode', e.target.value)}
-              className={`flex-shrink-0 border-r px-3 py-3 text-xs outline-none cursor-pointer ${
-                dark ? 'bg-slate-700 border-slate-600 text-white' : 'bg-slate-100 border-slate-300 text-slate-900'
-              }`}
-            >
-              {COUNTRIES.map((c) => (
-                <option key={c.iso} value={c.dialCode}>
-                  {countryFlag(c.iso)} {c.dialCode}
-                </option>
-              ))}
-            </select>
+      </div>
+
+      {/* Length of stay */}
+      <div>
+        <label className={labelClass(dark)}>
+          {es ? 'Duración de la estadía' : 'Length of stay'} <span className="text-red-500">*</span>
+        </label>
+        <div className="mt-2 grid gap-3 sm:grid-cols-2">
+          <div>
+            <p className={`mb-1 text-xs ${dark ? 'text-slate-400' : 'text-slate-500'}`}>
+              {es ? 'Fecha de entrada' : 'Move-in date'}
+            </p>
             <input
-              type="tel"
-              value={form.phone}
-              onChange={(e) => set('phone', e.target.value.replace(/\D/g, '').slice(0, 12))}
-              inputMode="numeric"
-              placeholder="555 555 5555"
-              className={`min-w-0 flex-1 bg-transparent px-3 py-3 text-sm outline-none ${
-                dark ? 'text-white placeholder-slate-400' : 'text-slate-900'
+              type="date"
+              min={today}
+              value={form.checkIn}
+              onChange={(e) => {
+                set('checkIn', e.target.value);
+                if (form.checkOut && e.target.value > form.checkOut) set('checkOut', '');
+              }}
+              className={`w-full rounded-2xl border p-3 outline-none text-sm transition ${
+                dark
+                  ? 'border-slate-600 bg-slate-800 text-white focus:border-terracotta focus:ring-2 focus:ring-terracotta/20'
+                  : 'border-slate-300 bg-slate-50 text-slate-900 focus:border-garden focus:ring-2 focus:ring-garden/20'
               }`}
             />
+            {err('checkIn')}
+          </div>
+          <div>
+            <p className={`mb-1 text-xs ${dark ? 'text-slate-400' : 'text-slate-500'}`}>
+              {es ? 'Fecha de salida' : 'Move-out date'}
+            </p>
+            <input
+              type="date"
+              min={form.checkIn || today}
+              value={form.checkOut}
+              onChange={(e) => set('checkOut', e.target.value)}
+              className={`w-full rounded-2xl border p-3 outline-none text-sm transition ${
+                dark
+                  ? 'border-slate-600 bg-slate-800 text-white focus:border-terracotta focus:ring-2 focus:ring-terracotta/20'
+                  : 'border-slate-300 bg-slate-50 text-slate-900 focus:border-garden focus:ring-2 focus:ring-garden/20'
+              }`}
+            />
+            {err('checkOut')}
           </div>
         </div>
+
+        {/* Duration summary */}
+        {stayValid && (
+          <p className={`mt-2 text-xs font-semibold ${dark ? 'text-green-400' : 'text-green-700'}`}>
+            {es
+              ? `✓ ${Math.round(stayDays! / 30.44)} mes${Math.round(stayDays! / 30.44) !== 1 ? 'es' : ''} (${stayDays} días)`
+              : `✓ ${Math.round(stayDays! / 30.44)} month${Math.round(stayDays! / 30.44) !== 1 ? 's' : ''} (${stayDays} days)`}
+          </p>
+        )}
+
+        {/* Short-stay warning */}
+        {stayTooShort && (
+          <div className={`mt-2 rounded-xl border p-3 text-xs ${
+            dark ? 'border-amber-600/50 bg-amber-900/20 text-amber-300' : 'border-amber-300 bg-amber-50 text-amber-800'
+          }`}>
+            <p className="font-semibold">
+              {es ? 'Las estancias de menos de 1 mes no aplican para arrendamiento mensual.' : 'Stays under 1 month are not eligible for a monthly lease.'}
+            </p>
+            <p className="mt-1">
+              {es ? 'Para estadías cortas, reserva directamente en Airbnb: ' : 'For short-term stays, book directly on Airbnb: '}
+              <a
+                href={selectedUnit.airbnbUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline font-semibold hover:opacity-80 transition"
+              >
+                {es ? 'Ver en Airbnb ↗' : 'View on Airbnb ↗'}
+              </a>
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Notes */}
@@ -255,8 +338,8 @@ export default function LeaseApplicationForm({ defaultUnit, onSuccess, dark }: P
           className={`${inputClass(dark)} resize-none`}
           placeholder={
             es
-              ? 'Fecha de mudanza preferida, preguntas u otro contexto…'
-              : 'Preferred move-in date, questions, or any other context…'
+              ? 'Preguntas u otro contexto…'
+              : 'Questions or any other context…'
           }
         />
       </div>

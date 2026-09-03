@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { Unit, LEASE_TIERS } from '../data/units';
 import { useLanguage } from '../contexts/LanguageContext';
 import useAvailability, { Availability } from '../hooks/useAvailability';
@@ -69,8 +68,14 @@ export default function UnitCard({ unit, onSelect, onInquire, showDetails }: Pro
           </ul>
         )}
 
-        {/* Short-term */}
-        <div className="rounded-2xl border border-slate-700/60 bg-slate-800/40 px-4 py-3 space-y-2">
+        {/* Short-term — entire div navigates to Airbnb */}
+        <div
+          role="link"
+          tabIndex={0}
+          onClick={(e) => { e.stopPropagation(); window.open(unit.airbnbUrl, '_blank', 'noopener,noreferrer'); }}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); window.open(unit.airbnbUrl, '_blank', 'noopener,noreferrer'); } }}
+          className="rounded-2xl border border-slate-700/60 bg-slate-800/40 px-4 py-3 space-y-2 cursor-pointer hover:border-slate-500/80 hover:bg-slate-700/40 transition"
+        >
           <div className="flex items-center justify-between gap-2">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
               {es ? 'Corto plazo · Airbnb' : 'Short-term · Airbnb'}
@@ -87,23 +92,20 @@ export default function UnitCard({ unit, onSelect, onInquire, showDetails }: Pro
                 : <>${unit.shortTermMin}–${unit.shortTermMax}<span className="font-normal text-slate-400"> USD/night</span></>
               }
             </p>
-            <Link
-              href={unit.airbnbUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs font-semibold text-terracotta hover:text-[#b55e47] shrink-0 transition"
-              onClick={(e) => e.stopPropagation()}
-            >
+            <span className="text-xs font-semibold text-terracotta shrink-0">
               {es ? 'Ver en Airbnb ↗' : 'View on Airbnb ↗'}
-            </Link>
+            </span>
           </div>
           <p className="text-xs text-slate-500">
             {es ? 'Tarifa nocturna varía según demanda, antes de descuentos.' : 'Nightly rate varies by demand, before discounts.'}
           </p>
         </div>
 
-        {/* Monthly lease — tiered */}
-        <div className="rounded-2xl border border-amber-900/40 bg-amber-950/20 px-4 py-3 space-y-2.5">
+        {/* Monthly lease — entire div opens inquire modal */}
+        <div
+          onClick={(e) => { e.stopPropagation(); onInquire(e); }}
+          className="rounded-2xl border border-amber-900/40 bg-amber-950/20 px-4 py-3 space-y-2.5 cursor-pointer hover:border-amber-700/50 hover:bg-amber-950/30 transition"
+        >
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-400/80">
             {es ? 'Arrendamiento mensual' : 'Monthly lease'}
           </p>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Unit, units } from '../data/units';
 import { useLanguage } from '../contexts/LanguageContext';
 import useUsdToMxn from '../hooks/useUsdToMxn';
@@ -55,6 +55,9 @@ export default function LeaseApplicationForm({ defaultUnit, onSuccess, dark }: P
   });
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const checkInRef = useRef<HTMLInputElement>(null);
+  const checkOutRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (geoReady) setForm(prev => ({ ...prev, phoneDialCode: geoDialCode }));
@@ -254,11 +257,15 @@ export default function LeaseApplicationForm({ defaultUnit, onSuccess, dark }: P
           {es ? 'Duración de la estadía' : 'Length of stay'} <span className="text-red-500">*</span>
         </label>
         <div className="mt-2 grid gap-3 sm:grid-cols-2">
-          <div>
+          <div
+            className="cursor-pointer"
+            onClick={() => { checkInRef.current?.showPicker?.(); checkInRef.current?.focus(); }}
+          >
             <p className={`mb-1 text-xs ${dark ? 'text-slate-400' : 'text-slate-500'}`}>
               {es ? 'Fecha de entrada' : 'Move-in date'}
             </p>
             <input
+              ref={checkInRef}
               type="date"
               min={today}
               value={form.checkIn}
@@ -266,7 +273,7 @@ export default function LeaseApplicationForm({ defaultUnit, onSuccess, dark }: P
                 set('checkIn', e.target.value);
                 if (form.checkOut && e.target.value > form.checkOut) set('checkOut', '');
               }}
-              className={`w-full rounded-2xl border p-3 outline-none text-sm transition ${
+              className={`w-full rounded-2xl border p-3 outline-none text-sm transition cursor-pointer ${
                 dark
                   ? 'border-slate-600 bg-slate-800 text-white focus:border-terracotta focus:ring-2 focus:ring-terracotta/20'
                   : 'border-slate-300 bg-slate-50 text-slate-900 focus:border-garden focus:ring-2 focus:ring-garden/20'
@@ -274,16 +281,20 @@ export default function LeaseApplicationForm({ defaultUnit, onSuccess, dark }: P
             />
             {err('checkIn')}
           </div>
-          <div>
+          <div
+            className="cursor-pointer"
+            onClick={() => { checkOutRef.current?.showPicker?.(); checkOutRef.current?.focus(); }}
+          >
             <p className={`mb-1 text-xs ${dark ? 'text-slate-400' : 'text-slate-500'}`}>
               {es ? 'Fecha de salida' : 'Move-out date'}
             </p>
             <input
+              ref={checkOutRef}
               type="date"
               min={form.checkIn || today}
               value={form.checkOut}
               onChange={(e) => set('checkOut', e.target.value)}
-              className={`w-full rounded-2xl border p-3 outline-none text-sm transition ${
+              className={`w-full rounded-2xl border p-3 outline-none text-sm transition cursor-pointer ${
                 dark
                   ? 'border-slate-600 bg-slate-800 text-white focus:border-terracotta focus:ring-2 focus:ring-terracotta/20'
                   : 'border-slate-300 bg-slate-50 text-slate-900 focus:border-garden focus:ring-2 focus:ring-garden/20'

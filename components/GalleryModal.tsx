@@ -1,24 +1,35 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useLanguage } from "../contexts/LanguageContext";
+import { GALLERY_CATEGORIES, GalleryCategory, getGalleryImages } from "../data/gallery";
+import GalleryFilters, { toggleInSet } from "./GalleryFilters";
 
 interface GalleryModalProps {
-  images: string[];
+  /** Fixed set of images. When omitted, the full property gallery is shown with area filters. */
+  images?: string[];
   initialIndex?: number;
   onClose: () => void;
 }
 
-export default function GalleryModal({ images, initialIndex = 0, onClose }: GalleryModalProps) {
+export default function GalleryModal({ images: fixedImages, initialIndex = 0, onClose }: GalleryModalProps) {
   const { t } = useLanguage();
   const [activeIndex, setActiveIndex] = useState(initialIndex);
   const [view, setView] = useState<"single" | "grid">("single");
+  const [selected, setSelected] = useState<Set<GalleryCategory>>(() => new Set(GALLERY_CATEGORIES));
+  const filterable = !fixedImages;
+  const images = useMemo(() => fixedImages ?? getGalleryImages(selected), [fixedImages, selected]);
+
+  const toggleCategory = (category: GalleryCategory) => {
+    setSelected((prev) => toggleInSet(prev, category));
+    setActiveIndex(0);
+  };
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
-      if (view === "single") {
+      if (view === "single" && images.length) {
         if (e.key === "ArrowLeft") setActiveIndex((p) => (p - 1 + images.length) % images.length);
         if (e.key === "ArrowRight") setActiveIndex((p) => (p + 1) % images.length);
       }
@@ -27,7 +38,7 @@ export default function GalleryModal({ images, initialIndex = 0, onClose }: Gall
     return () => document.removeEventListener("keydown", handleKey);
   }, [onClose, view, images.length]);
 
-  if (!images.length) return null;
+  if (!filterable && !images.length) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onClick={onClose}>
@@ -37,7 +48,7 @@ export default function GalleryModal({ images, initialIndex = 0, onClose }: Gall
         <div className="flex items-center justify-between gap-4 border-b border-slate-700 pb-4">
           <div>
             <p className="text-sm uppercase tracking-[0.24em] text-slate-400">{t("home.galleryTitle")}</p>
-            {view === "single" && (
+            {view === "single" && images.length > 0 && (
               <p className="text-sm text-slate-300">{`${activeIndex + 1} / ${images.length}`}</p>
             )}
           </div>
@@ -75,8 +86,16 @@ export default function GalleryModal({ images, initialIndex = 0, onClose }: Gall
           </div>
         </div>
 
+        {filterable && (
+          <GalleryFilters selected={selected} onToggle={toggleCategory} className="mt-4" />
+        )}
+
+        {images.length === 0 && (
+          <p className="py-16 text-center text-slate-300">{t("gallery.empty")}</p>
+        )}
+
         {/* Single view */}
-        {view === "single" && (
+        {view === "single" && images.length > 0 && (
           <>
             <div className="mt-6 rounded-3xl bg-slate-900 p-2">
               <div className="relative aspect-[16/10] max-h-[55vh] w-full overflow-hidden rounded-3xl bg-slate-800">

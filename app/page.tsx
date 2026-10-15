@@ -10,6 +10,7 @@ import GalleryModal from "../components/GalleryModal";
 import ContactModal from "../components/ContactModal";
 import LeaseApplicationModal from "../components/LeaseApplicationModal";
 import UnitCard from "../components/UnitCard";
+import EntireHomeCard from "../components/EntireHomeCard";
 import { useLanguage } from "../contexts/LanguageContext";
 
 export default function HomePage() {
@@ -19,19 +20,7 @@ export default function HomePage() {
   const [galleryIndex, setGalleryIndex] = useState(0);
   const [contactOpen, setContactOpen] = useState(false);
   const { t } = useLanguage();
-
-  const galleryImages = [
-    '/imgs/OaxacaPicture_1.jpg',
-    '/imgs/OaxacaPicture_2.jpg',
-    '/imgs/OaxacaPicture_3.jpg',
-    '/imgs/OaxacaPicture_4.jpg',
-    '/imgs/OaxacaPicture_5.jpg',
-    '/imgs/OaxacaPicture_6.jpg',
-    '/imgs/OaxacaPicture_7.png',
-    '/imgs/OaxacaPicture_8.jpg',
-    '/imgs/OaxacaPicture_9.jpg',
-    '/imgs/OaxacaPicture_10.jpg',
-  ];
+  const entireHome = units.find((unit) => unit.annualOnly);
 
   const features = [
     {
@@ -146,7 +135,7 @@ export default function HomePage() {
           <Link href="/units" className="text-sm font-semibold text-terracotta hover:text-[#a95b48]">{t("home.seeAllUnits")}</Link>
         </div>
         <div className="mt-10 grid gap-6 md:grid-cols-3">
-          {units.filter((unit) => unit.slug !== 'entire-house').map((unit) => (
+          {units.filter((unit) => !unit.annualOnly).map((unit) => (
             <UnitCard
               key={unit.slug}
               unit={unit}
@@ -156,6 +145,11 @@ export default function HomePage() {
           ))}
         </div>
 
+        {entireHome && (
+          <div className="mt-6">
+            <EntireHomeCard unit={entireHome} onInquire={() => setApplyUnit(entireHome)} />
+          </div>
+        )}
       </section>
 
       {/* Good to Know */}
@@ -179,7 +173,6 @@ export default function HomePage() {
       <UnitModal unit={selectedUnit} onClose={() => setSelectedUnit(null)} />
       {galleryOpen && (
         <GalleryModal
-          images={galleryImages}
           initialIndex={galleryIndex}
           onClose={() => setGalleryOpen(false)}
         />

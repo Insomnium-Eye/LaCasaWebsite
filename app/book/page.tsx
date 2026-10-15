@@ -44,7 +44,7 @@ export default function BookPage() {
 
         {/* Unit Pricing Cards */}
         <div className="mb-10 grid gap-4 sm:grid-cols-3">
-          {units.map((unit) => {
+          {units.filter((unit) => !unit.annualOnly).map((unit) => {
             const usd = rate > 0 ? Math.floor(unit.monthlyRateMXN / rate).toLocaleString() : '—';
             return (
               <button

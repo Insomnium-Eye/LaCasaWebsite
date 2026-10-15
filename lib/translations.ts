@@ -159,14 +159,14 @@ export const translations = {
       heading: "Gallery",
       title: "A curated preview of the property.",
       description: "Responsive photography-style sections with interior, garden, and sunset views designed for an elegant property showcase.",
-      items: [
-        "Exterior views",
-        "Garden details",
-        "Sunset patio",
-        "Interior lounge",
-        "Bedroom comfort",
-        "Stargazing bathtub"
-      ]
+      filterLabel: "Show",
+      filters: {
+        exterior: "Exterior",
+        mainRoom: "Main Room",
+        bungalow1: "Bungalow 1",
+        bungalow2: "Bungalow 2"
+      },
+      empty: "Select at least one area to see photos."
     },
     book: {
       heading: "Lease Inquiry",
@@ -309,6 +309,12 @@ export const translations = {
       capacityLabel: "Capacity:",
       guestsLabel: "occupants",
       checkAvailability: "Inquire",
+      entireHome: {
+        leaseBadge: "1-year lease only",
+        perMonth: "/month",
+        leaseNote: "The entire home is only available on a 12-month lease. We do not accept short-term or month-to-month rentals for the full property.",
+        inquire: "Apply for the entire home"
+      },
       items: {
         "bungalow-1": {
           name: "Sun of My Heart",
@@ -332,7 +338,7 @@ export const translations = {
           terrace: "Shared courtyard access"
         },
         "entire-house": {
-          name: "Entire House",
+          name: "Entire Home",
           type: "Full property rental",
           summary: "Rent the entire beautiful property including all bungalows and the main residence (office and master bedroom remain locked).",
           bathroom: "Multiple bathrooms",
@@ -765,14 +771,14 @@ export const translations = {
       heading: "Galería",
       title: "Una vista curada de la propiedad.",
       description: "Secciones fotográficas receptivas con vistas interiores, de jardín y atardecer diseñadas para una exhibición elegante de la propiedad.",
-      items: [
-        "Vistas exteriores",
-        "Detalles del jardín",
-        "Patio al atardecer",
-        "Sala interior",
-        "Confort en el dormitorio",
-        "Tina para observar las estrellas"
-      ]
+      filterLabel: "Mostrar",
+      filters: {
+        exterior: "Exterior",
+        mainRoom: "Habitación Principal",
+        bungalow1: "Bungalow 1",
+        bungalow2: "Bungalow 2"
+      },
+      empty: "Selecciona al menos un área para ver fotos."
     },
     book: {
       heading: "Consulta de Arrendamiento",
@@ -918,6 +924,12 @@ export const translations = {
       capacityLabel: "Capacidad:",
       guestsLabel: "ocupantes",
       checkAvailability: "Consultar",
+      entireHome: {
+        leaseBadge: "Solo contrato de 1 año",
+        perMonth: "/mes",
+        leaseNote: "La casa completa solo está disponible con contrato de 12 meses. No aceptamos rentas de corto plazo ni mes a mes para la propiedad completa.",
+        inquire: "Solicitar la casa completa"
+      },
       items: {
         "bungalow-1": {
           name: "Sol de mi Corazón",

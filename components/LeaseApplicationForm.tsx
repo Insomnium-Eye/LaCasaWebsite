@@ -69,8 +69,9 @@ export default function LeaseApplicationForm({ defaultUnit, onSuccess, dark }: P
   const depositUSD = rate > 0 ? Math.floor(depositMXN / rate) : null;
 
   const stayDays = daysBetween(form.checkIn, form.checkOut);
-  const stayTooShort = stayDays !== null && stayDays < 30;
-  const stayValid = stayDays !== null && stayDays >= 30;
+  const minStayDays = selectedUnit.annualOnly ? 365 : 30;
+  const stayTooShort = stayDays !== null && stayDays < minStayDays;
+  const stayValid = stayDays !== null && stayDays >= minStayDays;
 
   const set = (key: string, value: string) =>
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -82,7 +83,11 @@ export default function LeaseApplicationForm({ defaultUnit, onSuccess, dark }: P
       e.email = es ? 'Correo inválido' : 'Invalid email';
     if (!form.checkIn) e.checkIn = es ? 'Requerido' : 'Required';
     if (!form.checkOut) e.checkOut = es ? 'Requerido' : 'Required';
-    if (stayTooShort)
+    if (stayTooShort && selectedUnit.annualOnly)
+      e.checkOut = es
+        ? 'La casa completa requiere un contrato mínimo de 1 año.'
+        : 'The entire home requires a minimum 1-year lease.';
+    else if (stayTooShort)
       e.checkOut = es
         ? 'La estadía mínima es de 1 mes para arrendamiento mensual.'
         : 'Minimum stay is 1 month for a monthly lease.';
@@ -313,8 +318,19 @@ export default function LeaseApplicationForm({ defaultUnit, onSuccess, dark }: P
           </p>
         )}
 
+        {/* Annual-only warning */}
+        {stayTooShort && selectedUnit.annualOnly && (
+          <div className={`mt-2 rounded-xl border p-3 text-xs ${
+            dark ? 'border-amber-600/50 bg-amber-900/20 text-amber-300' : 'border-amber-300 bg-amber-50 text-amber-800'
+          }`}>
+            <p className="font-semibold">
+              {es ? 'La casa completa solo se renta con contrato de 1 año.' : 'The entire home is only available on a 1-year lease.'}
+            </p>
+          </div>
+        )}
+
         {/* Short-stay warning */}
-        {stayTooShort && (
+        {stayTooShort && !selectedUnit.annualOnly && (
           <div className={`mt-2 rounded-xl border p-3 text-xs ${
             dark ? 'border-amber-600/50 bg-amber-900/20 text-amber-300' : 'border-amber-300 bg-amber-50 text-amber-800'
           }`}>

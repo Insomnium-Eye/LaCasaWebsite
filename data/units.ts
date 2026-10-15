@@ -19,6 +19,8 @@ export type Unit = {
   airbnbUrl: string;
   displayImage?: string;
   galleryImages?: string[];
+  /** Only leased on a 12-month term — no short-term or monthly tiers. */
+  annualOnly?: boolean;
 };
 
 export const units: Unit[] = [
@@ -89,5 +91,20 @@ export const units: Unit[] = [
       "/imgs/Room/bed2.jpg",
       "/imgs/Room/kitchen.jpg"
     ]
+  },
+  {
+    slug: "entire-house",
+    name: "Entire Home",
+    type: "Full property",
+    summary: "The whole property: both bungalows, the main residence, and the gardens.",
+    capacity: 6,
+    bathroom: "Multiple bathrooms",
+    terrace: "Multiple terraces and garden areas",
+    monthlyRateMXN: 55000,
+    shortTermMin: 0,
+    shortTermMax: 0,
+    airbnbUrl: "",
+    displayImage: "/imgs/OaxacaPicture_1.jpg",
+    annualOnly: true
   },
 ];

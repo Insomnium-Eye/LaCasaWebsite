@@ -6,6 +6,7 @@ import { units, Unit } from "../../data/units";
 import UnitModal from "../../components/UnitModal";
 import LeaseApplicationModal from "../../components/LeaseApplicationModal";
 import UnitCard from "../../components/UnitCard";
+import EntireHomeCard from "../../components/EntireHomeCard";
 import { useLanguage } from "../../contexts/LanguageContext";
 import BackgroundSlideshow from "../../components/BackgroundSlideshow";
 
@@ -13,6 +14,7 @@ export default function UnitsPage() {
   const { t } = useLanguage();
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
   const [applyUnit, setApplyUnit] = useState<Unit | null>(null);
+  const entireHome = units.find((unit) => unit.annualOnly);
 
   return (
     <div className="relative overflow-hidden bg-black text-white min-h-screen">
@@ -37,7 +39,7 @@ export default function UnitsPage() {
           </div>
         </div>
         <div className="mt-12 grid gap-8 lg:grid-cols-3">
-          {units.map((unit) => (
+          {units.filter((unit) => !unit.annualOnly).map((unit) => (
             <UnitCard
               key={unit.slug}
               unit={unit}
@@ -47,6 +49,12 @@ export default function UnitsPage() {
             />
           ))}
         </div>
+
+        {entireHome && (
+          <div className="mt-8">
+            <EntireHomeCard unit={entireHome} onInquire={() => setApplyUnit(entireHome)} />
+          </div>
+        )}
       </div>
       <UnitModal unit={selectedUnit} onClose={() => setSelectedUnit(null)} />
       {applyUnit && <LeaseApplicationModal unit={applyUnit} onClose={() => setApplyUnit(null)} />}

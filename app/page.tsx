@@ -180,6 +180,13 @@ export default function HomePage() {
       <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} />
       {applyUnit && <LeaseApplicationModal unit={applyUnit} onClose={() => setApplyUnit(null)} />}
       </div>
+      {/* Sticky "buy instead" link — sits above the language toggle in the bottom-right corner */}
+      <a
+        href="https://oaxaca-house-for-sale.com"
+        className="fixed bottom-20 right-6 z-40 rounded-full bg-terracotta px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-black/40 transition hover:bg-[#b55e47] active:scale-95"
+      >
+        {t("home.buyInstead")}
+      </a>
     </div>
   );
 }

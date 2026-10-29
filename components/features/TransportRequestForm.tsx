@@ -5,32 +5,8 @@ import { GuestSession } from '@/types/guest-portal';
 import { useLanguage } from '@/contexts/LanguageContext';
 import useUsdToMxn from '@/hooks/useUsdToMxn';
 import DateInput from '@/components/DateInput';
-
-interface Destination {
-  id: string;
-  emoji: string;
-  name: { en: string; es: string };
-  priceUsd: number;
-  duration: { en: string; es: string };
-}
-
-const DESTINATIONS: Destination[] = [
-  { id: 'airport',          emoji: '✈️',  name: { en: 'Airport – Xoxocotlán International (OAX)',                    es: 'Aeropuerto – Internacional Xoxocotlán (OAX)' },                    priceUsd: 50,    duration: { en: '15–25 min',                          es: '15–25 min' } },
-  { id: 'el_llano',         emoji: '🌳',  name: { en: 'El Llano (Parque Juárez)',                                     es: 'El Llano (Parque Juárez)' },                                       priceUsd: 7.32,  duration: { en: '10–20 min',                          es: '10–20 min' } },
-  { id: 'zocalo',           emoji: '🏛️',  name: { en: 'Zócalo (Historic Main Square)',                                es: 'Zócalo (Plaza Principal Histórica)' },                              priceUsd: 7.32,  duration: { en: '12–25 min',                          es: '12–25 min' } },
-  { id: 'monte_alban',      emoji: '🗿',  name: { en: 'Monte Albán (Archaeological Site)',                            es: 'Monte Albán (Zona Arqueológica)' },                                 priceUsd: 80,    duration: { en: '20–35 min',                          es: '20–35 min' } },
-  { id: 'ado_station',      emoji: '🚌',  name: { en: 'ADO Bus Station',                                             es: 'Central de Autobuses ADO' },                                        priceUsd: 7.32,  duration: { en: '15–25 min',                          es: '15–25 min' } },
-  { id: 'hierve_el_agua',   emoji: '💧',  name: { en: 'Hierve el Agua (Petrified Waterfalls)',                        es: 'Hierve el Agua (Cascadas Petrificadas)' },                          priceUsd: 200,   duration: { en: '1.5–2.5 hrs · full-day recommended', es: '1.5–2.5 hrs · se recomienda día completo' } },
-  { id: 'arbol_tule',       emoji: '🌲',  name: { en: 'Árbol del Tule (Tree of Tule)',                                es: 'Árbol del Tule' },                                                  priceUsd: 10.74, duration: { en: '20–35 min',                          es: '20–35 min' } },
-  { id: 'mitla',            emoji: '🏺',  name: { en: 'Mitla (Archaeological Site)',                                  es: 'Mitla (Zona Arqueológica)' },                                       priceUsd: 110,   duration: { en: '50–75 min',                          es: '50–75 min' } },
-  { id: 'teotitlan',        emoji: '🧶',  name: { en: 'Teotitlán del Valle (Textile Village)',                        es: 'Teotitlán del Valle (Pueblo Textil)' },                             priceUsd: 90,    duration: { en: '45–60 min',                          es: '45–60 min' } },
-  { id: 'artisan_villages', emoji: '🎨',  name: { en: 'San Bartolo Coyotepec / San Martín Tilcajete (Artisan Villages)', es: 'San Bartolo Coyotepec / San Martín Tilcajete (Pueblos Artesanales)' }, priceUsd: 65, duration: { en: '25–40 min',                          es: '25–40 min' } },
-];
-
-// Round MXN down to nearest 10
-function floorToTen(mxn: number): number {
-  return Math.floor(mxn / 10) * 10;
-}
+import { MAX_PASSENGERS, TRANSPORT_DESTINATIONS, formatMxnWithUsd, getDestination, oneWayPriceMxn, tripPriceMxn } from '@/lib/transportPricing';
+import { startTransportCheckout } from '@/lib/transportCheckout';
 
 interface TransportRequestFormProps {
   session: GuestSession | null;
@@ -56,23 +32,13 @@ const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: Transport
   const [roundTrip, setRoundTrip] = useState(false);
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showPayment, setShowPayment] = useState(false);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [cancelled, setCancelled] = useState(false);
 
-  const PAYMENT_METHODS = [
-    { id: 'clabe',   icon: '🏦', label: 'CLABE (Mexican Bank Transfer)', detail: '002610702365656432', sub: 'Rosa Elena Duran Ramirez', note: 'SPEI transfer — include your travel date in the concept field.' },
-    { id: 'paypal',  icon: '🅿️', label: 'PayPal',    detail: 'insomnium-eye@live.com', note: 'Include your travel date in the payment note.' },
-    { id: 'cashapp', icon: '💵', label: 'Cash App',  detail: '$DavidGPiper',            note: 'Include your travel date in the note.' },
-    { id: 'venmo',   icon: '💙', label: 'Venmo',     detail: '@David-Piper-73',         note: 'Include your travel date in the note.' },
-  ];
-
-  function copyToClipboard(text: string, id: string) {
-    navigator.clipboard.writeText(text).then(() => {
-      setCopiedId(id);
-      setTimeout(() => setCopiedId(null), 2000);
-    });
-  }
+  // Stripe sends the guest back with ?payment=cancelled if they abandon checkout.
+  useEffect(() => {
+    setCancelled(new URLSearchParams(window.location.search).get('payment') === 'cancelled');
+  }, []);
 
   if (!session) return null;
 
@@ -82,70 +48,25 @@ const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: Transport
   const minDatetime = checkInDatetime > nowDatetime ? checkInDatetime : nowDatetime;
   const maxDatetime = session.checkOut.slice(0, 10) + 'T23:59';
 
-  const selectedDest = DESTINATIONS.find((d) => d.id === destinationId) ?? null;
-
-  // Price calculation: round trip = base × 2 × 0.9 (10% off)
-  const priceUsd = selectedDest
-    ? roundTrip
-      ? selectedDest.priceUsd * 2 * 0.9
-      : selectedDest.priceUsd
-    : 0;
-
-  function formatPrice(usd: number): string {
-    if (language === 'es') {
-      const mxn = floorToTen(usd * rate);
-      return `$${mxn.toLocaleString('es-MX')} MXN`;
-    }
-    return `$${usd.toFixed(2)} USD`;
-  }
-
-  function formatDropdownPrice(usd: number): string {
-    if (language === 'es') {
-      return `$${floorToTen(usd * rate).toLocaleString('es-MX')} MXN`;
-    }
-    return `$${usd.toFixed(0)}`;
-  }
+  const selectedDest = getDestination(destinationId);
+  const oneWayMxn = selectedDest ? oneWayPriceMxn(selectedDest) : 0;
+  const totalMxn = selectedDest ? tripPriceMxn(selectedDest, roundTrip) : 0;
+  const formatPrice = (mxn: number) => formatMxnWithUsd(mxn, language, rate);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedDest) return;
     setLoading(true);
     setError(null);
-    setShowPayment(false);
+    setCancelled(false);
 
-    try {
-      const response = await fetch('/api/requests/transport', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.token}`,
-        },
-        body: JSON.stringify({
-          destination: selectedDest.name.en,
-          datetime,
-          passengers,
-          roundTrip,
-          estimatedPriceUsd: priceUsd,
-          notes: notes || undefined,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.error || 'Failed to book transport');
-        return;
-      }
-
-      setShowPayment(true);
-      setDestinationId('');
-      setDatetime('');
-      setPassengers(1);
-      setRoundTrip(false);
-      setNotes('');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
+    const checkoutError = await startTransportCheckout(
+      { destinationId: selectedDest.id, datetime, passengers, roundTrip, notes: notes || undefined, language },
+      session.token
+    );
+    // On success the browser is already navigating to Stripe, so keep the spinner.
+    if (checkoutError) {
+      setError(checkoutError);
       setLoading(false);
     }
   };
@@ -170,9 +91,9 @@ const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: Transport
             required
           >
             <option value="">{t('portal.transportRequest.selectDestination')}</option>
-            {DESTINATIONS.map((dest) => (
+            {TRANSPORT_DESTINATIONS.map((dest) => (
               <option key={dest.id} value={dest.id}>
-                {dest.emoji} {dest.name[language === 'es' ? 'es' : 'en']} — {formatDropdownPrice(dest.priceUsd)} · {dest.duration[language === 'es' ? 'es' : 'en']}
+                {dest.emoji} {dest.name[language === 'es' ? 'es' : 'en']} — {formatPrice(oneWayPriceMxn(dest))} · {dest.duration[language === 'es' ? 'es' : 'en']}
               </option>
             ))}
           </select>
@@ -217,7 +138,7 @@ const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: Transport
               disabled={loading}
               className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-amber-600 transition-colors disabled:bg-gray-100"
             >
-              {[1, 2, 3, 4, 5, 6, 7].map((n) => (
+              {Array.from({ length: MAX_PASSENGERS }, (_, i) => i + 1).map((n) => (
                 <option key={n} value={n}>
                   {n} {n === 1 ? t('portal.transportRequest.person') : t('portal.transportRequest.people')}
                 </option>
@@ -263,26 +184,32 @@ const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: Transport
               <>
                 <div className="flex justify-between text-sm text-gray-700">
                   <span>{t('portal.transportRequest.oneWayX2')}</span>
-                  <span>{formatPrice(selectedDest.priceUsd * 2)}</span>
+                  <span>{formatPrice(oneWayMxn * 2)}</span>
                 </div>
                 <div className="flex justify-between text-sm text-green-700">
                   <span>{t('portal.transportRequest.roundTripDiscount')}</span>
-                  <span>−{formatPrice(selectedDest.priceUsd * 2 * 0.1)}</span>
+                  <span>−{formatPrice(oneWayMxn * 2 - totalMxn)}</span>
                 </div>
                 <div className="flex justify-between font-semibold text-gray-900 border-t border-amber-200 pt-2 mt-1">
                   <span>{t('portal.transportRequest.total')}</span>
-                  <span>{formatPrice(priceUsd)}</span>
+                  <span>{formatPrice(totalMxn)}</span>
                 </div>
               </>
             ) : (
               <div className="flex justify-between font-semibold text-gray-900">
                 <span>{t('portal.transportRequest.estimatedPrice')}</span>
-                <span>{formatPrice(priceUsd)}</span>
+                <span>{formatPrice(totalMxn)}</span>
               </div>
             )}
             <p className="text-xs text-gray-500 pt-1">
               {t('portal.transportRequest.priceDisclaimer')}
             </p>
+          </div>
+        )}
+
+        {cancelled && !error && (
+          <div className="p-4 bg-amber-50 border-l-4 border-amber-500 rounded">
+            <p className="text-sm text-amber-800">{t('portal.transportRequest.paymentCancelled')}</p>
           </div>
         )}
 
@@ -309,57 +236,6 @@ const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: Transport
           )}
         </button>
       </form>
-
-      {/* Payment screen — shown after successful booking */}
-      {showPayment && (
-        <div className="mt-8 space-y-4">
-          <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
-            <p className="text-green-800 font-semibold text-lg">✓ Transport Booked!</p>
-            <p className="text-green-700 text-sm mt-1">
-              Your request is confirmed. Please complete payment using one of the methods below.
-            </p>
-          </div>
-
-          <p className="text-slate-700 font-semibold text-center">Choose your payment method:</p>
-
-          <div className="space-y-3">
-            {PAYMENT_METHODS.map((m) => (
-              <div key={m.id} className="border-2 border-slate-200 rounded-xl p-4 hover:border-amber-400 transition-colors">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <span className="text-2xl flex-shrink-0">{m.icon}</span>
-                    <div className="min-w-0">
-                      <p className="font-semibold text-slate-900 text-sm">{m.label}</p>
-                      <p className="text-amber-700 font-mono font-bold truncate">{m.detail}</p>
-                      {m.sub && <p className="text-slate-500 text-xs">{m.sub}</p>}
-                      <p className="text-slate-500 text-xs mt-0.5">{m.note}</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => copyToClipboard(m.detail, m.id)}
-                    className="flex-shrink-0 px-3 py-1.5 text-xs font-semibold border-2 border-amber-600 text-amber-700 rounded-lg hover:bg-amber-600 hover:text-white transition-colors"
-                  >
-                    {copiedId === m.id ? '✓ Copied' : 'Copy'}
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg">
-            <p className="text-sm text-amber-900">
-              <span className="font-semibold">Important:</span> Always include your travel date in the payment note so we can match it to your booking.
-            </p>
-          </div>
-
-          <button
-            onClick={() => setShowPayment(false)}
-            className="w-full px-6 py-3 bg-gradient-to-r from-amber-700 to-orange-600 hover:from-amber-800 hover:to-orange-700 text-white rounded-lg font-semibold transition-colors"
-          >
-            Done
-          </button>
-        </div>
-      )}
     </div>
   );
 };

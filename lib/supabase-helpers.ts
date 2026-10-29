@@ -118,6 +118,35 @@ export const createTransportRequest = async (
   return row;
 };
 
+/**
+ * Records a transport booking that has already been paid by card.
+ * Skips the insert if the same trip is already recorded, so Stripe webhook retries are harmless.
+ * Returns null when it was a duplicate.
+ */
+export const createPaidTransportRequest = async (
+  reservationId: string,
+  destination: string,
+  datetime: string,
+  passengers: number,
+  roundTrip: boolean,
+  priceMxn: number,
+  notes?: string
+): Promise<TransportRequest | null> => {
+  const sql = getSql();
+  const [existing] = await sql<TransportRequest[]>`
+    SELECT * FROM transport_requests
+    WHERE reservation_id = ${reservationId} AND destination = ${destination} AND scheduled_at = ${datetime}
+    LIMIT 1`;
+  if (existing) return null;
+  const [row] = await sql<TransportRequest[]>`
+    INSERT INTO transport_requests
+      (reservation_id, destination, scheduled_at, passengers, round_trip, price, notes, status)
+    VALUES
+      (${reservationId}, ${destination}, ${datetime}, ${passengers}, ${roundTrip}, ${priceMxn}, ${notes ?? null}, 'confirmed')
+    RETURNING *`;
+  return row;
+};
+
 export const getTransportDestinations = async () => {
   const sql = getSql();
   return sql`SELECT * FROM transport_destinations WHERE is_active = true ORDER BY name`;

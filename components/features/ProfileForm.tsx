@@ -42,7 +42,7 @@ const ProfileForm = ({ session, onSessionUpdate }: ProfileFormProps) => {
   };
 
   useEffect(() => {
-    if (!session?.token) return;
+    if (!session?.token || session.isAdmin) return;
     fetch('/api/guest/profile', { headers: { Authorization: `Bearer ${session.token}` } })
       .then(async (r) => {
         const data = await r.json();
@@ -92,13 +92,7 @@ const ProfileForm = ({ session, onSessionUpdate }: ProfileFormProps) => {
     }
   };
 
-  if (session?.isAdmin) {
-    return (
-      <div className="bg-white rounded-lg shadow-lg p-8 max-w-2xl mx-auto text-gray-600">
-        {label('The admin login has no guest profile.', 'El acceso de administrador no tiene perfil de huésped.')}
-      </div>
-    );
-  }
+  if (session?.isAdmin) return <AdminPasswordForm session={session} onSessionUpdate={onSessionUpdate} />;
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-8 max-w-2xl mx-auto">
@@ -207,5 +201,92 @@ const ProfileForm = ({ session, onSessionUpdate }: ProfileFormProps) => {
     </div>
   );
 };
+
+/** The admin login has no reservation, so its profile is only its password. */
+function AdminPasswordForm({ session, onSessionUpdate }: { session: GuestSession; onSessionUpdate: (s: GuestSession) => void }) {
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMessage(null);
+    if (newPassword !== confirmPassword) {
+      setMessage({ ok: false, text: 'The new passwords don’t match.' });
+      return;
+    }
+    setSaving(true);
+    try {
+      const res = await fetch('/api/guest/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.token}` },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setMessage({ ok: false, text: data.error || 'Could not change the password.' });
+        return;
+      }
+      onSessionUpdate({ ...session, usingDefaultPassword: false });
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setMessage({ ok: true, text: 'Admin password changed. Use it next time you log in with the admin code.' });
+    } catch {
+      setMessage({ ok: false, text: 'Network error. Please try again.' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="bg-white rounded-lg shadow-lg p-8 max-w-2xl mx-auto">
+      <h3 className="text-2xl font-bold text-gray-900 mb-1">🔐 Admin Password</h3>
+      <p className="text-gray-500 text-sm mb-6">The password you enter together with the admin code to log in here.</p>
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {session.usingDefaultPassword && (
+          <div className="p-4 bg-amber-50 border-l-4 border-amber-500 rounded text-sm text-amber-900">
+            The admin login is still using the default password. Please choose your own.
+          </div>
+        )}
+        <div>
+          <label className={labelClass}>Current password <span className="text-red-500">*</span></label>
+          <input className={inputClass} type="password" autoComplete="current-password" required value={currentPassword}
+            onChange={(e) => { setCurrentPassword(e.target.value); setMessage(null); }} />
+        </div>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label className={labelClass}>New password <span className="text-red-500">*</span></label>
+            <input className={inputClass} type="password" autoComplete="new-password" minLength={8} required value={newPassword}
+              onChange={(e) => { setNewPassword(e.target.value); setMessage(null); }} />
+          </div>
+          <div>
+            <label className={labelClass}>Confirm new password <span className="text-red-500">*</span></label>
+            <input className={inputClass} type="password" autoComplete="new-password" required value={confirmPassword}
+              onChange={(e) => { setConfirmPassword(e.target.value); setMessage(null); }} />
+          </div>
+        </div>
+        <p className="text-xs text-gray-500 -mt-2">At least 8 characters.</p>
+
+        {message && (
+          <div className={`p-4 border-l-4 rounded text-sm ${message.ok ? 'bg-green-50 border-green-500 text-green-800' : 'bg-red-50 border-red-500 text-red-700'}`}>
+            {message.text}
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={saving}
+          className="w-full bg-gradient-to-r from-amber-700 to-orange-600 hover:from-amber-800 hover:to-orange-700 disabled:from-gray-400 disabled:to-gray-400 text-white font-bold py-3 px-4 rounded-lg transition-all"
+        >
+          {saving ? 'Saving…' : 'Change admin password'}
+        </button>
+      </form>
+    </div>
+  );
+}
 
 export default ProfileForm;

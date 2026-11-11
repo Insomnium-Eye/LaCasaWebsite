@@ -5,15 +5,38 @@ import { USERNAME_PATTERN, generateGuestJWT, verifyGuestJWT } from '@/lib/guest-
 import { MIN_PASSWORD_LENGTH, hashPassword, verifyGuestPassword } from '@/lib/password';
 import { createGuestSession, getReservationById, sameGuestReservationIds } from '@/lib/supabase-helpers';
 import { GuestSession, Reservation } from '@/types/guest-portal';
+import { getAdminPasswordHash, setAdminPasswordHash } from '@/lib/adminCredentials';
 
 async function authenticate(request: NextRequest): Promise<{ session: GuestSession } | { error: NextResponse }> {
   const auth = request.headers.get('authorization');
   const session = auth?.startsWith('Bearer ') ? verifyGuestJWT(auth.substring(7)) : null;
   if (!session) return { error: NextResponse.json({ success: false, error: 'Please log in again.' }, { status: 401 }) };
-  if (session.isAdmin) {
-    return { error: NextResponse.json({ success: false, error: 'The admin login has no profile.' }, { status: 403 }) };
-  }
   return { session };
+}
+
+const adminPasswordSchema = z.object({
+  currentPassword: z.string().min(1, 'Enter your current password.'),
+  newPassword: z.string().max(200)
+    .refine((v) => v.length >= MIN_PASSWORD_LENGTH, `New password must be at least ${MIN_PASSWORD_LENGTH} characters.`),
+});
+
+/** The admin login has no reservation — its profile is just its password. */
+async function changeAdminPassword(request: NextRequest) {
+  const parsed = adminPasswordSchema.safeParse(await request.json().catch(() => null));
+  if (!parsed.success) {
+    return NextResponse.json({ success: false, error: parsed.error.issues[0].message }, { status: 400 });
+  }
+  try {
+    if (!(await verifyGuestPassword(parsed.data.currentPassword, await getAdminPasswordHash()))) {
+      return NextResponse.json({ success: false, error: 'Your current password is incorrect.' }, { status: 401 });
+    }
+    await setAdminPasswordHash(await hashPassword(parsed.data.newPassword));
+    return NextResponse.json({ success: true, data: { usingDefaultPassword: false } });
+  } catch (error) {
+    console.error('[admin password change]', error);
+    const msg = error instanceof Error ? error.message : 'Could not save your new password.';
+    return NextResponse.json({ success: false, error: msg }, { status: 500 });
+  }
 }
 
 const profileOf = (r: Reservation) => ({
@@ -30,6 +53,10 @@ const profileOf = (r: Reservation) => ({
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if ('error' in auth) return auth.error;
+
+  if (auth.session.isAdmin) {
+    return NextResponse.json({ success: true, data: { isAdmin: true, usingDefaultPassword: !(await getAdminPasswordHash()) } });
+  }
 
   const reservation = await getReservationById(auth.session.reservationId);
   if (!reservation) return NextResponse.json({ success: false, error: 'Reservation not found.' }, { status: 404 });
@@ -58,6 +85,7 @@ const updateSchema = z.object({
 export async function PATCH(request: NextRequest) {
   const auth = await authenticate(request);
   if ('error' in auth) return auth.error;
+  if (auth.session.isAdmin) return changeAdminPassword(request);
 
   const parsed = updateSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {

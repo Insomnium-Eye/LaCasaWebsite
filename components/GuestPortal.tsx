@@ -101,7 +101,7 @@ const GuestPortal = () => {
           onTransportRequest={handleAirportCTA}
         />
 
-        {session?.usingDefaultPassword && !session.isAdmin && activeSection !== 'profile' && (
+        {session?.usingDefaultPassword && activeSection !== 'profile' && (
           <button
             type="button"
             onClick={() => handleSectionChange('profile')}

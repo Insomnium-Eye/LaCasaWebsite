@@ -10,6 +10,7 @@ import {
   USERNAME_PATTERN,
 } from '@/lib/guest-auth';
 import { verifyGuestPassword } from '@/lib/password';
+import { getAdminPasswordHash } from '@/lib/adminCredentials';
 
 const RATE_LIMIT_MAP = new Map<string, number[]>();
 const RATE_LIMIT_ATTEMPTS = parseInt(process.env.RATE_LIMIT_ATTEMPTS || '10');
@@ -63,9 +64,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Admin bypass — never hits the DB (the admin code is not a guest account, so no password)
+    if (!password || typeof password !== 'string') {
+      return NextResponse.json(
+        { success: false, error: 'Please enter your password.' },
+        { status: 400 }
+      );
+    }
+
+    // Admin login — the admin code plus the admin password (shared default until changed)
     const adminCode = process.env.ADMIN_PORTAL_CODE;
     if (adminCode && trimmed === adminCode) {
+      let adminHash: string | null;
+      try {
+        adminHash = await getAdminPasswordHash();
+      } catch (dbErr) {
+        console.error('[Guest login] admin credentials DB error:', dbErr);
+        return NextResponse.json(
+          { success: false, error: 'Unable to reach the reservation system. Please try again shortly.' },
+          { status: 503 }
+        );
+      }
+      if (!(await verifyGuestPassword(password, adminHash))) {
+        return NextResponse.json(
+          { success: false, error: 'Incorrect lock code or password.' },
+          { status: 401 }
+        );
+      }
+
       const token = generateGuestJWT({
         reservationId: 'admin',
         guestName: 'Admin',
@@ -89,16 +114,10 @@ export async function POST(request: NextRequest) {
           nightsRemaining: 0,
           nightlyRate: 0,
           isAdmin: true,
+          usingDefaultPassword: !adminHash,
           token,
         },
       }, { status: 200 });
-    }
-
-    if (!password || typeof password !== 'string') {
-      return NextResponse.json(
-        { success: false, error: 'Please enter your password.' },
-        { status: 400 }
-      );
     }
 
     const type = detectIdentifierType(trimmed);

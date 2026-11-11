@@ -3,6 +3,7 @@ import type Stripe from 'stripe';
 import { Resend } from 'resend';
 import { getStripe } from '@/lib/stripe';
 import { createPaidTransportRequest } from '@/lib/supabase-helpers';
+import { handleRentInvoice, handleRentSetupCompleted, handleRentSubscriptionEnded } from '@/lib/rentWebhook';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const ADMIN_EMAIL = 'ebm22david@gmail.com';
@@ -105,6 +106,29 @@ export async function POST(request: NextRequest) {
         console.error('Transport payment follow-up failed:', error);
       }
     }
+  }
+
+  // Rent handlers are idempotent, so on failure return 500 and let Stripe retry the event.
+  try {
+    switch (event.type) {
+      case 'checkout.session.completed':
+        if (event.data.object.mode === 'setup' && event.data.object.metadata?.kind === 'rent_setup') {
+          await handleRentSetupCompleted(stripe, event.data.object);
+        }
+        break;
+      case 'invoice.paid':
+        await handleRentInvoice(event.data.object, 'paid');
+        break;
+      case 'invoice.payment_failed':
+        await handleRentInvoice(event.data.object, 'failed');
+        break;
+      case 'customer.subscription.deleted':
+        await handleRentSubscriptionEnded(event.data.object);
+        break;
+    }
+  } catch (error) {
+    console.error(`Rent webhook (${event.type}) failed:`, error);
+    return NextResponse.json({ error: 'Rent processing failed' }, { status: 500 });
   }
 
   return NextResponse.json({ received: true });

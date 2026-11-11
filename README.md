@@ -426,11 +426,11 @@ PostgreSQL on Supabase. Only the website's server connects (through `DATABASE_UR
 | `tenants` | Long-term tenants and their rent subscription |
 | `rent_payments` | One row per rent charge (paid or failed) |
 | `admin_credentials` | The admin portal password hash (single row) |
-| `transport_requests` | Paid portal transport trips. **Missing in the live database** (see [To-dos](#to-dos)) |
-| `reviews`, `review_images` | Guest reviews. **Missing in the live database** (see [To-dos](#to-dos)) |
+| `transport_requests` | Paid portal transport trips (created by migration 008) |
+| `reviews`, `review_images` | Guest reviews awaiting or past moderation (created by migration 008) |
 | `cleaning_requests`, `stay_extensions`, `cancellation_requests`, `transport_destinations` | Defined in `schema.sql` for the old request endpoints; not in the live database and no longer needed |
 
-Migrations: `001` booking webhook fields · `002` booking count · `003` tenants and rent payments · `004` guest usernames and passwords · `005` admin credentials · `006` row-level security for the 003 and 005 tables · `007` closes **every** table to Supabase's public API (row-level security, no anon/authenticated access).
+Migrations: `001` booking webhook fields · `002` booking count · `003` tenants and rent payments · `004` guest usernames and passwords · `005` admin credentials · `006` row-level security for the 003 and 005 tables · `007` closes **every** table to Supabase's public API (row-level security, no anon/authenticated access) · `008` creates `reviews`, `review_images` and `transport_requests`.
 
 ---
 
@@ -462,8 +462,9 @@ Migrations: `001` booking webhook fields · `002` booking count · `003` tenants
 
 ### Broken in production
 
-- [ ] **Create the `reviews` and `review_images` tables.** They don't exist in the live database, so **Leave a Review** (`/api/reviews`) and `/admin/reviews` fail.
-- [ ] **Create the `transport_requests` table.** Without it, paid portal transport trips aren't recorded against the guest's reservation (the Stripe webhook logs the error; payment and emails still work).
+- [ ] **Run `db/migrations/008_add_reviews_and_transport_requests.sql` in Supabase.** Until then, the tables are missing from the live database:
+  - `reviews` and `review_images`: **Leave a Review** (`/api/reviews`) and `/admin/reviews` fail.
+  - `transport_requests`: paid portal transport trips aren't recorded against the guest's reservation (the Stripe webhook logs the error; payment and emails still work).
 
 ### Features
 

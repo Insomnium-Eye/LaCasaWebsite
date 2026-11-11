@@ -7,7 +7,9 @@ import {
   detectIdentifierType,
   normalizeIdentifier,
   generateGuestJWT,
+  USERNAME_PATTERN,
 } from '@/lib/guest-auth';
+import { verifyGuestPassword } from '@/lib/password';
 
 const RATE_LIMIT_MAP = new Map<string, number[]>();
 const RATE_LIMIT_ATTEMPTS = parseInt(process.env.RATE_LIMIT_ATTEMPTS || '10');
@@ -37,11 +39,11 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { identifier } = await request.json();
+    const { identifier, password } = await request.json();
 
     if (!identifier || typeof identifier !== 'string' || !identifier.trim()) {
       return NextResponse.json(
-        { success: false, error: 'Please provide an email, phone number, or lock code.' },
+        { success: false, error: 'Please enter your lock code, email, or username.' },
         { status: 400 }
       );
     }
@@ -49,18 +51,19 @@ export async function POST(request: NextRequest) {
     const trimmed = identifier.trim();
     const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed);
     const isLockCode = /^\d{4}$/.test(trimmed);
+    const isUsername = USERNAME_PATTERN.test(trimmed);
     const phoneDigits = trimmed.replace(/\D/g, '');
     const isPhone = !isLockCode && phoneDigits.length >= 7 && phoneDigits.length <= 15
       && /^\+?[\d\s\-(). ]+$/.test(trimmed);
 
-    if (!isEmail && !isLockCode && !isPhone) {
+    if (!isEmail && !isLockCode && !isPhone && !isUsername) {
       return NextResponse.json(
-        { success: false, error: 'Please enter a valid 4-digit lock code, email address, or phone number.' },
+        { success: false, error: 'Please enter a valid 4-digit lock code, email address, phone number, or username.' },
         { status: 400 }
       );
     }
 
-    // Admin bypass — never hits the DB
+    // Admin bypass — never hits the DB (the admin code is not a guest account, so no password)
     const adminCode = process.env.ADMIN_PORTAL_CODE;
     if (adminCode && trimmed === adminCode) {
       const token = generateGuestJWT({
@@ -91,6 +94,13 @@ export async function POST(request: NextRequest) {
       }, { status: 200 });
     }
 
+    if (!password || typeof password !== 'string') {
+      return NextResponse.json(
+        { success: false, error: 'Please enter your password.' },
+        { status: 400 }
+      );
+    }
+
     const type = detectIdentifierType(trimmed);
     const normalized = normalizeIdentifier(trimmed, type);
 
@@ -111,9 +121,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!reservation) {
+    // Same message either way so the form doesn't reveal which lock codes exist.
+    if (!reservation || !(await verifyGuestPassword(password, reservation.password_hash))) {
       return NextResponse.json(
-        { success: false, error: 'No confirmed reservation found for that identifier.' },
+        { success: false, error: 'Incorrect lock code or password.' },
         { status: 401 }
       );
     }

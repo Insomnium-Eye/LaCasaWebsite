@@ -17,6 +17,8 @@ export interface GuestSession {
   nightlyRate: number;
   token: string; // JWT
   isAdmin?: boolean;
+  /** True while the guest still uses the shared default password. */
+  usingDefaultPassword?: boolean;
 }
 
 export interface Reservation {
@@ -26,6 +28,8 @@ export interface Reservation {
   email: string;
   phone?: string;
   digital_key?: string;
+  username?: string | null;
+  password_hash?: string | null;
   unit_id: string;
   unit_name: string;
   check_in: string; // ISO date
@@ -166,7 +170,7 @@ export interface ReviewPayload {
 }
 
 // Portal Sidebar Items
-export type PortalSection = 'cleaning' | 'transport' | 'extend' | 'cancel' | 'review' | 'maintenance';
+export type PortalSection = 'cleaning' | 'transport' | 'extend' | 'cancel' | 'review' | 'maintenance' | 'profile';
 
 export const PORTAL_SECTIONS: Record<
   PortalSection,
@@ -201,6 +205,11 @@ export const PORTAL_SECTIONS: Record<
     label: 'Maintenance',
     icon: '🔧',
     description: 'Report an issue',
+  },
+  profile: {
+    label: 'User Profile',
+    icon: '👤',
+    description: 'Email, username & password',
   },
 };
 

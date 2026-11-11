@@ -30,10 +30,13 @@ export const verifyGuestJWT = (token: string): GuestSession | null => {
   }
 };
 
-// Detect identifier type (email, phone, or digital key)
+/** Usernames start with a letter so they can't be confused with lock codes or phone numbers. */
+export const USERNAME_PATTERN = /^[a-zA-Z][a-zA-Z0-9._-]{2,29}$/;
+
+// Detect identifier type (email, phone, digital key, or username)
 export const detectIdentifierType = (
   identifier: string
-): 'email' | 'phone' | 'digital_key' => {
+): 'email' | 'phone' | 'digital_key' | 'username' => {
   const stripped = identifier.trim();
 
   // Check if email
@@ -44,6 +47,11 @@ export const detectIdentifierType = (
   // Check if 4-digit lock code (must come before phone — 4 digits also match phone regex)
   if (/^\d{4}$/.test(stripped)) {
     return 'digital_key';
+  }
+
+  // Must come before phone — a username like "maria2024" contains digits
+  if (USERNAME_PATTERN.test(stripped)) {
+    return 'username';
   }
 
   // Check if phone (E.164 format: +1234567890 or just digits)
@@ -80,11 +88,13 @@ export const normalizeDigitalKey = (key: string): string => {
 
 export const normalizeIdentifier = (
   identifier: string,
-  type: 'email' | 'phone' | 'digital_key'
+  type: 'email' | 'phone' | 'digital_key' | 'username'
 ): string => {
   switch (type) {
     case 'email':
       return normalizeEmail(identifier);
+    case 'username':
+      return identifier.trim().toLowerCase();
     case 'phone':
       return normalizePhone(identifier);
     case 'digital_key':

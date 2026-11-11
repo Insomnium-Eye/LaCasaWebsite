@@ -30,6 +30,12 @@ const PortalSidebar = ({ activeSection, onSectionChange, session }: PortalSideba
         : t('portal.sections.reviewDesc'),
       locked: isReviewLocked,
     },
+    {
+      key: 'profile',
+      label: language === 'es' ? 'Perfil de Usuario' : 'User Profile',
+      icon: '👤',
+      description: language === 'es' ? 'Correo, usuario y contraseña' : 'Email, username & password',
+    },
   ];
 
   return (

@@ -20,7 +20,7 @@ export const useGuestAuth = () => {
     }
   }, []);
 
-  const login = useCallback(async (identifier: string) => {
+  const login = useCallback(async (identifier: string, password: string) => {
     setLoading(true);
     setError(null);
 
@@ -28,7 +28,7 @@ export const useGuestAuth = () => {
       const response = await fetch('/api/auth/guest-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ identifier }),
+        body: JSON.stringify({ identifier, password }),
       });
 
       const data = await response.json();
@@ -48,6 +48,12 @@ export const useGuestAuth = () => {
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  /** Replace the stored session, e.g. after the guest edits their profile. */
+  const updateSession = useCallback((next: GuestSession) => {
+    setSession(next);
+    sessionStorage.setItem('guest-portal-session', JSON.stringify(next));
   }, []);
 
   const logout = useCallback(() => {
@@ -90,6 +96,7 @@ export const useGuestAuth = () => {
     login,
     logout,
     refreshSession,
+    updateSession,
     isAuthenticated: !!session,
   };
 };

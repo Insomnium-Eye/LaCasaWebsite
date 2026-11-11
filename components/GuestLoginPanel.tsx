@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface GuestLoginPanelProps {
-  onLogin: (identifier: string) => Promise<boolean>;
+  onLogin: (identifier: string, password: string) => Promise<boolean>;
   loading: boolean;
   error: string | null;
 }
@@ -15,14 +15,17 @@ function getFormatError(value: string): string | null {
   if (!v) return null;
   if (/^\d{4}$/.test(v)) return null; // 4-digit lock code
   if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return null; // email
+  if (/^[a-zA-Z][a-zA-Z0-9._-]{2,29}$/.test(v)) return null; // username
   const digits = v.replace(/\D/g, '');
   if (digits.length >= 7 && digits.length <= 15 && /^\+?[\d\s\-(). ]+$/.test(v)) return null; // phone
-  return 'Enter a 4-digit lock code, email address, or phone number.';
+  return 'Enter your 4-digit lock code, email, phone number, or username.';
 }
 
 const GuestLoginPanel = ({ onLogin, loading, error }: GuestLoginPanelProps) => {
   const { t } = useLanguage();
   const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
   const [touched, setTouched] = useState(false);
 
@@ -44,7 +47,7 @@ const GuestLoginPanel = ({ onLogin, loading, error }: GuestLoginPanelProps) => {
       return;
     }
 
-    const success = await onLogin(identifier);
+    const success = await onLogin(identifier, password);
     if (!success) {
       setLocalError(error || t('portal.loginError'));
     }
@@ -103,6 +106,31 @@ const GuestLoginPanel = ({ onLogin, loading, error }: GuestLoginPanelProps) => {
                 <p className="mt-2 text-xs text-gray-500">
                   {t('portal.identifierHint')}
                 </p>
+              </div>
+
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                  {t('portal.password')}
+                </label>
+                <div className="relative">
+                  <input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(e) => { setPassword(e.target.value); setLocalError(null); }}
+                    placeholder={t('portal.enterPassword')}
+                    disabled={loading}
+                    className="w-full px-4 py-3 pr-20 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-amber-600 transition-colors disabled:bg-gray-100"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((s) => !s)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-amber-700 hover:text-amber-900"
+                  >
+                    {showPassword ? t('portal.hidePassword') : t('portal.showPassword')}
+                  </button>
+                </div>
               </div>
 
               {/* Format hint shown while typing */}

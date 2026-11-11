@@ -13,16 +13,19 @@ import ExtendStayForm from './features/ExtendStayForm';
 import CancelReservationForm from './features/CancelReservationForm';
 import LeaveReviewForm from './features/LeaveReviewForm';
 import MaintenanceRequestForm from './features/MaintenanceRequestForm';
+import ProfileForm from './features/ProfileForm';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface TransportPrefill {
   destinationId: string;
   date: string; // YYYY-MM-DD
 }
 
-const VALID_TABS: PortalSection[] = ['transport', 'cleaning', 'extend', 'cancel', 'review', 'maintenance'];
+const VALID_TABS: PortalSection[] = ['transport', 'cleaning', 'extend', 'cancel', 'review', 'maintenance', 'profile'];
 
 const GuestPortal = () => {
-  const { session, loading, error, login, logout, isAuthenticated } = useGuestAuth();
+  const { session, loading, error, login, logout, isAuthenticated, updateSession } = useGuestAuth();
+  const { language } = useLanguage();
   const [activeSection, setActiveSection] = useState<PortalSection>('transport');
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [transportPrefill, setTransportPrefill] = useState<TransportPrefill | null>(null);
@@ -98,6 +101,18 @@ const GuestPortal = () => {
           onTransportRequest={handleAirportCTA}
         />
 
+        {session?.usingDefaultPassword && !session.isAdmin && activeSection !== 'profile' && (
+          <button
+            type="button"
+            onClick={() => handleSectionChange('profile')}
+            className="w-full text-left p-4 bg-amber-50 border-l-4 border-amber-500 rounded-lg shadow text-sm text-amber-900 hover:bg-amber-100 transition-colors"
+          >
+            🔒 {language === 'es'
+              ? 'Aún usas la contraseña predeterminada. Toca aquí para elegir una propia.'
+              : 'You’re using the default password. Tap here to set your own.'}
+          </button>
+        )}
+
         <div
           className={`transition-all duration-300 transform ${
             isTransitioning
@@ -117,6 +132,7 @@ const GuestPortal = () => {
           {activeSection === 'cancel' && <CancelReservationForm session={session} />}
           {activeSection === 'review' && <LeaveReviewForm session={session} />}
           {activeSection === 'maintenance' && <MaintenanceRequestForm session={session} />}
+          {activeSection === 'profile' && <ProfileForm session={session} onSessionUpdate={updateSession} />}
         </div>
       </div>
     </div>

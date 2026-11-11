@@ -14,7 +14,7 @@ import {
 
 export const findReservationByIdentifier = async (
   identifier: string,
-  type: 'email' | 'phone' | 'digital_key'
+  type: 'email' | 'phone' | 'digital_key' | 'username'
 ): Promise<Reservation | null> => {
   const sql = getSql();
   let rows: Reservation[];
@@ -25,6 +25,10 @@ export const findReservationByIdentifier = async (
   } else if (type === 'phone') {
     rows = await sql<Reservation[]>`
       SELECT * FROM reservations WHERE phone = ${identifier} AND status IN ('confirmed', 'checked_in') LIMIT 1`;
+  } else if (type === 'username') {
+    rows = await sql<Reservation[]>`
+      SELECT * FROM reservations WHERE LOWER(username) = ${identifier} AND status IN ('confirmed', 'checked_in')
+      ORDER BY check_in LIMIT 1`;
   } else {
     // '0000' is a retired-key sentinel (set once a guest has checked out) and must
     // never authenticate — it can be shared by many past reservations.
@@ -68,6 +72,7 @@ export const createGuestSession = (
   nightsRemaining: calculateNightsRemaining(reservation),
   nightlyRate: reservation.nightly_rate,
   token,
+  usingDefaultPassword: !reservation.password_hash,
 });
 
 // ============ CLEANING REQUESTS ============

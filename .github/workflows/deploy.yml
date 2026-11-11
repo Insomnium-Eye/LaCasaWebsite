@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch: # "Run workflow" button in GitHub Actions, e.g. after changing only env vars
 
 jobs:
   deploy:

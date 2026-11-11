@@ -25,7 +25,7 @@ const LeaveReviewForm = ({ session }: LeaveReviewFormProps) => {
 
   if (isLocked) {
     const locale = language === 'es' ? 'es-MX' : 'en-US';
-    const checkOutFormatted = new Date(session.checkOut + 'T12:00:00Z').toLocaleDateString(
+    const checkOutFormatted = new Date(session.checkOut.slice(0, 10) + 'T12:00:00Z').toLocaleDateString(
       locale,
       { day: '2-digit', month: '2-digit', year: 'numeric' }
     );

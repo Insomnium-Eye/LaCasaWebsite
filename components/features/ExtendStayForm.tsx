@@ -5,15 +5,24 @@ import { GuestSession } from '@/types/guest-portal';
 import { useLanguage } from '@/contexts/LanguageContext';
 import DateInput from '@/components/DateInput';
 
+const DAY_MS = 1000 * 60 * 60 * 24;
+
+/** Pure calendar-date math in UTC, so the viewer's timezone can't shift the day. */
 function addDays(iso: string, n: number): string {
-  const d = new Date(iso + 'T00:00:00');
-  d.setDate(d.getDate() + n);
+  const d = new Date(iso.slice(0, 10) + 'T00:00:00Z');
+  d.setUTCDate(d.getUTCDate() + n);
   return d.toISOString().slice(0, 10);
 }
 
 function subDays(iso: string, n: number): string {
   return addDays(iso, -n);
 }
+
+function nightsBetween(fromIso: string, toIso: string): number {
+  return Math.round((Date.parse(toIso + 'T00:00:00Z') - Date.parse(fromIso + 'T00:00:00Z')) / DAY_MS);
+}
+
+const isIsoDate = (s: string) => /^\d{4}-\d{2}-\d{2}$/.test(s) && !Number.isNaN(Date.parse(s + 'T00:00:00Z'));
 
 interface ExtendStayFormProps {
   session: GuestSession | null;
@@ -30,9 +39,12 @@ const ExtendStayForm = ({ session }: ExtendStayFormProps) => {
   const [maxCheckout, setMaxCheckout] = useState<string | undefined>(undefined);
 
   const currentCheckoutIso = session?.checkOut?.slice(0, 10) ?? '';
+  const hasCheckout = isIsoDate(currentCheckoutIso);
+  // Older stored sessions may still carry the rate as a string.
+  const nightlyRate = Number(session?.nightlyRate) || 0;
 
   useEffect(() => {
-    if (!session?.unitSlug) return;
+    if (!session?.unitSlug || !hasCheckout) return;
     fetch(`/api/availability/${session.unitSlug}`)
       .then(r => r.json())
       .then((data: { blocked?: { start: string; end: string }[] }) => {
@@ -51,27 +63,26 @@ const ExtendStayForm = ({ session }: ExtendStayFormProps) => {
         }
       })
       .catch(() => {/* no limit if unavailable */});
-  }, [session?.unitSlug, currentCheckoutIso]);
+  }, [session?.unitSlug, currentCheckoutIso, hasCheckout]);
 
   if (!session) return null;
 
-  const currentCheckout = new Date(currentCheckoutIso);
-  const minNewCheckout = new Date(currentCheckout);
-  minNewCheckout.setDate(minNewCheckout.getDate() + 1);
+  // e.g. the admin login, which has no reservation dates
+  if (!hasCheckout) {
+    return (
+      <div className="bg-white rounded-lg shadow-lg p-8 max-w-2xl mx-auto text-gray-600">
+        {language === 'es'
+          ? 'Esta sesión no tiene una reserva con fecha de salida para extender.'
+          : 'This login has no reservation checkout date to extend.'}
+      </div>
+    );
+  }
+
+  const minNewCheckout = addDays(currentCheckoutIso, 1);
 
   const handleCheckoutChange = (value: string) => {
     setNewCheckout(value);
-
-    if (value) {
-      const newDate = new Date(value);
-      const extraNights = Math.ceil(
-        (newDate.getTime() - currentCheckout.getTime()) / (1000 * 60 * 60 * 24)
-      );
-      const cost = extraNights * session.nightlyRate;
-      setCalculatedCost(cost);
-    } else {
-      setCalculatedCost(0);
-    }
+    setCalculatedCost(value ? nightsBetween(currentCheckoutIso, value) * nightlyRate : 0);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -114,12 +125,7 @@ const ExtendStayForm = ({ session }: ExtendStayFormProps) => {
     }
   };
 
-  const extraNights = newCheckout
-    ? Math.ceil(
-        (new Date(newCheckout).getTime() - currentCheckout.getTime()) /
-          (1000 * 60 * 60 * 24)
-      )
-    : 0;
+  const extraNights = newCheckout ? nightsBetween(currentCheckoutIso, newCheckout) : 0;
 
   const noRoomToExtend = maxCheckout !== undefined && maxCheckout <= currentCheckoutIso;
 
@@ -145,7 +151,7 @@ const ExtendStayForm = ({ session }: ExtendStayFormProps) => {
         <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
           <p className="text-sm text-gray-600">{t('portal.extendStay.currentCheckout')}</p>
           <p className="text-lg font-semibold text-gray-900">
-            {new Date(session.checkOut.slice(0,10) + 'T12:00:00Z').toLocaleDateString(locale, {
+            {new Date(currentCheckoutIso + 'T12:00:00Z').toLocaleDateString(locale, {
               weekday: 'long',
               month: 'long',
               day: 'numeric',
@@ -164,7 +170,7 @@ const ExtendStayForm = ({ session }: ExtendStayFormProps) => {
             value={newCheckout}
             onChange={handleCheckoutChange}
             language={language}
-            min={minNewCheckout.toISOString().split('T')[0]}
+            min={minNewCheckout}
             max={maxCheckout}
             required
             disabled={loading || noRoomToExtend}
@@ -186,7 +192,7 @@ const ExtendStayForm = ({ session }: ExtendStayFormProps) => {
               <span className="font-semibold">{t('portal.extendStay.additionalNights')}:</span> {extraNights}
             </p>
             <p className="text-sm text-gray-700">
-              <span className="font-semibold">{t('portal.extendStay.nightlyRate')}:</span> ${session.nightlyRate.toFixed(2)} USD
+              <span className="font-semibold">{t('portal.extendStay.nightlyRate')}:</span> ${nightlyRate.toFixed(2)} USD
             </p>
             <div className="pt-2 border-t border-amber-300">
               <p className="text-lg font-bold text-amber-900">

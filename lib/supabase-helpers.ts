@@ -70,7 +70,8 @@ export const createGuestSession = (
   checkIn: reservation.check_in,
   checkOut: reservation.check_out,
   nightsRemaining: calculateNightsRemaining(reservation),
-  nightlyRate: reservation.nightly_rate,
+  // DECIMAL columns come back from postgres as strings
+  nightlyRate: Number(reservation.nightly_rate) || 0,
   token,
   usingDefaultPassword: !reservation.password_hash,
 });

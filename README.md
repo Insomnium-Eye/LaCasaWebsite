@@ -426,10 +426,11 @@ PostgreSQL on Supabase. Only the website's server connects (through `DATABASE_UR
 | `tenants` | Long-term tenants and their rent subscription |
 | `rent_payments` | One row per rent charge (paid or failed) |
 | `admin_credentials` | The admin portal password hash (single row) |
-| `transport_requests`, `cleaning_requests`, `stay_extensions`, `cancellation_requests`, `transport_destinations` | Portal requests (older flow) |
-| `reviews`, `review_images` | Guest reviews |
+| `transport_requests` | Paid portal transport trips. **Missing in the live database** (see [To-dos](#to-dos)) |
+| `reviews`, `review_images` | Guest reviews. **Missing in the live database** (see [To-dos](#to-dos)) |
+| `cleaning_requests`, `stay_extensions`, `cancellation_requests`, `transport_destinations` | Defined in `schema.sql` for the old request endpoints; not in the live database and no longer needed |
 
-Migrations: `001` booking webhook fields · `002` booking count · `003` tenants and rent payments · `004` guest usernames and passwords · `005` admin credentials · `006` row-level security for the 003 and 005 tables.
+Migrations: `001` booking webhook fields · `002` booking count · `003` tenants and rent payments · `004` guest usernames and passwords · `005` admin credentials · `006` row-level security for the 003 and 005 tables · `007` closes **every** table to Supabase's public API (row-level security, no anon/authenticated access).
 
 ---
 
@@ -437,7 +438,7 @@ Migrations: `001` booking webhook fields · `002` booking count · `003` tenants
 
 ### Security and privacy (highest priority)
 
-- [ ] **Check row-level security on the older tables.** Run the RLS block from [rule 1](#1-protect-user-data) for `reservations`, `bookings`, `calendar_feeds`, `external_blocks`, `reviews` and the request tables, so that none are reachable through Supabase's public API.
+- [x] **Close every table to Supabase's public API.** Migration 007 was run on 11 Nov 2026; all tables show `rls_on = true` and `anon_can_read = false`.
 - [ ] **Rename `NEXT_PUBLIC_JWT_SECRET`** to a server-only name (e.g. `GUEST_JWT_SECRET`). The `NEXT_PUBLIC_` prefix risks it being bundled into browser code. Also remove its insecure fallback value.
 - [ ] **Remove the insecure fallback values** for `ADMIN_TOKEN_SECRET` and `ADMIN_USERNAME`/`ADMIN_PASSWORD`, so the server refuses to work rather than using a guessable default.
 - [ ] **Rate-limit the admin code checks** on `/api/admin/*`. The 4-digit admin code alone unlocks those routes.
@@ -458,6 +459,11 @@ Migrations: `001` booking webhook fields · `002` booking count · `003` tenants
 - [ ] **Move `checkAdminCode` and `escapeHtml`** from `lib/rent.ts` into general-purpose modules, and use one shared admin lock screen for all `/admin/*` pages.
 - [ ] **Consolidate or delete the old root docs** (`API_EXAMPLES.md`, `BOOKING_*.md`, `FUTURE_ENHANCEMENTS.md`, `IMPLEMENTATION_SUMMARY.md`, `QUICK_START.md`, `README_VISUAL_GUIDE.md`, `TRANSPORTATION_SERVICES_DOCS.md`, `GITHUB_PAGES_DEPLOYMENT.md`) and the GitHub Pages leftovers (`deploy.sh`, `CNAME`).
 - [ ] **Stop committing `tsconfig.tsbuildinfo`**: add it to `.gitignore`.
+
+### Broken in production
+
+- [ ] **Create the `reviews` and `review_images` tables.** They don't exist in the live database, so **Leave a Review** (`/api/reviews`) and `/admin/reviews` fail.
+- [ ] **Create the `transport_requests` table.** Without it, paid portal transport trips aren't recorded against the guest's reservation (the Stripe webhook logs the error; payment and emails still work).
 
 ### Features
 

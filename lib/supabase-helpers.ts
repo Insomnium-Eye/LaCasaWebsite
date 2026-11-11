@@ -49,7 +49,23 @@ export const getReservationById = async (
   return rows[0] ?? null;
 };
 
-export const calculateNightsRemaining = (reservation: Reservation): number => {
+/**
+ * IDs of this reservation plus any other current reservation sharing its lock
+ * code (a returning guest), so login details stay identical across them.
+ * '0000' is the retired-key sentinel shared by many past stays, so it never groups.
+ */
+export const sameGuestReservationIds = async (reservation: Reservation): Promise<string[]> => {
+  const sql = getSql();
+  const key = reservation.digital_key && reservation.digital_key !== '0000' ? reservation.digital_key : null;
+  const rows = await sql<{ id: string }[]>`
+    SELECT id FROM reservations
+    WHERE id = ${reservation.id}
+       OR (${key}::text IS NOT NULL AND digital_key = ${key} AND status IN ('confirmed', 'checked_in'))
+  `;
+  return rows.map((r) => r.id);
+};
+
+export const calculateNightsRemaining =(reservation: Reservation): number => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const checkOut = new Date(reservation.check_out);

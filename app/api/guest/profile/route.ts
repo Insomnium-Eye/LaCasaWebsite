@@ -3,11 +3,8 @@ import { z } from 'zod';
 import { getSql } from '@/lib/db';
 import { USERNAME_PATTERN, generateGuestJWT, verifyGuestJWT } from '@/lib/guest-auth';
 import { MIN_PASSWORD_LENGTH, hashPassword, verifyGuestPassword } from '@/lib/password';
-import { createGuestSession, getReservationById } from '@/lib/supabase-helpers';
+import { createGuestSession, getReservationById, sameGuestReservationIds } from '@/lib/supabase-helpers';
 import { GuestSession, Reservation } from '@/types/guest-portal';
-
-// Retired-key sentinel set at checkout; shared by many past reservations, so never group by it.
-const RETIRED_CODE = '0000';
 
 async function authenticate(request: NextRequest): Promise<{ session: GuestSession } | { error: NextResponse }> {
   const auth = request.headers.get('authorization');
@@ -78,15 +75,7 @@ export async function PATCH(request: NextRequest) {
 
     const sql = getSql();
 
-    // A returning guest can have several active reservations sharing one lock code.
-    // Keep their login details identical across them, whichever one the login finds.
-    const key = reservation.digital_key && reservation.digital_key !== RETIRED_CODE ? reservation.digital_key : null;
-    const sameGuest = await sql<{ id: string }[]>`
-      SELECT id FROM reservations
-      WHERE id = ${reservation.id}
-         OR (${key}::text IS NOT NULL AND digital_key = ${key} AND status IN ('confirmed', 'checked_in'))
-    `;
-    const ids = sameGuest.map((r) => r.id);
+    const ids = await sameGuestReservationIds(reservation);
 
     // Usernames and emails are login identifiers, so another current guest can't share them.
     if (body.username) {

@@ -4,6 +4,8 @@ import { Unit, LEASE_TIERS } from '../data/units';
 import { useLanguage } from '../contexts/LanguageContext';
 import useAvailability, { Availability } from '../hooks/useAvailability';
 import useUsdToMxn from '../hooks/useUsdToMxn';
+import useNightlyRates from '../hooks/useNightlyRates';
+import { formatNightlyRange } from '../lib/nightlyRates';
 
 interface Props {
   unit: Unit;
@@ -28,6 +30,8 @@ export default function UnitCard({ unit, onSelect, onInquire, showDetails }: Pro
   const es = language === 'es';
   const { rate } = useUsdToMxn();
   const { availability, loading } = useAvailability(unit.slug);
+  const nightlyRates = useNightlyRates(unit.slug);
+  const nightly = nightlyRates && formatNightlyRange(nightlyRates, language, rate);
 
   return (
     <article
@@ -87,9 +91,9 @@ export default function UnitCard({ unit, onSelect, onInquire, showDetails }: Pro
           </div>
           <div className="flex items-center justify-between gap-2">
             <p className="text-sm font-semibold text-white">
-              {es && rate > 0
-                ? <>${Math.round(unit.shortTermMin * rate).toLocaleString()}–${Math.round(unit.shortTermMax * rate).toLocaleString()}<span className="font-normal text-slate-400"> MXN/noche</span></>
-                : <>${unit.shortTermMin}–${unit.shortTermMax}<span className="font-normal text-slate-400"> USD/night</span></>
+              {nightly
+                ? <>{nightly.range}<span className="font-normal text-slate-400"> {nightly.unit}</span></>
+                : <span className="font-normal text-slate-500">…</span>
               }
             </p>
             <span className="text-xs font-semibold text-terracotta shrink-0">

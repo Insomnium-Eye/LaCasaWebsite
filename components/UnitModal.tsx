@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { Unit, LEASE_TIERS } from '../data/units';
 import { useLanguage } from '../contexts/LanguageContext';
 import useUsdToMxn from '../hooks/useUsdToMxn';
+import useNightlyRates from '../hooks/useNightlyRates';
+import { formatNightlyRange } from '../lib/nightlyRates';
 import useAvailability, { Availability } from '../hooks/useAvailability';
 import LeaseApplicationModal from './LeaseApplicationModal';
 
@@ -17,6 +19,8 @@ export default function UnitModal({ unit, onClose }: UnitModalProps) {
   const es = language === 'es';
   const { rate } = useUsdToMxn();
   const { availability, loading: availLoading } = useAvailability(unit?.slug ?? '');
+  const nightlyRates = useNightlyRates(unit?.slug ?? '');
+  const nightly = nightlyRates && formatNightlyRange(nightlyRates, language, rate);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [showApply, setShowApply] = useState(false);
 
@@ -122,9 +126,9 @@ export default function UnitModal({ unit, onClose }: UnitModalProps) {
               </div>
               <div className="flex items-center justify-between gap-2">
                 <p className="text-lg font-semibold text-slate-900">
-                  {es && rate > 0
-                    ? <>${Math.round(unit.shortTermMin * rate).toLocaleString()}–${Math.round(unit.shortTermMax * rate).toLocaleString()}<span className="text-sm font-normal text-slate-500"> MXN/noche</span></>
-                    : <>${unit.shortTermMin}–${unit.shortTermMax}<span className="text-sm font-normal text-slate-500"> USD/night</span></>
+                  {nightly
+                    ? <>{nightly.range}<span className="text-sm font-normal text-slate-500"> {nightly.unit}</span></>
+                    : <span className="text-sm font-normal text-slate-500">…</span>
                   }
                 </p>
                 <a

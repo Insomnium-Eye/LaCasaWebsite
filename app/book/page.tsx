@@ -8,6 +8,13 @@ import BackgroundSlideshow from "../../components/BackgroundSlideshow";
 import LeaseApplicationForm from "../../components/LeaseApplicationForm";
 import useUsdToMxn from "../../hooks/useUsdToMxn";
 
+/** Sidebar names for each unit: [English, Spanish]. */
+const UNIT_LABELS: Record<string, [string, string]> = {
+  "bungalow-1": ["Bungalow 1 (Sun of My Heart)", "Bungalow 1 (Sol de mi Corazón)"],
+  "bungalow-2": ["Bungalow 2 (Magic Moon)", "Bungalow 2 (Luna Mágica)"],
+  "main-bedroom": ["Main Residence Bedroom (Blessed Land)", "Habitación principal (Tierra Bendita)"],
+};
+
 export default function BookPage() {
   const { t, language } = useLanguage();
   const { rate } = useUsdToMxn();
@@ -131,9 +138,16 @@ export default function BookPage() {
             <div className="rounded-4xl border border-slate-700 bg-[#241a13]/90 p-6 shadow-sm shadow-black/10">
               <p className="text-sm uppercase tracking-[0.24em] text-slate-300">{t("book.discountsTitle")}</p>
               <ul className="mt-4 space-y-3 text-slate-300 text-sm">
-                <li className="flex gap-2"><span>🏠</span><span>{t("book.discount7nights")}</span></li>
-                <li className="flex gap-2"><span>🏠</span><span>{t("book.discount28nights")}</span></li>
-                <li className="flex gap-2"><span>🏠</span><span>{t("book.rule.extraGuestFee")}</span></li>
+                {units.filter((u) => !u.annualOnly).map((u) => (
+                  <li key={u.slug} className="flex gap-2">
+                    <span>🏠</span>
+                    <span>
+                      {UNIT_LABELS[u.slug]?.[language === "es" ? 1 : 0] ?? u.name}:{" "}
+                      {rate > 0 && <>${Math.floor(u.monthlyRateMXN / rate).toLocaleString("en-US")} USD / </>}
+                      ${u.monthlyRateMXN.toLocaleString("en-US")} MXN {language === "es" ? "al mes" : "per month"}.
+                    </span>
+                  </li>
+                ))}
               </ul>
             </div>
 

@@ -13,6 +13,7 @@ export type Unit = {
   capacity: number;
   bathroom: string;
   terrace: string;
+  /** Monthly rent on a 12-month lease; shorter terms apply the LEASE_TIERS multipliers. */
   monthlyRateMXN: number;
   shortTermMin: number;
   shortTermMax: number;
@@ -32,7 +33,7 @@ export const units: Unit[] = [
     capacity: 2,
     bathroom: "En-suite bathroom",
     terrace: "Private veranda with garden access",
-    monthlyRateMXN: 17000,
+    monthlyRateMXN: 10500,
     shortTermMin: 55,
     shortTermMax: 115,
     airbnbUrl: "https://airbnb.com/h/oaxaca-rental-bungalow1",
@@ -57,7 +58,7 @@ export const units: Unit[] = [
     capacity: 2,
     bathroom: "En-suite bathroom",
     terrace: "Private veranda with garden access",
-    monthlyRateMXN: 20000,
+    monthlyRateMXN: 14500,
     shortTermMin: 65,
     shortTermMax: 125,
     airbnbUrl: "https://airbnb.com/h/oaxaca-rental-bungalow2",
@@ -78,7 +79,7 @@ export const units: Unit[] = [
     capacity: 2,
     bathroom: "En-suite bathroom",
     terrace: "Shared terrace nearby",
-    monthlyRateMXN: 8000,
+    monthlyRateMXN: 8500,
     shortTermMin: 40,
     shortTermMax: 100,
     airbnbUrl: "https://airbnb.com/h/oaxaca-rental-room1",

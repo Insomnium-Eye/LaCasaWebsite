@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { verifyAdminToken } from '@/lib/adminToken';
 import { createTimedPasscode } from '@/lib/ttlock';
+import { escapeHtml } from '@/lib/rent';
 
 const FRONT_GATE_LOCK_ID = 32117998;
 
@@ -70,6 +71,80 @@ function buildLoginHint(hasEmail: boolean, hasPhone: boolean): string {
   return 'your lock code or phone number';
 }
 
+export interface ConfirmedStay {
+  guest_name: string;
+  email: string | null;
+  phone: string | null;
+  unit_name: string;
+  check_in: string;
+  check_out: string;
+  nights: number;
+  guests: number;
+  lock_code: string;
+}
+
+/**
+ * Programs the stay's door code into the front gate and sends the guest their
+ * confirmation (lock code + portal link) by email and SMS.
+ * Returns how the guest was notified, e.g. "email and SMS".
+ */
+export async function confirmStay(booking: ConfirmedStay): Promise<string> {
+  const [firstName] = booking.guest_name.trim().split(' ');
+  const hasEmail = !!booking.email;
+  const hasPhone = !!booking.phone;
+
+  await provisionLockCode(booking.lock_code, booking.guest_name, booking.check_in, booking.check_out);
+
+  if (hasEmail && process.env.RESEND_API_KEY) {
+    const loginHint = buildLoginHint(true, hasPhone);
+    await resend.emails.send({
+      from: 'La Casa Oaxaca <onboarding@resend.dev>',
+      to: [booking.email!],
+      replyTo: 'ebm22david@gmail.com',
+      subject: '🎉 Your Stay is Confirmed – La Casa Oaxaca',
+      html: `
+        <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
+          <h2 style="color:#8d4a3f;">🎉 Your stay is confirmed!</h2>
+          <p>Hi ${escapeHtml(firstName)},</p>
+          <p>Great news — your booking at <strong>${escapeHtml(booking.unit_name)}, La Casa Oaxaca</strong> has been confirmed. We can't wait to welcome you!</p>
+          <table style="width:100%;border-collapse:collapse;margin:20px 0;">
+            <tr><td style="padding:8px;color:#555;">Check-in</td><td style="padding:8px;font-weight:bold;">${booking.check_in}</td></tr>
+            <tr style="background:#f9f9f9;"><td style="padding:8px;color:#555;">Check-out</td><td style="padding:8px;font-weight:bold;">${booking.check_out}</td></tr>
+            <tr><td style="padding:8px;color:#555;">Nights</td><td style="padding:8px;font-weight:bold;">${booking.nights}</td></tr>
+            <tr style="background:#f9f9f9;"><td style="padding:8px;color:#555;">Guests</td><td style="padding:8px;font-weight:bold;">${booking.guests}</td></tr>
+          </table>
+          <div style="background:#fdf3f0;border-left:4px solid #8d4a3f;padding:20px;margin:24px 0;border-radius:8px;">
+            <p style="margin:0 0 8px;font-size:14px;color:#8d4a3f;text-transform:uppercase;letter-spacing:0.1em;">🔑 Your Lock Code</p>
+            <p style="margin:0;font-size:3rem;font-weight:bold;letter-spacing:0.4em;color:#1a1008;">${booking.lock_code}</p>
+            <p style="margin:8px 0 0;font-size:13px;color:#666;">Enter this code on your unit's keypad to unlock the door.</p>
+          </div>
+          <div style="background:#f0f7f0;border-left:4px solid #4a7043;padding:16px;margin:20px 0;border-radius:8px;">
+            <p style="margin:0 0 6px;font-size:14px;color:#4a7043;font-weight:bold;">🏠 Guest Portal</p>
+            <p style="margin:0 0 8px;font-size:13px;color:#555;">Access your booking details, make requests, and manage your stay at<br>
+              <a href="${PORTAL_URL}" style="color:#4a7043;font-weight:bold;">${PORTAL_URL}</a></p>
+            <p style="margin:0;font-size:13px;color:#555;">Log in with ${loginHint}.</p>
+          </div>
+          <div style="background:#fff8f0;border-left:4px solid #c36a4f;padding:16px;margin:20px 0;border-radius:8px;">
+            <p style="margin:0 0 6px;font-size:14px;color:#c36a4f;font-weight:bold;">✈️ Flying In? Request a Ride</p>
+            <p style="margin:0;font-size:13px;color:#555;">Use the <strong>"Request a Ride"</strong> feature in your Guest Portal to arrange an airport pickup. We'll have someone ready to welcome you!</p>
+          </div>
+          <p style="color:#888;font-size:13px;margin-top:32px;">Questions? Reply to this email or message us on WhatsApp.<br>— La Casa Oaxaca</p>
+        </div>
+      `,
+    }).catch((err: unknown) => console.error('[Confirm email]', err));
+  }
+
+  if (hasPhone) {
+    const loginHint = hasEmail ? 'code, email, or phone' : 'code or phone';
+    const sms = `La Casa Oaxaca: Stay confirmed! Check-in: ${booking.check_in}. Lock code: ${booking.lock_code}. Portal: ${PORTAL_URL} (log in with your ${loginHint}). Flying in? Request airport pickup in the portal!`;
+    await sendSms(booking.phone!, sms).catch((err: unknown) =>
+      console.error('[SMS]', err instanceof Error ? err.message : err),
+    );
+  }
+
+  return [hasEmail && 'email', hasPhone && 'SMS'].filter(Boolean).join(' and ');
+}
+
 export async function handleBookingAction(
   id: string,
   token: string,
@@ -120,54 +195,7 @@ export async function handleBookingAction(
     await sql`UPDATE reservations SET status = ${newStatus} WHERE digital_key = ${booking.lock_code}`.catch(() => null);
 
     if (action === 'confirm') {
-      await provisionLockCode(booking.lock_code, booking.guest_name, booking.check_in, booking.check_out);
-
-      if (hasEmail && process.env.RESEND_API_KEY) {
-        const loginHint = buildLoginHint(true, hasPhone);
-        await resend.emails.send({
-          from: 'La Casa Oaxaca <onboarding@resend.dev>',
-          to: [booking.email],
-          replyTo: 'ebm22david@gmail.com',
-          subject: '🎉 Your Stay is Confirmed – La Casa Oaxaca',
-          html: `
-            <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
-              <h2 style="color:#8d4a3f;">🎉 Your stay is confirmed!</h2>
-              <p>Hi ${firstName},</p>
-              <p>Great news — your booking at <strong>${booking.unit_name}, La Casa Oaxaca</strong> has been confirmed. We can't wait to welcome you!</p>
-              <table style="width:100%;border-collapse:collapse;margin:20px 0;">
-                <tr><td style="padding:8px;color:#555;">Check-in</td><td style="padding:8px;font-weight:bold;">${booking.check_in}</td></tr>
-                <tr style="background:#f9f9f9;"><td style="padding:8px;color:#555;">Check-out</td><td style="padding:8px;font-weight:bold;">${booking.check_out}</td></tr>
-                <tr><td style="padding:8px;color:#555;">Nights</td><td style="padding:8px;font-weight:bold;">${booking.nights}</td></tr>
-                <tr style="background:#f9f9f9;"><td style="padding:8px;color:#555;">Guests</td><td style="padding:8px;font-weight:bold;">${booking.guests}</td></tr>
-              </table>
-              <div style="background:#fdf3f0;border-left:4px solid #8d4a3f;padding:20px;margin:24px 0;border-radius:8px;">
-                <p style="margin:0 0 8px;font-size:14px;color:#8d4a3f;text-transform:uppercase;letter-spacing:0.1em;">🔑 Your Lock Code</p>
-                <p style="margin:0;font-size:3rem;font-weight:bold;letter-spacing:0.4em;color:#1a1008;">${booking.lock_code}</p>
-                <p style="margin:8px 0 0;font-size:13px;color:#666;">Enter this code on your unit's keypad to unlock the door.</p>
-              </div>
-              <div style="background:#f0f7f0;border-left:4px solid #4a7043;padding:16px;margin:20px 0;border-radius:8px;">
-                <p style="margin:0 0 6px;font-size:14px;color:#4a7043;font-weight:bold;">🏠 Guest Portal</p>
-                <p style="margin:0 0 8px;font-size:13px;color:#555;">Access your booking details, make requests, and manage your stay at<br>
-                  <a href="${PORTAL_URL}" style="color:#4a7043;font-weight:bold;">${PORTAL_URL}</a></p>
-                <p style="margin:0;font-size:13px;color:#555;">Log in with ${loginHint}.</p>
-              </div>
-              <div style="background:#fff8f0;border-left:4px solid #c36a4f;padding:16px;margin:20px 0;border-radius:8px;">
-                <p style="margin:0 0 6px;font-size:14px;color:#c36a4f;font-weight:bold;">✈️ Flying In? Request a Ride</p>
-                <p style="margin:0;font-size:13px;color:#555;">Use the <strong>"Request a Ride"</strong> feature in your Guest Portal to arrange an airport pickup. We'll have someone ready to welcome you!</p>
-              </div>
-              <p style="color:#888;font-size:13px;margin-top:32px;">Questions? Reply to this email or message us on WhatsApp.<br>— La Casa Oaxaca</p>
-            </div>
-          `,
-        }).catch((err: unknown) => console.error('[Confirm email]', err));
-      }
-
-      if (hasPhone) {
-        const loginHint = hasEmail ? 'code, email, or phone' : 'code or phone';
-        const sms = `La Casa Oaxaca: Stay confirmed! Check-in: ${booking.check_in}. Lock code: ${booking.lock_code}. Portal: ${PORTAL_URL} (log in with your ${loginHint}). Flying in? Request airport pickup in the portal!`;
-        await sendSms(booking.phone, sms).catch((err: unknown) =>
-          console.error('[SMS]', err instanceof Error ? err.message : err),
-        );
-      }
+      await confirmStay(booking);
 
       const notified = [hasEmail && 'email', hasPhone && 'SMS'].filter(Boolean).join(' and ');
       return htmlPage(
@@ -266,50 +294,7 @@ export async function runBookingAction(id: string, action: 'confirm' | 'deny'): 
     await sql`UPDATE reservations SET status = ${newStatus} WHERE digital_key = ${booking.lock_code}`.catch(() => null);
 
     if (action === 'confirm') {
-      await provisionLockCode(booking.lock_code, booking.guest_name, booking.check_in, booking.check_out);
-
-      if (hasEmail && process.env.RESEND_API_KEY) {
-        const loginHint = buildLoginHint(true, hasPhone);
-        await resend.emails.send({
-          from: 'La Casa Oaxaca <onboarding@resend.dev>',
-          to: [booking.email],
-          replyTo: 'ebm22david@gmail.com',
-          subject: '🎉 Your Stay is Confirmed – La Casa Oaxaca',
-          html: `
-            <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
-              <h2 style="color:#8d4a3f;">🎉 Your stay is confirmed!</h2>
-              <p>Hi ${firstName},</p>
-              <p>Great news — your booking at <strong>${booking.unit_name}, La Casa Oaxaca</strong> has been confirmed. We can't wait to welcome you!</p>
-              <table style="width:100%;border-collapse:collapse;margin:20px 0;">
-                <tr><td style="padding:8px;color:#555;">Check-in</td><td style="padding:8px;font-weight:bold;">${booking.check_in}</td></tr>
-                <tr style="background:#f9f9f9;"><td style="padding:8px;color:#555;">Check-out</td><td style="padding:8px;font-weight:bold;">${booking.check_out}</td></tr>
-                <tr><td style="padding:8px;color:#555;">Nights</td><td style="padding:8px;font-weight:bold;">${booking.nights}</td></tr>
-                <tr style="background:#f9f9f9;"><td style="padding:8px;color:#555;">Guests</td><td style="padding:8px;font-weight:bold;">${booking.guests}</td></tr>
-              </table>
-              <div style="background:#fdf3f0;border-left:4px solid #8d4a3f;padding:20px;margin:24px 0;border-radius:8px;">
-                <p style="margin:0 0 8px;font-size:14px;color:#8d4a3f;text-transform:uppercase;letter-spacing:0.1em;">🔑 Your Lock Code</p>
-                <p style="margin:0;font-size:3rem;font-weight:bold;letter-spacing:0.4em;color:#1a1008;">${booking.lock_code}</p>
-                <p style="margin:8px 0 0;font-size:13px;color:#666;">Enter this code on your unit's keypad to unlock the door.</p>
-              </div>
-              <div style="background:#f0f7f0;border-left:4px solid #4a7043;padding:16px;margin:20px 0;border-radius:8px;">
-                <p style="margin:0 0 6px;font-size:14px;color:#4a7043;font-weight:bold;">🏠 Guest Portal</p>
-                <p style="margin:0 0 8px;font-size:13px;color:#555;">Access your booking details at <a href="${PORTAL_URL}" style="color:#4a7043;font-weight:bold;">${PORTAL_URL}</a></p>
-                <p style="margin:0;font-size:13px;color:#555;">Log in with ${loginHint}.</p>
-              </div>
-              <div style="background:#fff8f0;border-left:4px solid #c36a4f;padding:16px;margin:20px 0;border-radius:8px;">
-                <p style="margin:0 0 6px;font-size:14px;color:#c36a4f;font-weight:bold;">✈️ Flying In? Request a Ride</p>
-                <p style="margin:0;font-size:13px;color:#555;">Use the <strong>"Request a Ride"</strong> feature in your Guest Portal to arrange an airport pickup.</p>
-              </div>
-              <p style="color:#888;font-size:13px;margin-top:32px;">Questions? Reply to this email or message us on WhatsApp.<br>— La Casa Oaxaca</p>
-            </div>
-          `,
-        }).catch((err: unknown) => console.error('[Confirm email]', err));
-      }
-      if (hasPhone) {
-        const loginHint = hasEmail ? 'code, email, or phone' : 'code or phone';
-        const sms = `La Casa Oaxaca: Stay confirmed! Check-in: ${booking.check_in}. Lock code: ${booking.lock_code}. Portal: ${PORTAL_URL} (log in with your ${loginHint}). Flying in? Request airport pickup in the portal!`;
-        await sendSms(booking.phone, sms).catch((err: unknown) => console.error('[SMS]', err));
-      }
+      await confirmStay(booking);
     } else {
       if (hasEmail && process.env.RESEND_API_KEY) {
         await resend.emails.send({

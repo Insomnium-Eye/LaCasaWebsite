@@ -16,6 +16,12 @@ export function checkAdminCode(request: NextRequest): NextResponse | null {
 export const escapeHtml = (value: string) =>
   value.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 
+/** One label/value row of an HTML email table (value escaped); empty values are skipped. */
+export const emailRow = (label: string, value: string) =>
+  value
+    ? `<tr><td style="padding:6px 12px;color:#555;width:160px;">${label}</td><td style="padding:6px 12px;font-weight:600;">${escapeHtml(value)}</td></tr>`
+    : '';
+
 export type TenantStatus = 'pending_setup' | 'activating' | 'active' | 'past_due' | 'completed' | 'cancelled';
 
 export interface Tenant {

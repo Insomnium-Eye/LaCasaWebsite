@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react';
 import { Unit, LEASE_TIERS } from '../data/units';
 import { useLanguage } from '../contexts/LanguageContext';
 import useUsdToMxn from '../hooks/useUsdToMxn';
-import useNightlyRates from '../hooks/useNightlyRates';
-import { formatNightlyRange } from '../lib/nightlyRates';
+import NightlyPrice from './NightlyPrice';
+import StayBookingButtons from './StayBookingButtons';
 import useAvailability, { Availability } from '../hooks/useAvailability';
 import LeaseApplicationModal from './LeaseApplicationModal';
 
@@ -19,8 +19,6 @@ export default function UnitModal({ unit, onClose }: UnitModalProps) {
   const es = language === 'es';
   const { rate } = useUsdToMxn();
   const { availability, loading: availLoading } = useAvailability(unit?.slug ?? '');
-  const nightlyRates = useNightlyRates(unit?.slug ?? '');
-  const nightly = nightlyRates && formatNightlyRange(nightlyRates, language, rate);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [showApply, setShowApply] = useState(false);
 
@@ -112,7 +110,7 @@ export default function UnitModal({ unit, onClose }: UnitModalProps) {
             <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
               <div className="flex items-center justify-between gap-2 mb-2">
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-                  {es ? 'Corto plazo · Airbnb' : 'Short-term · Airbnb'}
+                  {es ? 'Corto plazo · por noche' : 'Short-term · nightly'}
                 </p>
                 {availLoading
                   ? <span className="text-xs text-slate-400">—</span>
@@ -124,25 +122,10 @@ export default function UnitModal({ unit, onClose }: UnitModalProps) {
                     : null
                 }
               </div>
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-lg font-semibold text-slate-900">
-                  {nightly
-                    ? <>{nightly.range}<span className="text-sm font-normal text-slate-500"> {nightly.unit}</span></>
-                    : <span className="text-sm font-normal text-slate-500">…</span>
-                  }
-                </p>
-                <a
-                  href={unit.airbnbUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs font-semibold text-terracotta hover:text-[#b55e47] transition"
-                >
-                  {es ? 'Reservar en Airbnb ↗' : 'Book on Airbnb ↗'}
-                </a>
+              <div className="space-y-3">
+                <NightlyPrice slug={unit.slug} tone="light" />
+                <StayBookingButtons unit={unit} tone="light" />
               </div>
-              <p className="mt-1 text-xs text-slate-400">
-                {es ? 'Tarifa nocturna según demanda, antes de descuentos.' : 'Nightly rate based on demand, before discounts.'}
-              </p>
             </div>
 
             {/* Monthly lease — tiered */}

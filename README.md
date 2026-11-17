@@ -5,9 +5,9 @@ The website and back office for **La Casa Oaxaca**: private bungalows, a room in
 The site does four jobs:
 
 1. **Marketing:** units, amenities, gallery, tours, things to do, FAQ. Everything is in English and Spanish.
-2. **Bookings and availability:** live room availability synced with **Airbnb's calendar** (and Booking.com), long-term lease inquiries, and manual bookings by the admin.
+2. **Bookings and availability:** live nightly prices from **Hospitable** (synced with Airbnb and Vrbo), **direct bookings paid by card**, room availability synced with Airbnb's calendar (and Booking.com), long-term lease inquiries, and manual bookings by the admin.
 3. **A guest portal:** guests log in with their door lock code and a password to request cleaning, transport, stay extensions or maintenance, cancel, leave a review, and manage their profile.
-4. **Payments through Stripe:** private transport trips paid by card, and long-term tenants' **rent charged automatically on the 1st of each month**.
+4. **Payments through Stripe:** direct stays and private transport trips paid by card, and long-term tenants' **rent charged automatically on the 1st of each month**.
 
 > **Working on this repo? Read [Engineering rules](#engineering-rules) and follow the [Commit checklist](#commit-checklist) before and after every commit.**
 
@@ -18,6 +18,7 @@ The site does four jobs:
 - [Tech stack](#tech-stack)
 - [How it works](#how-it-works)
   - [Airbnb calendar integration](#airbnb-calendar-integration)
+  - [Nightly prices and direct bookings](#nightly-prices-and-direct-bookings)
   - [Guest portal and logins](#guest-portal-and-logins)
   - [Payments](#payments)
 - [Getting started](#getting-started)
@@ -68,6 +69,25 @@ our reservations + bookings ─────────────────�
 - **Live Airbnb lookup.** `/api/airbnb-availability/[slug]` reads a unit's Airbnb iCal directly (from the `AIRBNB_ICAL_*` environment variables). The unit pop-up uses it to show the next free dates, and its "Book" button links to that unit's Airbnb listing.
 - **Inbound reservations.** `/api/booking-webhook` (from Make.com or Zapier) and `/api/bookingcom-webhook` record platform reservations in our database and email the admin.
 
+### Nightly prices and direct bookings
+
+The unit cards show each unit's **current nightly price** (tonight's, or the next available night's) and two buttons: **Book directly** and an **Airbnb** button that opens the listing.
+
+```
+Airbnb / Vrbo ◀──sync──▶ Hospitable ──API──▶ lib/hospitable.ts ──▶ /api/nightly-rates (1 h cache) ──▶ unit cards
+                                                    │
+"Book directly" form ──▶ /api/stays/quote ──────────┤  live per-night prices + availability (never cached)
+                    └──▶ /api/stays/checkout ───────┘──▶ Stripe Checkout, shown inside the pop-up
+                                                              │ payment succeeds
+                                                              ▼
+                         /api/stripe/webhook ──▶ reservation + door code + confirmation emails
+```
+
+- **Prices come from Hospitable**, the channel manager connected to the Airbnb and Vrbo listings. One read-only token (`HOSPITABLE_API_TOKEN`) and each unit's Hospitable property ID (`HOSPITABLE_PROPERTY_*`) are needed. Without them, the cards show the static ranges from `data/units.ts` and direct booking is unavailable.
+- **A direct booking is checked twice**: on our own calendar (reservations and booking requests, plus the 2-day cleaning buffer) and on Hospitable's (Airbnb/Vrbo bookings, minimum stay, closed check-in/check-out days). The total is the sum of Hospitable's nightly prices, worked out on the server and charged in the listing's currency.
+- **Dates aren't held while the guest pays.** When the webhook arrives it checks again, under a per-unit database lock. If the dates were taken meanwhile, the payment is **refunded automatically** and both sides are emailed.
+- **Hospitable doesn't learn about direct bookings automatically** (the token is read-only). The admin email for each paid booking asks you to block the dates in Hospitable (see [To-dos](#to-dos)).
+
 ### Guest portal and logins
 
 - Guests log in at `/portal` with their **4-digit door lock code**, plus a **password**. Their email, phone number or a username also work in place of the lock code.
@@ -80,6 +100,7 @@ our reservations + bookings ─────────────────�
 
 All card handling happens on **Stripe-hosted pages**. Card numbers never reach our servers or database.
 
+- **Direct stays.** See [Nightly prices and direct bookings](#nightly-prices-and-direct-bookings). The payment form is Stripe's own, embedded in the pop-up (Embedded Checkout), so card numbers still never reach our servers.
 - **Transport trips.** `/api/transport/checkout` works out the price **on the server** from `lib/transportPricing.ts`, then opens a Stripe Checkout session. When the webhook confirms payment, the trip is recorded and confirmation emails go out.
 - **Tenant rent.** The admin adds a tenant at `/admin/tenants`, and the tenant receives a permanent signed link. That link opens Stripe Checkout in "setup" mode to save a card. The webhook then creates a subscription that charges on the 1st of each month at 09:00 Oaxaca time, and cancels itself after the lease's last month. The same link later opens Stripe's billing portal so the tenant can update their card.
 - **Webhook.** `/api/stripe/webhook` verifies Stripe's signature on every event. It must be subscribed to `checkout.session.completed`, `invoice.paid`, `invoice.payment_failed` and `customer.subscription.deleted`.
@@ -122,6 +143,9 @@ Set these in **Vercel → Settings → Environment Variables** (Production), and
 | `RATE_LIMIT_ATTEMPTS`, `RATE_LIMIT_WINDOW_MINUTES` | Portal login rate limit (default 10 attempts per 15 minutes) |
 | `STRIPE_SECRET_KEY` | Stripe API key (`sk_test_…` or `sk_live_…`) |
 | `STRIPE_WEBHOOK_SECRET` | Signing secret of the Stripe webhook endpoint |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe publishable key (`pk_test_…` or `pk_live_…`), for the payment form in the "Book directly" pop-up. Publishable keys are meant to be public. |
+| `HOSPITABLE_API_TOKEN` | Hospitable personal access token (Read): nightly prices and availability |
+| `HOSPITABLE_PROPERTY_BUNGALOW_1`, `HOSPITABLE_PROPERTY_BUNGALOW_2`, `HOSPITABLE_PROPERTY_MAIN_BEDROOM` | Each unit's Hospitable property ID (the property linked to its Airbnb listing) |
 | `RESEND_API_KEY` | Sending email |
 | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER` | WhatsApp messages |
 | `NEXT_PUBLIC_WHATSAPP_NUMBER` | WhatsApp contact button |
@@ -181,7 +205,7 @@ We hold guests' names, emails, phone numbers, door codes, ID check results and p
 
 ### 2. Payment safety
 
-- **Card data never touches our code.** Use only Stripe-hosted pages (Checkout and the Billing Portal).
+- **Card data never touches our code.** Use only Stripe-hosted payment forms: Checkout (hosted or embedded) and the Billing Portal.
 - **Prices are always worked out on the server** from our own price tables. Never trust an amount sent by the browser.
 - **Payment results come only from verified Stripe webhooks**, never from redirect pages or query strings.
 - **Webhook handlers must be idempotent**, because Stripe retries events. Claim rows atomically, use unique keys such as the invoice ID, and pass idempotency keys to Stripe create calls. Return a 500 only when a retry should happen.
@@ -256,6 +280,7 @@ Go through this before and after every commit. AI assistants working on this rep
 | `/tours` | `app/tours/page.tsx` | Tours and excursions |
 | `/transport` | `app/transport/page.tsx` | Private transport: destinations, prices, pay by card |
 | `/transport/success` | `app/transport/success/page.tsx` | Shown after a transport payment |
+| `/stay/confirmed` | `app/stay/confirmed/page.tsx` | Shown after paying for a direct stay |
 | `/book` | `app/book/page.tsx` | Long-term lease inquiry |
 | `/book/confirmation` | `app/book/confirmation/page.tsx` | Shown after an inquiry |
 | `/booking` | `app/booking/page.tsx` | Old booking form; not linked anywhere (see [To-dos](#to-dos)) |
@@ -288,6 +313,8 @@ Go through this before and after every commit. AI assistants working on this rep
 | Route | Auth | What it does |
 |---|---|---|
 | `GET /api/availability/[unitSlug]` | Public | Blocked date ranges (our bookings + imported blocks + 2-day buffer) |
+| `GET /api/nightly-rates` | Public | Each unit's current nightly price and 90-day range from Hospitable (cached 1 hour) |
+| `POST /api/stays/quote` | Public | Checks and prices a direct stay (our calendar + Hospitable's live calendar) |
 | `GET /api/airbnb-availability/[slug]` | Public | Reads the unit's Airbnb iCal to find the next available dates |
 | `GET /api/calendar/[unitSlug]` | Public | iCal export of our bookings, for Airbnb and Booking.com to import |
 | `GET/POST /api/calendar/import` | `CRON_SECRET` | Daily cron: pulls the `calendar_feeds` iCal URLs into `external_blocks` |
@@ -302,8 +329,9 @@ Go through this before and after every commit. AI assistants working on this rep
 
 | Route | Auth | What it does |
 |---|---|---|
+| `POST /api/stays/checkout` | Public | Checks and prices the stay again on the server, then creates an embedded Stripe Checkout session |
 | `POST /api/transport/checkout` | Public or guest JWT | Prices the trip on the server and creates the Stripe Checkout session |
-| `POST /api/stripe/webhook` | Stripe signature | Transport payments; rent setup, invoices and lease end |
+| `POST /api/stripe/webhook` | Stripe signature | Direct stays (record or auto-refund); transport payments; rent setup, invoices and lease end |
 | `GET /api/rent/setup/[id]/[token]` | HMAC tenant token | Tenant's permanent link: card setup, then the billing portal |
 
 **Admin**
@@ -334,7 +362,9 @@ Go through this before and after every commit. AI assistants working on this rep
 |---|---|
 | `ClientLayout.tsx` | Client-side wrapper: language provider and EN/ES toggle |
 | `BackgroundSlideshow.tsx` | Full-screen photo slideshow background |
-| `UnitCard.tsx`, `UnitModal.tsx` | Unit card and details pop-up (photos, rates, live Airbnb availability, booking links) |
+| `UnitCard.tsx`, `UnitModal.tsx` | Unit card and details pop-up (photos, rates, live availability, booking buttons) |
+| `NightlyPrice.tsx` | A unit's current nightly price (live from Hospitable) |
+| `StayBookingButtons.tsx`, `StayBookingModal.tsx` | "Book directly" + Airbnb buttons; booking form with live price, then Stripe's payment form in the pop-up |
 | `EntireHomeCard.tsx` | "Rent the entire home" card |
 | `GalleryModal.tsx`, `GalleryFilters.tsx` | Photo viewer and category filters |
 | `ContactModal.tsx` | Contact form pop-up |
@@ -368,15 +398,19 @@ Go through this before and after every commit. AI assistants working on this rep
 | `password.ts` | scrypt password hashing and verification (default-password fallback) |
 | `adminCredentials.ts` | Read and save the admin portal password hash |
 | `adminToken.ts` | HMAC tokens for admin approve/reject links |
-| `bookingAction.ts` | Confirm/deny logic for booking requests (TTLock code, notifications) |
+| `bookingAction.ts` | Confirm/deny logic for booking requests; `confirmStay` (TTLock code + guest confirmation email/SMS), also used for paid stays |
 | `ttlock.ts` | TTLock API: create and delete timed gate passcodes |
 | `stripe.ts` | Shared Stripe client (`getStripe()`) |
+| `hospitable.ts` | Hospitable API: unit calendars, current nightly prices, `quoteStay` |
+| `nightlyRates.ts` | Nightly-rate types and display formatting (shared with the browser) |
+| `stayBooking.ts` | Direct-stay validation and `checkStay` (dates, our calendar, Hospitable) |
+| `stayWebhook.ts` | Stripe event for a paid stay: record the reservation, or refund if the dates were taken |
 | `transportPricing.ts` | Transport destinations and server-side prices (MXN) |
 | `transportCheckout.ts` | Browser helper that starts a transport checkout |
-| `rent.ts` | Rent schedule maths, tenant link tokens, admin-code check, `escapeHtml`, money formatting |
+| `rent.ts` | Rent schedule maths, tenant link tokens, admin-code check, `escapeHtml` and `emailRow` for emails, money formatting |
 | `rentWebhook.ts` | Stripe rent events: create subscription, record invoices, lease end |
 | `currency.ts` | MXN/USD price formatting |
-| `date.ts` | Date formatting |
+| `date.ts` | Date formatting; stay-date maths (`addDays`, `nightsBetween`, `oaxacaToday`, cleaning buffer) |
 | `translations.ts` | All English and Spanish site text |
 | `google-vision.ts` | ID document detection and name extraction |
 | `ofac-sanctions.ts` | Fuzzy name matching against the OFAC sanctions list |
@@ -389,6 +423,7 @@ Go through this before and after every commit. AI assistants working on this rep
 |---|---|
 | `hooks/useGuestAuth.ts` | Portal session: login, logout, refresh, update |
 | `hooks/useAvailability.ts` | Fetches a unit's Airbnb availability |
+| `hooks/useNightlyRates.ts` | Fetches every unit's nightly rates once per page |
 | `hooks/useUsdToMxn.ts` | Daily-cached USD→MXN exchange rate |
 | `hooks/useGeoDialCode.ts` | Guesses the visitor's phone country code |
 | `contexts/LanguageContext.tsx` | EN/ES language state and `t()` translation function |
@@ -419,7 +454,7 @@ PostgreSQL on Supabase. Only the website's server connects (through `DATABASE_UR
 
 | Table | Holds |
 |---|---|
-| `reservations` | Guest stays: name, contact, unit, dates, door code, portal username and password hash, status |
+| `reservations` | Guest stays: name, contact, unit, dates, door code, portal username and password hash, status; for paid direct stays also the Stripe session, currency and guest count |
 | `bookings` | Direct booking requests |
 | `calendar_feeds` | Airbnb and Booking.com iCal URLs per unit |
 | `external_blocks` | Dates blocked by imported calendars |
@@ -430,7 +465,7 @@ PostgreSQL on Supabase. Only the website's server connects (through `DATABASE_UR
 | `reviews`, `review_images` | Guest reviews awaiting or past moderation (created by migration 008) |
 | `cleaning_requests`, `stay_extensions`, `cancellation_requests`, `transport_destinations` | Defined in `schema.sql` for the old request endpoints; not in the live database and no longer needed |
 
-Migrations: `001` booking webhook fields · `002` booking count · `003` tenants and rent payments · `004` guest usernames and passwords · `005` admin credentials · `006` row-level security for the 003 and 005 tables · `007` closes **every** table to Supabase's public API (row-level security, no anon/authenticated access) · `008` creates `reviews`, `review_images` and `transport_requests`.
+Migrations: `001` booking webhook fields · `002` booking count · `003` tenants and rent payments · `004` guest usernames and passwords · `005` admin credentials · `006` row-level security for the 003 and 005 tables · `007` closes **every** table to Supabase's public API (row-level security, no anon/authenticated access) · `008` creates `reviews`, `review_images` and `transport_requests` · `009` adds `stripe_session_id` (unique), `payment_currency` and `guests` to `reservations`, for paid direct stays.
 
 ---
 
@@ -467,6 +502,9 @@ Migrations: `001` booking webhook fields · `002` booking count · `003` tenants
   - `transport_requests`: paid portal transport trips aren't recorded against the guest's reservation (the Stripe webhook logs the error; payment and emails still work).
 
 ### Features
+
+- [ ] **Block direct bookings in Hospitable automatically.** Today the admin email asks you to block the dates by hand; until you do, Airbnb or Vrbo could sell the same nights (the webhook refunds the direct guest if it notices first). Options: a Hospitable token with Write access to block the calendar through the API, or adding our `/api/calendar/[unitSlug]` iCal feed to Hospitable as an imported calendar.
+- [ ] **Merge duplicate Hospitable properties.** Bungalow 1's Airbnb and Vrbo listings share one Hospitable property, but the other Vrbo listings are separate properties, so their calendars aren't linked to the Airbnb ones.
 
 - [ ] **Create Airbnb guests automatically.** When an Airbnb booking is confirmed, automatically add the guest to `reservations`, with **Airbnb's suggested lock code** as their door code. Save their name, email, phone, unit and dates where available, so they can log into the portal right away.
   - **Starting point:** `POST /api/booking-webhook` already creates a reservation from a Make.com/Zapier payload (name, email, dates, unit). But it generates its own lock code; extend it to accept the lock code and phone.

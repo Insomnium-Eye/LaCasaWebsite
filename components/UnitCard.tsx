@@ -4,8 +4,8 @@ import { Unit, LEASE_TIERS } from '../data/units';
 import { useLanguage } from '../contexts/LanguageContext';
 import useAvailability, { Availability } from '../hooks/useAvailability';
 import useUsdToMxn from '../hooks/useUsdToMxn';
-import useNightlyRates from '../hooks/useNightlyRates';
-import { formatNightlyRange } from '../lib/nightlyRates';
+import NightlyPrice from './NightlyPrice';
+import StayBookingButtons from './StayBookingButtons';
 
 interface Props {
   unit: Unit;
@@ -30,8 +30,6 @@ export default function UnitCard({ unit, onSelect, onInquire, showDetails }: Pro
   const es = language === 'es';
   const { rate } = useUsdToMxn();
   const { availability, loading } = useAvailability(unit.slug);
-  const nightlyRates = useNightlyRates(unit.slug);
-  const nightly = nightlyRates && formatNightlyRange(nightlyRates, language, rate);
 
   return (
     <article
@@ -72,37 +70,19 @@ export default function UnitCard({ unit, onSelect, onInquire, showDetails }: Pro
           </ul>
         )}
 
-        {/* Short-term — entire div navigates to Airbnb */}
-        <div
-          role="link"
-          tabIndex={0}
-          onClick={(e) => { e.stopPropagation(); window.open(unit.airbnbUrl, '_blank', 'noopener,noreferrer'); }}
-          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); window.open(unit.airbnbUrl, '_blank', 'noopener,noreferrer'); } }}
-          className="rounded-2xl border border-slate-700/60 bg-slate-800/40 px-4 py-3 space-y-2 cursor-pointer hover:border-slate-500/80 hover:bg-slate-700/40 transition"
-        >
+        {/* Short-term: live nightly price, book directly or on Airbnb */}
+        <div className="rounded-2xl border border-slate-700/60 bg-slate-800/40 px-4 py-3 space-y-3">
           <div className="flex items-center justify-between gap-2">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
-              {es ? 'Corto plazo · Airbnb' : 'Short-term · Airbnb'}
+              {es ? 'Corto plazo · por noche' : 'Short-term · nightly'}
             </p>
             {loading
               ? <span className="text-xs text-slate-600">{es ? 'cargando…' : 'loading…'}</span>
               : <AvailBadge label={availability?.nightly ?? null} />
             }
           </div>
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-sm font-semibold text-white">
-              {nightly
-                ? <>{nightly.range}<span className="font-normal text-slate-400"> {nightly.unit}</span></>
-                : <span className="font-normal text-slate-500">…</span>
-              }
-            </p>
-            <span className="text-xs font-semibold text-terracotta shrink-0">
-              {es ? 'Ver en Airbnb ↗' : 'View on Airbnb ↗'}
-            </span>
-          </div>
-          <p className="text-xs text-slate-500">
-            {es ? 'Tarifa nocturna varía según demanda, antes de descuentos.' : 'Nightly rate varies by demand, before discounts.'}
-          </p>
+          <NightlyPrice slug={unit.slug} />
+          <StayBookingButtons unit={unit} />
         </div>
 
         {/* Monthly lease — entire div opens inquire modal */}

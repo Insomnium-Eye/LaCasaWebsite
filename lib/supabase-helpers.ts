@@ -1,4 +1,6 @@
+import type postgres from 'postgres';
 import { getSql } from './db';
+import { CLEANING_BUFFER_DAYS, addDays } from './date';
 import {
   Reservation,
   GuestSession,
@@ -168,6 +170,73 @@ export const createPaidTransportRequest = async (
     RETURNING *`;
   return row;
 };
+
+// ============ DIRECT (PAID) STAYS ============
+
+type Db = postgres.Sql | postgres.TransactionSql;
+
+/**
+ * True if one of our own stays (reservations or booking requests) overlaps
+ * checkIn → checkOut, counting the cleaning buffer after each stay.
+ */
+export const hasOverlappingStay = async (unitSlug: string, checkIn: string, checkOut: string, sql: Db = getSql()) => {
+  const from = addDays(checkIn, -CLEANING_BUFFER_DAYS);
+  const to = addDays(checkOut, CLEANING_BUFFER_DAYS);
+  const [row] = await sql<{ id: string }[]>`
+    SELECT id::text FROM reservations
+    WHERE unit_id = ${unitSlug} AND status IN ('pending', 'confirmed', 'checked_in')
+      AND check_out >= ${from}::date AND check_in <= ${to}::date
+    UNION ALL
+    SELECT id::text FROM bookings
+    WHERE unit_slug = ${unitSlug} AND status IN ('pending', 'confirmed', 'checked_in')
+      AND check_out >= ${from}::date AND check_in <= ${to}::date
+    LIMIT 1`;
+  return Boolean(row);
+};
+
+export interface PaidStay {
+  stripeSessionId: string;
+  unitSlug: string;
+  unitName: string;
+  checkIn: string;
+  checkOut: string;
+  guests: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  totalPaid: number;
+  currency: string;
+  nightlyRate: number;
+  pin: string;
+  bookingCount: number;
+}
+
+/**
+ * Records a paid direct stay as a confirmed reservation. Runs under a per-unit
+ * lock so two payments can't take the same dates, and is idempotent on the
+ * Stripe session ID because Stripe can deliver a webhook more than once.
+ * `takenElsewhere` = Airbnb/Vrbo already took some of the nights (checked by the caller).
+ */
+export const recordPaidStay = async (stay: PaidStay, takenElsewhere = false): Promise<'created' | 'exists' | 'conflict'> =>
+  getSql().begin(async (tx) => {
+    await tx`SELECT pg_advisory_xact_lock(hashtext(${'stay:' + stay.unitSlug}))`;
+    const [existing] = await tx`SELECT id FROM reservations WHERE stripe_session_id = ${stay.stripeSessionId}`;
+    if (existing) return 'exists' as const;
+    if (takenElsewhere) return 'conflict' as const;
+    if (await hasOverlappingStay(stay.unitSlug, stay.checkIn, stay.checkOut, tx)) return 'conflict' as const;
+
+    await tx`
+      INSERT INTO reservations
+        (guest_first_name, guest_last_name, email, phone, digital_key, unit_id, unit_name,
+         check_in, check_out, nightly_rate, total_paid, payment_currency, guests, source, status,
+         booking_count, stripe_session_id)
+      VALUES
+        (${stay.firstName}, ${stay.lastName}, ${stay.email}, ${stay.phone}, ${stay.pin}, ${stay.unitSlug}, ${stay.unitName},
+         ${stay.checkIn}, ${stay.checkOut}, ${stay.nightlyRate}, ${stay.totalPaid}, ${stay.currency}, ${stay.guests}, 'direct', 'confirmed',
+         ${stay.bookingCount}, ${stay.stripeSessionId})`;
+    return 'created' as const;
+  });
 
 export const getTransportDestinations = async () => {
   const sql = getSql();

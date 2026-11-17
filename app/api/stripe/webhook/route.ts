@@ -4,17 +4,10 @@ import { Resend } from 'resend';
 import { getStripe } from '@/lib/stripe';
 import { createPaidTransportRequest } from '@/lib/supabase-helpers';
 import { handleRentInvoice, handleRentSetupCompleted, handleRentSubscriptionEnded } from '@/lib/rentWebhook';
+import { handleStayPaid } from '@/lib/stayWebhook';
+import { ADMIN_EMAIL, emailRow as row, escapeHtml } from '@/lib/rent';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const ADMIN_EMAIL = 'ebm22david@gmail.com';
-
-const escapeHtml = (value: string) =>
-  value.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
-
-const row = (label: string, value: string) =>
-  value
-    ? `<tr><td style="padding:6px 12px;color:#555;width:160px;">${label}</td><td style="padding:6px 12px;font-weight:600;">${escapeHtml(value)}</td></tr>`
-    : '';
 
 async function handleTransportPaid(session: Stripe.Checkout.Session) {
   const m = session.metadata ?? {};
@@ -108,12 +101,15 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // Rent handlers are idempotent, so on failure return 500 and let Stripe retry the event.
+  // Rent and stay handlers are idempotent, so on failure return 500 and let Stripe retry the event.
   try {
     switch (event.type) {
       case 'checkout.session.completed':
         if (event.data.object.mode === 'setup' && event.data.object.metadata?.kind === 'rent_setup') {
           await handleRentSetupCompleted(stripe, event.data.object);
+        }
+        if (event.data.object.payment_status === 'paid' && event.data.object.metadata?.kind === 'stay') {
+          await handleStayPaid(stripe, event.data.object);
         }
         break;
       case 'invoice.paid':

@@ -1,14 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { CLEANING_BUFFER_DAYS, addDays } from '@/lib/date';
 
 export interface BlockedRange {
   start: string; // YYYY-MM-DD
   end: string;   // YYYY-MM-DD (inclusive last blocked day)
-}
-
-function addDays(dateStr: string, days: number): string {
-  const d = new Date(dateStr + 'T00:00:00Z');
-  d.setUTCDate(d.getUTCDate() + days);
-  return d.toISOString().slice(0, 10);
 }
 
 export async function GET(
@@ -46,12 +41,12 @@ export async function GET(
       // Own bookings: block check-in through 2 days after checkout (cleaning + maintenance buffer)
       ...bookings.map((b) => ({
         start: b.check_in,
-        end: addDays(b.check_out, 2),
+        end: addDays(b.check_out, CLEANING_BUFFER_DAYS),
       })),
       // External blocks: same 2-day buffer
       ...external.map((e) => ({
         start: e.start_date,
-        end: addDays(e.end_date, 2),
+        end: addDays(e.end_date, CLEANING_BUFFER_DAYS),
       })),
     ];
 

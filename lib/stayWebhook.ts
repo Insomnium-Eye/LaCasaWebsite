@@ -116,7 +116,7 @@ export async function handleStayPaid(stripe: Stripe, session: Stripe.Checkout.Se
 
   // Confirmed: door code + guest email/SMS, then tell the admin to block the dates in Hospitable.
   try {
-    await confirmStay({
+    const { lockSet } = await confirmStay({
       guest_name: m.guestName,
       email: m.guestEmail,
       phone: m.guestPhone,
@@ -131,11 +131,16 @@ export async function handleStayPaid(stripe: Stripe, session: Stripe.Checkout.Se
       await resend.emails.send({
         from: FROM,
         to: [ADMIN_EMAIL],
-        subject: `💳 New paid direct booking: ${m.guestName} — ${unit.name} (${m.checkIn})`,
+        subject: `${lockSet ? '💳' : '⚠️'} New paid direct booking: ${m.guestName} — ${unit.name} (${m.checkIn})${lockSet ? '' : ' — set the door code'}`,
         html: `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
           <h2 style="color:#8d4a3f;">💳 New paid direct booking</h2>
+          ${lockSet
+            ? `<p>Door PIN <strong>${escapeHtml(pin)}</strong> is set on the front gate for this stay.</p>`
+            : `<div style="background:#fde2e1;border-left:4px solid #b42318;padding:12px 16px;border-radius:8px;margin-bottom:12px;">
+                <strong>Action needed: the door code could not be set automatically.</strong> In the TTLock app, add PIN <strong>${escapeHtml(pin)}</strong> on the front gate, valid ${escapeHtml(m.checkIn)} → ${escapeHtml(m.checkOut)}. The guest has already been sent this PIN.
+              </div>`}
           <div style="background:#fff3cd;border-left:4px solid #c36a4f;padding:12px 16px;border-radius:8px;">
-            <strong>Action needed:</strong> block ${escapeHtml(m.checkIn)} → ${escapeHtml(m.checkOut)} for ${escapeHtml(unit.name)} in Hospitable, so Airbnb and Vrbo can't book them.
+            Airbnb and Vrbo are blocked automatically once this unit's calendar feed is imported into Hospitable. If it isn't yet, block ${escapeHtml(m.checkIn)} → ${escapeHtml(m.checkOut)} for ${escapeHtml(unit.name)} in Hospitable by hand.
           </div>
           <table style="width:100%;border-collapse:collapse;margin:16px 0;">
             ${row('Guest', m.guestName)}${row('Email', m.guestEmail)}${row('Phone', m.guestPhone)}

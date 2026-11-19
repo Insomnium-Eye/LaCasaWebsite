@@ -6,23 +6,26 @@ import { escapeHtml } from '@/lib/rent';
 
 const FRONT_GATE_LOCK_ID = 32117998;
 
+/** Sets the guest's PIN on the front gate for their stay. Returns false if it couldn't be set. */
 async function provisionLockCode(
   lockCode: string,
   guestName: string,
   checkIn: string,
   checkOut: string,
-): Promise<void> {
+): Promise<boolean> {
   const ready = process.env.TTLOCK_CLIENT_ID && process.env.TTLOCK_CLIENT_SECRET
     && process.env.TTLOCK_USERNAME && process.env.TTLOCK_PASSWORD;
   if (!ready) {
     console.log('[TTLock] env vars not set — skipping lock provisioning');
-    return;
+    return false;
   }
   try {
     await createTimedPasscode(FRONT_GATE_LOCK_ID, lockCode, guestName, checkIn, checkOut);
     console.log(`[TTLock] passcode ${lockCode} provisioned for ${guestName} (${checkIn}→${checkOut})`);
+    return true;
   } catch (err) {
     console.error('[TTLock] failed to provision passcode:', err instanceof Error ? err.message : err);
+    return false;
   }
 }
 
@@ -88,12 +91,12 @@ export interface ConfirmedStay {
  * confirmation (lock code + portal link) by email and SMS.
  * Returns how the guest was notified, e.g. "email and SMS".
  */
-export async function confirmStay(booking: ConfirmedStay): Promise<string> {
+export async function confirmStay(booking: ConfirmedStay): Promise<{ notifiedVia: string; lockSet: boolean }> {
   const [firstName] = booking.guest_name.trim().split(' ');
   const hasEmail = !!booking.email;
   const hasPhone = !!booking.phone;
 
-  await provisionLockCode(booking.lock_code, booking.guest_name, booking.check_in, booking.check_out);
+  const lockSet = await provisionLockCode(booking.lock_code, booking.guest_name, booking.check_in, booking.check_out);
 
   if (hasEmail && process.env.RESEND_API_KEY) {
     const loginHint = buildLoginHint(true, hasPhone);
@@ -142,7 +145,7 @@ export async function confirmStay(booking: ConfirmedStay): Promise<string> {
     );
   }
 
-  return [hasEmail && 'email', hasPhone && 'SMS'].filter(Boolean).join(' and ');
+  return { notifiedVia: [hasEmail && 'email', hasPhone && 'SMS'].filter(Boolean).join(' and '), lockSet };
 }
 
 export async function handleBookingAction(

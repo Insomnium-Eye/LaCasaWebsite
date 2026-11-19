@@ -4,6 +4,7 @@ import { Resend } from 'resend';
 import { getSql } from '@/lib/db';
 import { units } from '@/data/units';
 import { Tenant, checkAdminCode, escapeHtml, formatMoney, monthLabel, tenantLink } from '@/lib/rent';
+import { EMAIL_FROM } from '@/lib/email';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -89,7 +90,7 @@ export async function POST(request: NextRequest) {
       const from = monthLabel(body.first_rent_date, body.language);
       const to = monthLabel(body.first_rent_date, body.language, body.months - 1);
       const { error } = await resend.emails.send({
-        from: 'La Casa Oaxaca <onboarding@resend.dev>',
+        from: EMAIL_FROM,
         to: [body.email],
         subject: es ? '🏠 Configura el pago automático de tu renta — La Casa Oaxaca' : '🏠 Set up automatic rent payments — La Casa Oaxaca',
         html: `

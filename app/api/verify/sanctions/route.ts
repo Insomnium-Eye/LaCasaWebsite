@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkNameAgainstOFAC } from '@/lib/ofac-sanctions';
 import { Resend } from 'resend';
+import { ADMIN_EMAIL, EMAIL_FROM } from '@/lib/email';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -34,8 +35,8 @@ export async function POST(req: NextRequest) {
       : `<tr><td colspan="2" style="padding:8px;color:#6b7280;">No matches found</td></tr>`;
 
     await resend.emails.send({
-      from: 'La Casa Oaxaca <onboarding@resend.dev>',
-      to: ['ebm22david@gmail.com'],
+      from: EMAIL_FROM,
+      to: [ADMIN_EMAIL],
       subject: `ID Verification – OFAC ${levelLabel}: ${name.trim()}`,
       html: `
         <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">

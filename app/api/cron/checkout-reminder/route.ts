@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import jwt from 'jsonwebtoken';
+import { ADMIN_EMAIL, EMAIL_FROM } from '@/lib/email';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const JWT_SECRET = process.env.NEXT_PUBLIC_JWT_SECRET || 'change-me-in-production';
@@ -101,9 +102,9 @@ export async function GET(request: NextRequest) {
       const btnBlue  = 'display:inline-block;background:#2563eb;color:white;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;';
 
       await resend.emails.send({
-        from: 'La Casa Oaxaca <onboarding@resend.dev>',
+        from: EMAIL_FROM,
         to: [r.email],
-        replyTo: 'ebm22david@gmail.com',
+        replyTo: ADMIN_EMAIL,
         subject: `🏡 Check-out reminder — ${r.unit_name} (tomorrow)`,
         html: `
           <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">

@@ -2,14 +2,14 @@ import type Stripe from 'stripe';
 import { Resend } from 'resend';
 import { getSql } from '@/lib/db';
 import { ADMIN_EMAIL, Tenant, escapeHtml, firstChargeAt, formatMoney, leaseEndAt, monthLabel } from '@/lib/rent';
+import { EMAIL_FROM } from '@/lib/email';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM = 'La Casa Oaxaca <onboarding@resend.dev>';
 
 const sendEmail = async (to: string, subject: string, html: string) => {
   if (!process.env.RESEND_API_KEY || !to) return;
   const { error } = await resend.emails.send({
-    from: FROM,
+    from: EMAIL_FROM,
     to: [to],
     subject,
     html: `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;">${html}</div>`,

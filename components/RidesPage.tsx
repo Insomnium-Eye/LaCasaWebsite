@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useLanguage } from '../contexts/LanguageContext';
 import useUsdToMxn from '../hooks/useUsdToMxn';
 import BackgroundSlideshow from './BackgroundSlideshow';
+import TransportationServices from './TransportationServices';
 
 const RATES = {
   oneWay: [
@@ -159,6 +160,9 @@ export default function ToursContent() {
             </div>
           </div>
         </section>
+
+        {/* Local destinations (same list and online booking as /transport) */}
+        <TransportationServices embedded />
 
         {/* Base Transfer Rates */}
         <section className="space-y-6">

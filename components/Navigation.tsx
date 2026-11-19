@@ -15,7 +15,7 @@ export default function Navigation() {
     { href: "/gallery", label: t("nav.gallery") },
     { href: "/faq", label: t("nav.faq") },
     { href: "/contact", label: t("nav.contact") },
-    { href: "/tours", label: t("nav.tours") }
+    { href: "/rides", label: t("nav.tours") }
   ];
 
   return (

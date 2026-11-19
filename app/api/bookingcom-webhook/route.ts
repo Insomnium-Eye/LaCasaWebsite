@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSql } from '@/lib/db';
 import { Resend } from 'resend';
 import { generateUniquePin, getReturningGuestInfo } from '@/lib/reservation-helpers';
+import { ADMIN_EMAIL, EMAIL_FROM } from '@/lib/email';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -119,8 +120,8 @@ export async function POST(request: NextRequest) {
       : `⚠️ Booking.com webhook received — parse ${parseError ? 'failed' : 'ok'}`;
 
     await resend.emails.send({
-      from: 'La Casa Oaxaca <onboarding@resend.dev>',
-      to: ['ebm22david@gmail.com'],
+      from: EMAIL_FROM,
+      to: [ADMIN_EMAIL],
       subject,
       html: `
         <div style="font-family:sans-serif;max-width:700px;">
@@ -188,8 +189,8 @@ export async function POST(request: NextRequest) {
 
     if (process.env.RESEND_API_KEY) {
       await resend.emails.send({
-        from: 'La Casa Oaxaca <onboarding@resend.dev>',
-        to: ['ebm22david@gmail.com'],
+        from: EMAIL_FROM,
+        to: [ADMIN_EMAIL],
         subject: `🔑 PIN assigned: ${parsed.firstName} ${parsed.lastName} (${parsed.checkIn})`,
         html: `
           <div style="font-family:sans-serif;max-width:600px;">

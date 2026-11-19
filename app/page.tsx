@@ -57,7 +57,7 @@ export default function HomePage() {
 <Link href="/portal" className="rounded-full border border-slate-500 px-5 py-2 text-sm font-semibold text-slate-100 transition hover:bg-slate-900/50">
               {t("nav.guestSignIn")}
             </Link>
-            <Link href="/tours" className="hidden rounded-full border border-slate-600 px-5 py-2 text-sm font-semibold text-slate-300 transition hover:border-slate-400 hover:text-white sm:inline-flex">
+            <Link href="/rides" className="hidden rounded-full border border-slate-600 px-5 py-2 text-sm font-semibold text-slate-300 transition hover:border-slate-400 hover:text-white sm:inline-flex">
               {t("nav.tours")}
             </Link>
             </div>

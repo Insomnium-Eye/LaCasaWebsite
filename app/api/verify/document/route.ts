@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { checkIsIdentityDocument } from '@/lib/google-vision';
 import { checkNameAgainstOFAC, SanctionsResult } from '@/lib/ofac-sanctions';
 import { Resend } from 'resend';
+import { ADMIN_EMAIL, EMAIL_FROM } from '@/lib/email';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -105,8 +106,8 @@ export async function POST(req: NextRequest) {
 
     try {
       await resend.emails.send({
-        from: 'La Casa Oaxaca <onboarding@resend.dev>',
-        to: ['ebm22david@gmail.com'],
+        from: EMAIL_FROM,
+        to: [ADMIN_EMAIL],
         subject,
         html: buildEmail(result.extractedName, formName ?? null, result.documentType, sanctions),
       });

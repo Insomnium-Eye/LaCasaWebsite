@@ -1,7 +1,7 @@
 import { createHmac, timingSafeEqual } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 
-export const ADMIN_EMAIL = 'ebm22david@gmail.com';
+export { ADMIN_EMAIL } from '@/lib/email';
 
 /** Returns an error response unless the request carries the admin portal code. */
 export function checkAdminCode(request: NextRequest): NextResponse | null {

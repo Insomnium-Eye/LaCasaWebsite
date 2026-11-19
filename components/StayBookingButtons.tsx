@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Unit } from '@/data/units';
 import { useLanguage } from '@/contexts/LanguageContext';
 import StayBookingModal from './StayBookingModal';
@@ -49,7 +50,10 @@ export default function StayBookingButtons({ unit, tone = 'dark' }: { unit: Unit
           <AirbnbIcon className="h-5 w-5 text-[#FF5A5F]" />
         </a>
       )}
-      {open && <StayBookingModal unit={unit} onClose={() => setOpen(false)} />}
+      {/* Rendered on <body>: the card's hover lift (a CSS transform) would otherwise
+          shrink this full-screen pop-up down to the card's size. React events still
+          bubble to the wrapper above, so clicks inside don't open the unit pop-up. */}
+      {open && createPortal(<StayBookingModal unit={unit} onClose={() => setOpen(false)} />, document.body)}
     </div>
   );
 }

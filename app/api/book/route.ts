@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { generateAdminToken } from '@/lib/adminToken';
+import { ADMIN_EMAIL, EMAIL_FROM } from '@/lib/email';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -86,9 +87,9 @@ export async function POST(request: NextRequest) {
     // Guest pending email (lock code withheld until admin confirms)
     if (email && process.env.RESEND_API_KEY) {
       await resend.emails.send({
-        from: 'La Casa Oaxaca <onboarding@resend.dev>',
+        from: EMAIL_FROM,
         to: [email],
-        replyTo: 'ebm22david@gmail.com',
+        replyTo: ADMIN_EMAIL,
         subject: '📩 Booking Request Received – La Casa Oaxaca',
         html: `
           <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
@@ -145,8 +146,8 @@ export async function POST(request: NextRequest) {
       const denyUrl    = adminToken ? `${baseUrl}/reject/${bookingId}/${adminToken}`  : null;
 
       await resend.emails.send({
-        from: 'La Casa Oaxaca <onboarding@resend.dev>',
-        to: ['ebm22david@gmail.com'],
+        from: EMAIL_FROM,
+        to: [ADMIN_EMAIL],
         subject: `⏳ New Booking Request: ${name} – ${unitName} (${checkIn})`,
         html: `
           <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">

@@ -3,6 +3,7 @@ import { Resend } from 'resend';
 import { verifyAdminToken } from '@/lib/adminToken';
 import { createTimedPasscode } from '@/lib/ttlock';
 import { escapeHtml } from '@/lib/rent';
+import { ADMIN_EMAIL, EMAIL_FROM } from '@/lib/email';
 
 const FRONT_GATE_LOCK_ID = 32117998;
 
@@ -101,9 +102,9 @@ export async function confirmStay(booking: ConfirmedStay): Promise<{ notifiedVia
   if (hasEmail && process.env.RESEND_API_KEY) {
     const loginHint = buildLoginHint(true, hasPhone);
     await resend.emails.send({
-      from: 'La Casa Oaxaca <onboarding@resend.dev>',
+      from: EMAIL_FROM,
       to: [booking.email!],
-      replyTo: 'ebm22david@gmail.com',
+      replyTo: ADMIN_EMAIL,
       subject: '🎉 Your Stay is Confirmed – La Casa Oaxaca',
       html: `
         <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
@@ -213,9 +214,9 @@ export async function handleBookingAction(
     } else {
       if (hasEmail && process.env.RESEND_API_KEY) {
         await resend.emails.send({
-          from: 'La Casa Oaxaca <onboarding@resend.dev>',
+          from: EMAIL_FROM,
           to: [booking.email],
-          replyTo: 'ebm22david@gmail.com',
+          replyTo: ADMIN_EMAIL,
           subject: 'Update on Your Booking Request – La Casa Oaxaca',
           html: `
             <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
@@ -301,9 +302,9 @@ export async function runBookingAction(id: string, action: 'confirm' | 'deny'): 
     } else {
       if (hasEmail && process.env.RESEND_API_KEY) {
         await resend.emails.send({
-          from: 'La Casa Oaxaca <onboarding@resend.dev>',
+          from: EMAIL_FROM,
           to: [booking.email],
-          replyTo: 'ebm22david@gmail.com',
+          replyTo: ADMIN_EMAIL,
           subject: 'Update on Your Booking Request – La Casa Oaxaca',
           html: `
             <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">

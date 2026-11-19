@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import ToursContent from '@/components/ToursPage';
+import RidesContent from '@/components/RidesPage';
 
 export const metadata: Metadata = {
   title: 'Private Rides & Transfers | Oaxaca to Puerto Escondido | La Casa Oaxaca',
@@ -11,6 +11,6 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ToursPage() {
-  return <ToursContent />;
+export default function RidesPage() {
+  return <RidesContent />;
 }

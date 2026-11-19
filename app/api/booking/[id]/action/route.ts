@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { verifyAdminToken } from '@/lib/adminToken';
+import { ADMIN_EMAIL, EMAIL_FROM } from '@/lib/email';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const PORTAL_URL = 'https://oaxaca-rental.com/portal';
@@ -161,9 +162,9 @@ export async function GET(
     if (action === 'confirm') {
       if (hasEmail && process.env.RESEND_API_KEY) {
         await resend.emails.send({
-          from: 'La Casa Oaxaca <onboarding@resend.dev>',
+          from: EMAIL_FROM,
           to: [booking.email],
-          replyTo: 'ebm22david@gmail.com',
+          replyTo: ADMIN_EMAIL,
           subject: '🎉 Your Stay is Confirmed – La Casa Oaxaca',
           html: confirmEmailHtml(firstName, booking, hasPhone),
         }).catch((err: unknown) => console.error('[Confirm email]', err));
@@ -190,9 +191,9 @@ export async function GET(
     } else {
       if (hasEmail && process.env.RESEND_API_KEY) {
         await resend.emails.send({
-          from: 'La Casa Oaxaca <onboarding@resend.dev>',
+          from: EMAIL_FROM,
           to: [booking.email],
-          replyTo: 'ebm22david@gmail.com',
+          replyTo: ADMIN_EMAIL,
           subject: 'Update on Your Booking Request – La Casa Oaxaca',
           html: denyEmailHtml(firstName, booking),
         }).catch((err: unknown) => console.error('[Deny email]', err));

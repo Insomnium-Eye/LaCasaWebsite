@@ -7,7 +7,11 @@ import { TRANSPORT_DESTINATIONS, TransportDestination, oneWayPriceMxn, tripPrice
 import TransportQuoteModal from './TransportQuoteModal';
 import TransportBookingModal from './TransportBookingModal';
 
-export default function TransportationServices() {
+/**
+ * Local transfer destinations with card payment. `embedded` renders it as a
+ * white panel inside another page (the /rides page) instead of a full page.
+ */
+export default function TransportationServices({ embedded = false }: { embedded?: boolean }) {
   const { language } = useLanguage();
   const es = language === 'es';
   const lang = es ? 'es' : 'en';
@@ -43,13 +47,19 @@ export default function TransportationServices() {
   };
 
   return (
-    <div className="relative bg-white py-16 px-6 lg:px-8">
+    <div className={embedded ? 'relative rounded-3xl bg-white px-5 py-10 sm:px-8' : 'relative bg-white py-16 px-6 lg:px-8'}>
       <div className="mx-auto max-w-7xl">
         {/* Header Section */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-slate-900 mb-4">
-            🚗 {es ? 'Servicio de Transporte Privado' : 'Private Driving Services'}
-          </h1>
+          {embedded ? (
+            <h2 id="destinations" className="text-3xl font-bold text-slate-900 mb-4 scroll-mt-24">
+              🚗 {es ? 'Traslados locales' : 'Local Rides'}
+            </h2>
+          ) : (
+            <h1 className="text-4xl font-bold text-slate-900 mb-4">
+              🚗 {es ? 'Servicio de Transporte Privado' : 'Private Driving Services'}
+            </h1>
+          )}
           <p className="text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
             {es
               ? 'Traslados privados y confiables desde La Casa Oaxaca en San Felipe del Agua a los destinos más populares de Oaxaca. Precios en pesos mexicanos para un sedán estándar, servicio puerta a puerta. Reserva y paga en línea con tarjeta de débito o crédito.'

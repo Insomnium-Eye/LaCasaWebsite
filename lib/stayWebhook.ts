@@ -7,9 +7,9 @@ import { quoteStay } from '@/lib/hospitable';
 import { ADMIN_EMAIL, emailRow as row, escapeHtml } from '@/lib/rent';
 import { generateUniquePin, getReturningGuestInfo } from '@/lib/reservation-helpers';
 import { recordPaidStay } from '@/lib/supabase-helpers';
+import { EMAIL_FROM } from '@/lib/email';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM = 'La Casa Oaxaca <onboarding@resend.dev>';
 
 const money = (amount: number, currency: string) =>
   `$${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}`;
@@ -89,7 +89,7 @@ export async function handleStayPaid(stripe: Stripe, session: Stripe.Checkout.Se
     if (!process.env.RESEND_API_KEY) return;
     await Promise.all([
       resend.emails.send({
-        from: FROM,
+        from: EMAIL_FROM,
         to: [m.guestEmail],
         subject: es ? 'Tu reserva no pudo completarse — reembolso total' : "We couldn't complete your booking — full refund",
         html: `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
@@ -101,7 +101,7 @@ export async function handleStayPaid(stripe: Stripe, session: Stripe.Checkout.Se
         </div>`,
       }),
       resend.emails.send({
-        from: FROM,
+        from: EMAIL_FROM,
         to: [ADMIN_EMAIL],
         subject: `↩️ Direct booking refunded (dates taken): ${m.guestName} — ${unit.name}`,
         html: `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
@@ -129,7 +129,7 @@ export async function handleStayPaid(stripe: Stripe, session: Stripe.Checkout.Se
     });
     if (process.env.RESEND_API_KEY) {
       await resend.emails.send({
-        from: FROM,
+        from: EMAIL_FROM,
         to: [ADMIN_EMAIL],
         subject: `${lockSet ? '💳' : '⚠️'} New paid direct booking: ${m.guestName} — ${unit.name} (${m.checkIn})${lockSet ? '' : ' — set the door code'}`,
         html: `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;">

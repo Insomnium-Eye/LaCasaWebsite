@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { verifyGuestJWT } from '@/lib/guest-auth';
+import { ADMIN_EMAIL, EMAIL_FROM } from '@/lib/email';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -29,9 +30,9 @@ export async function POST(request: NextRequest) {
 
     if (process.env.RESEND_API_KEY) {
       await resend.emails.send({
-        from: 'La Casa Oaxaca <onboarding@resend.dev>',
-        to: ['ebm22david@gmail.com'],
-        replyTo: session.email || 'ebm22david@gmail.com',
+        from: EMAIL_FROM,
+        to: [ADMIN_EMAIL],
+        replyTo: session.email || ADMIN_EMAIL,
         subject: `🔧 Maintenance Request — ${category} — ${session.unitName}`,
         attachments,
         html: `

@@ -94,7 +94,7 @@ Airbnb / Vrbo ◀──sync──▶ Hospitable ──API──▶ lib/hospitabl
 - Every account starts with the shared default password from the `GUEST_DEFAULT_PASSWORD` environment variable. A guest who chooses their own password in **User Profile** gets it stored as an scrypt hash.
 - The admin logs into the same portal with the admin code, plus the admin password. The admin can change that password under **User Profile**; its hash is stored in `admin_credentials`.
 - After login the server issues a signed session token (a JWT), which lasts `JWT_EXPIRY_HOURS` (default 4).
-- Lock codes are generated when a booking is added or confirmed. Confirming a booking request also programs the code into the front gate through TTLock. After checkout, the nightly `/api/cron/expire-checkouts` job retires the lock code by setting it to the sentinel `0000`, which can never log in.
+- Lock codes are generated when a booking is added or confirmed. Confirming a booking request, or a paid direct booking, also programs the code into the front gate through TTLock, valid from 3:00 PM on the check-in date to 11:00 AM on the check-out date (Oaxaca time). If TTLock fails, the admin email says so and gives the PIN to add by hand. After checkout, the nightly `/api/cron/expire-checkouts` job retires the lock code by setting it to the sentinel `0000`, which can never log in.
 
 ### Payments
 
@@ -147,6 +147,7 @@ Set these in **Vercel → Settings → Environment Variables** (Production), and
 | `HOSPITABLE_API_TOKEN` | Hospitable personal access token (Read): nightly prices and availability |
 | `HOSPITABLE_PROPERTY_BUNGALOW_1`, `HOSPITABLE_PROPERTY_BUNGALOW_2`, `HOSPITABLE_PROPERTY_MAIN_BEDROOM` | Each unit's Hospitable property ID (the property linked to its Airbnb listing) |
 | `RESEND_API_KEY` | Sending email |
+| `EMAIL_FROM` | Sender for all emails, e.g. `La Casa Oaxaca <bookings@oaxaca-rental.com>`. Needs the domain verified in Resend; without it, Resend's test sender is used, which only delivers to the Resend account owner. |
 | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER` | WhatsApp messages |
 | `NEXT_PUBLIC_WHATSAPP_NUMBER` | WhatsApp contact button |
 | `TTLOCK_CLIENT_ID`, `TTLOCK_CLIENT_SECRET`, `TTLOCK_USERNAME`, `TTLOCK_PASSWORD` | Front gate door codes |
@@ -236,7 +237,7 @@ Go through this before and after every commit. AI assistants working on this rep
 ### Before committing
 
 1. **Review the diff** with `git status` and `git diff`. It should contain only the intended changes, with no stray debug code.
-2. **Scan for secrets and personal data.** There should be no `.env*` files, `sk_live`/`sk_test`/`whsec_` keys, passwords, admin or lock codes, iCal URLs, real emails or phone numbers.
+2. **Scan for secrets and personal data.** There should be no `.env*` files, `sk_live`/`sk_test`/`whsec_` keys, passwords, admin or lock codes, iCal URLs, personal emails or phone numbers. The one exception is the business address in `lib/email.ts`.
 3. **Security pass** against [rules 1 and 2](#1-protect-user-data). Check that:
    - every new or changed route has an auth check
    - inputs are validated
@@ -277,7 +278,7 @@ Go through this before and after every commit. AI assistants working on this rep
 | `/gallery` | `app/gallery/page.tsx` | Filterable photo gallery |
 | `/faq` | `app/faq/page.tsx` | Frequently asked questions |
 | `/contact` | `app/contact/page.tsx` | Contact form |
-| `/tours` | `app/tours/page.tsx` | Tours and excursions |
+| `/rides` | `app/rides/page.tsx` | Rides: local destinations with card payment (same as `/transport`), Puerto Escondido transfers and beach packages. `/tours` redirects here. |
 | `/transport` | `app/transport/page.tsx` | Private transport: destinations, prices, pay by card |
 | `/transport/success` | `app/transport/success/page.tsx` | Shown after a transport payment |
 | `/stay/confirmed` | `app/stay/confirmed/page.tsx` | Shown after paying for a direct stay |
@@ -370,7 +371,8 @@ Go through this before and after every commit. AI assistants working on this rep
 | `ContactModal.tsx` | Contact form pop-up |
 | `LeaseApplicationForm.tsx`, `LeaseApplicationModal.tsx` | Long-term lease application (MXN rates, deposit, USD conversion) |
 | `IdVerification.tsx` | ID photo upload and check; only used by the unlinked `/booking` page |
-| `ThingsToDoSection.tsx`, `ToursPage.tsx` | Local attractions and tours |
+| `ThingsToDoSection.tsx` | Local attractions |
+| `RidesPage.tsx` | The /rides page: local destinations (embeds `TransportationServices`), Puerto Escondido rates, packages and itineraries |
 | `TransportationServices.tsx`, `TransportBookingModal.tsx`, `TransportQuoteModal.tsx`, `TransportationAddons.tsx` | Transport destinations, booking and payment |
 | `DateInput.tsx` | Shared date and date-time picker (bilingual) |
 | `LanguageToggle.tsx` | EN/ES switch |
@@ -407,6 +409,7 @@ Go through this before and after every commit. AI assistants working on this rep
 | `stayWebhook.ts` | Stripe event for a paid stay: record the reservation, or refund if the dates were taken |
 | `transportPricing.ts` | Transport destinations and server-side prices (MXN) |
 | `transportCheckout.ts` | Browser helper that starts a transport checkout |
+| `email.ts` | `ADMIN_EMAIL` (the business inbox for all admin notifications) and `EMAIL_FROM` (the sender) |
 | `rent.ts` | Rent schedule maths, tenant link tokens, admin-code check, `escapeHtml` and `emailRow` for emails, money formatting |
 | `rentWebhook.ts` | Stripe rent events: create subscription, record invoices, lease end |
 | `currency.ts` | MXN/USD price formatting |
@@ -482,7 +485,7 @@ Migrations: `001` booking webhook fields · `002` booking count · `003` tenants
 - [ ] **Protect or remove `/api/db-check`**, which exposes database error details publicly.
 - [ ] **Verify the senders of `/api/bookingcom-webhook` and `/api/whatsapp/incoming`** (shared secret and Twilio signature).
 - [ ] **Move the hardcoded admin email** out of about 18 files into one environment variable. The repo is public.
-- [ ] **Verify a sending domain in Resend.** The `onboarding@resend.dev` test sender only delivers to the account owner, so guest and tenant emails may not arrive.
+- [ ] **Verify oaxaca-rental.com in Resend and set `EMAIL_FROM`.** The `onboarding@resend.dev` test sender only delivers to the Resend account owner, so guest emails, and admin emails to the business inbox, may not arrive until then.
 
 ### Cleanup (rule 3)
 

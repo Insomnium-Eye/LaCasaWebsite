@@ -6,6 +6,7 @@ import { createPaidTransportRequest } from '@/lib/supabase-helpers';
 import { handleRentInvoice, handleRentSetupCompleted, handleRentSubscriptionEnded } from '@/lib/rentWebhook';
 import { handleStayPaid } from '@/lib/stayWebhook';
 import { ADMIN_EMAIL, emailRow as row, escapeHtml } from '@/lib/rent';
+import { EMAIL_FROM } from '@/lib/email';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -39,7 +40,7 @@ async function handleTransportPaid(session: Stripe.Checkout.Session) {
   ].join('');
 
   await resend.emails.send({
-    from: 'La Casa Oaxaca <onboarding@resend.dev>',
+    from: EMAIL_FROM,
     to: [ADMIN_EMAIL],
     subject: `🚗 Paid Transport Booking: ${m.guestName} — ${m.destinationName} (${when})`,
     html: `
@@ -58,7 +59,7 @@ async function handleTransportPaid(session: Stripe.Checkout.Session) {
 
   if (m.guestEmail) {
     await resend.emails.send({
-      from: 'La Casa Oaxaca <onboarding@resend.dev>',
+      from: EMAIL_FROM,
       to: [m.guestEmail],
       subject: es ? '🚗 Tu transporte está confirmado — La Casa Oaxaca' : '🚗 Your transport is booked — La Casa Oaxaca',
       html: `

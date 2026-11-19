@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSql } from '@/lib/db';
 import { Resend } from 'resend';
 import { generateUniquePin, getReturningGuestInfo } from '@/lib/reservation-helpers';
+import { ADMIN_EMAIL, EMAIL_FROM } from '@/lib/email';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -86,8 +87,8 @@ export async function POST(request: NextRequest) {
         source === 'booking_com' ? 'Booking.com' : 'External';
 
       await resend.emails.send({
-        from: 'La Casa Oaxaca <onboarding@resend.dev>',
-        to: ['ebm22david@gmail.com'],
+        from: EMAIL_FROM,
+        to: [ADMIN_EMAIL],
         subject: `🏠 New ${sourceLabel} Booking: ${firstName} ${lastName} (${check_in})`,
         html: `
           <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">

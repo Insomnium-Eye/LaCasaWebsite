@@ -9,10 +9,10 @@ const CLIENT_SECRET = process.env.TTLOCK_CLIENT_SECRET ?? '';
 const USERNAME  = process.env.TTLOCK_USERNAME ?? '';   // TockLock account email
 const PASSWORD  = process.env.TTLOCK_PASSWORD ?? '';   // TockLock account password
 
-// Mexico City is UTC-6 (CST), UTC-5 during DST. We use noon local time so the
-// code activates when the guest arrives and expires after they check out.
-const CHECKIN_HOUR_UTC  = 18; // noon CST = 18:00 UTC
-const CHECKOUT_HOUR_UTC = 18;
+// Oaxaca is UTC-6 all year (no daylight saving time since 2022).
+// Codes work from check-in time on the arrival day until check-out time on the departure day.
+const CHECKIN_HOUR_UTC  = 21; // 3:00 PM Oaxaca
+const CHECKOUT_HOUR_UTC = 17; // 11:00 AM Oaxaca
 
 function md5(str: string): string {
   return crypto.createHash('md5').update(str).digest('hex');
@@ -56,7 +56,7 @@ export interface PasscodeResult {
 
 /**
  * Create a time-limited passcode on the Front Gate lock.
- * Active from check-in noon CST through check-out noon CST.
+ * Active from 3 PM (Oaxaca) on the check-in date until 11 AM on the check-out date.
  */
 export async function createTimedPasscode(
   lockId: number,

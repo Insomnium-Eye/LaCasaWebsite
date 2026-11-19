@@ -64,7 +64,7 @@ our reservations + bookings ─────────────────�
 ```
 
 - **Importing.** Each unit's Airbnb and Booking.com iCal URLs are stored in the `calendar_feeds` table. Every day at 06:00 UTC, the `/api/calendar/import` cron fetches them and saves the blocked dates into `external_blocks`.
-- **Exporting.** `/api/calendar/[unitSlug]` publishes an iCal feed of our own reservations. Paste that URL into Airbnb's "Import calendar" setting so that direct and portal bookings block Airbnb's calendar too.
+- **Exporting.** `/api/calendar/[unitSlug]` publishes an iCal feed of our own stays: paid direct bookings, admin and portal bookings (everything except Airbnb and Vrbo stays), each blocked through the cleaning days after check-out. Import that URL into **Hospitable** (each property → Calendar → import/sync calendar), so direct bookings block Airbnb and Vrbo automatically.
 - **Live availability.** `/api/availability/[unitSlug]` merges our bookings with the imported blocks. It adds a **2-day cleaning buffer** after every stay.
 - **Live Airbnb lookup.** `/api/airbnb-availability/[slug]` reads a unit's Airbnb iCal directly (from the `AIRBNB_ICAL_*` environment variables). The unit pop-up uses it to show the next free dates, and its "Book" button links to that unit's Airbnb listing.
 - **Inbound reservations.** `/api/booking-webhook` (from Make.com or Zapier) and `/api/bookingcom-webhook` record platform reservations in our database and email the admin.
@@ -503,7 +503,7 @@ Migrations: `001` booking webhook fields · `002` booking count · `003` tenants
 
 ### Features
 
-- [ ] **Block direct bookings in Hospitable automatically.** Today the admin email asks you to block the dates by hand; until you do, Airbnb or Vrbo could sell the same nights (the webhook refunds the direct guest if it notices first). Options: a Hospitable token with Write access to block the calendar through the API, or adding our `/api/calendar/[unitSlug]` iCal feed to Hospitable as an imported calendar.
+- [ ] **Import each unit's `/api/calendar/[unitSlug]` feed into Hospitable** (Bungalow 1, Bungalow 2, Main bedroom), so direct bookings block Airbnb and Vrbo within Hospitable's sync interval. Until then, the admin email for each paid booking asks you to block the dates by hand.
 - [ ] **Merge duplicate Hospitable properties.** Bungalow 1's Airbnb and Vrbo listings share one Hospitable property, but the other Vrbo listings are separate properties, so their calendars aren't linked to the Airbnb ones.
 
 - [ ] **Create Airbnb guests automatically.** When an Airbnb booking is confirmed, automatically add the guest to `reservations`, with **Airbnb's suggested lock code** as their door code. Save their name, email, phone, unit and dates where available, so they can log into the portal right away.

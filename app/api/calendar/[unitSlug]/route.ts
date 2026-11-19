@@ -1,10 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-function addDays(dateStr: string, days: number): string {
-  const d = new Date(dateStr + 'T00:00:00Z');
-  d.setUTCDate(d.getUTCDate() + days);
-  return d.toISOString().slice(0, 10);
-}
+import { CLEANING_BUFFER_DAYS, addDays } from '@/lib/date';
 
 function toICalDate(dateStr: string): string {
   return dateStr.replace(/-/g, '');
@@ -49,17 +44,29 @@ export async function GET(
     const { getSql } = await import('@/lib/db');
     const sql = getSql();
 
-    const bookings = await sql<{ id: string; check_in: string; check_out: string }[]>`
-      SELECT id::text, check_in::date::text AS check_in, check_out::date::text AS check_out
+    // Our own stays: paid direct bookings, admin/portal bookings and booking requests.
+    // Airbnb and Vrbo stays are left out: they're already on those calendars.
+    const stays = await sql<{ uid: string; check_in: string; check_out: string }[]>`
+      SELECT 'reservation-' || id::text AS uid, check_in::date::text AS check_in, check_out::date::text AS check_out
+      FROM reservations
+      WHERE unit_id = ${unitSlug}
+        AND status IN ('confirmed', 'checked_in')
+        AND COALESCE(source, 'direct') NOT IN ('airbnb', 'vrbo')
+      UNION ALL
+      SELECT 'booking-' || id::text, check_in::date::text, check_out::date::text
       FROM bookings
       WHERE unit_slug = ${unitSlug}
         AND status IN ('confirmed', 'checked_in')
-    `.catch(() => []);
+    `.catch((error) => {
+      console.error('iCal export query failed:', error);
+      return [];
+    });
 
-    const events = bookings.map((b) => ({
-      uid: `booking-${b.id}@oaxaca-rental.com`,
-      start: b.check_in,
-      end: addDays(b.check_out, 1), // include cleaning day
+    // Block the stay plus the cleaning days after check-out (buildIcal adds 1 more for the exclusive DTEND).
+    const events = stays.map((s) => ({
+      uid: `${s.uid}@oaxaca-rental.com`,
+      start: s.check_in,
+      end: addDays(s.check_out, CLEANING_BUFFER_DAYS - 1),
     }));
 
     const ical = buildIcal(unitSlug, events);

@@ -29,7 +29,7 @@ function errorMessage(code: string, es: boolean, minStay?: number) {
     min_stay: [`This stay needs at least ${minStay} nights.`, `Esta estancia requiere al menos ${minStay} noches.`],
     closed_checkin: ["Check-in isn't possible on that day. Please pick another check-in date.", 'No es posible hacer check-in ese día. Elige otra fecha de llegada.'],
     closed_checkout: ["Check-out isn't possible on that day. Please pick another check-out date.", 'No es posible hacer check-out ese día. Elige otra fecha de salida.'],
-    too_long: ['Online booking is for stays of up to 90 nights. For longer stays, see the monthly lease.', 'La reserva en línea es para estancias de hasta 90 noches. Para más tiempo, consulta el arrendamiento mensual.'],
+    too_long: ['Nightly booking is for stays of up to 29 nights. Staying a month or more? Apply for a monthly lease instead.', 'La reserva por noche es para estancias de hasta 29 noches. ¿Te quedas un mes o más? Solicita un arrendamiento mensual.'],
     too_many_guests: ['Too many guests for this unit.', 'Demasiados huéspedes para esta unidad.'],
     invalid_dates: ['Please choose valid dates.', 'Elige fechas válidas.'],
     invalid_details: ['Please check your details and try again.', 'Revisa tus datos e inténtalo de nuevo.'],

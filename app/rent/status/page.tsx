@@ -13,8 +13,8 @@ const MESSAGES: Record<string, Message> = {
     tone: "good",
     title: ["Autopay is set up!", "¡Pago automático configurado!"],
     body: [
-      "Your card is saved. Rent will be charged automatically on the 1st of each month, and you'll get a receipt by email each time.",
-      "Tu tarjeta quedó guardada. La renta se cobrará automáticamente el día 1 de cada mes y recibirás un recibo por correo cada vez.",
+      "Your card is saved. Rent will be charged automatically on the agreed day each month, and you'll get a receipt by email each time.",
+      "Tu tarjeta quedó guardada. La renta se cobrará automáticamente el día acordado de cada mes y recibirás un recibo por correo cada vez.",
     ],
   },
   active: {

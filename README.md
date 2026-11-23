@@ -7,7 +7,7 @@ The site does four jobs:
 1. **Marketing:** units, amenities, gallery, tours, things to do, FAQ. Everything is in English and Spanish.
 2. **Bookings and availability:** live nightly prices from **Hospitable** (synced with Airbnb and Vrbo), **direct bookings paid by card**, room availability synced with Airbnb's calendar (and Booking.com), long-term lease inquiries, and manual bookings by the admin.
 3. **A guest portal:** guests log in with their door lock code and a password to request cleaning, transport, stay extensions or maintenance, cancel, leave a review, and manage their profile.
-4. **Payments through Stripe:** direct stays and private transport trips paid by card, and long-term tenants' **rent charged automatically on the 1st of each month**.
+4. **Payments through Stripe:** direct stays and private transport trips paid by card, and monthly tenants' **rent charged automatically on the agreed day of each month** (any day from 1 to 28).
 
 > **Working on this repo? Read [Engineering rules](#engineering-rules) and follow the [Commit checklist](#commit-checklist) before and after every commit.**
 
@@ -84,6 +84,7 @@ Airbnb / Vrbo ◀──sync──▶ Hospitable ──API──▶ lib/hospitabl
 ```
 
 - **Prices come from Hospitable**, the channel manager connected to the Airbnb and Vrbo listings. One read-only token (`HOSPITABLE_API_TOKEN`) and each unit's Hospitable property ID (`HOSPITABLE_PROPERTY_*`) are needed. Without them, the cards show the static ranges from `data/units.ts` and direct booking is unavailable.
+- **Nightly bookings are for up to 29 nights.** Stays of 30 nights or more go through the monthly lease (lease application, then rent autopay), which is also the lease form's minimum.
 - **A direct booking is checked twice**: on our own calendar (reservations and booking requests, plus the 2-day cleaning buffer) and on Hospitable's (Airbnb/Vrbo bookings, minimum stay, closed check-in/check-out days). The total is the sum of Hospitable's nightly prices, worked out on the server and charged in the listing's currency.
 - **Dates aren't held while the guest pays.** When the webhook arrives it checks again, under a per-unit database lock. If the dates were taken meanwhile, the payment is **refunded automatically** and both sides are emailed.
 - **Hospitable doesn't learn about direct bookings automatically** (the token is read-only). The admin email for each paid booking asks you to block the dates in Hospitable (see [To-dos](#to-dos)).
@@ -102,7 +103,7 @@ All card handling happens on **Stripe-hosted pages**. Card numbers never reach o
 
 - **Direct stays.** See [Nightly prices and direct bookings](#nightly-prices-and-direct-bookings). The payment form is Stripe's own, embedded in the pop-up (Embedded Checkout), so card numbers still never reach our servers.
 - **Transport trips.** `/api/transport/checkout` works out the price **on the server** from `lib/transportPricing.ts`, then opens a Stripe Checkout session. When the webhook confirms payment, the trip is recorded and confirmation emails go out.
-- **Tenant rent.** The admin adds a tenant at `/admin/tenants`, and the tenant receives a permanent signed link. That link opens Stripe Checkout in "setup" mode to save a card. The webhook then creates a subscription that charges on the 1st of each month at 09:00 Oaxaca time, and cancels itself after the lease's last month. The same link later opens Stripe's billing portal so the tenant can update their card.
+- **Tenant rent.** The admin adds a tenant at `/admin/tenants`, and the tenant receives a permanent signed link. That link opens Stripe Checkout in "setup" mode to save a card. The webhook then creates a subscription that charges on the first rent date's day of the month (1–28, chosen when adding the tenant) at 09:00 Oaxaca time, and cancels itself after the lease's last month. The same link later opens Stripe's billing portal so the tenant can update their card.
 - **Webhook.** `/api/stripe/webhook` verifies Stripe's signature on every event. It must be subscribed to `checkout.session.completed`, `invoice.paid`, `invoice.payment_failed` and `customer.subscription.deleted`.
 
 ---

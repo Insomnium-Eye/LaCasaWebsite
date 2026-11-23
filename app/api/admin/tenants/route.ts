@@ -5,6 +5,7 @@ import { getSql } from '@/lib/db';
 import { units } from '@/data/units';
 import { Tenant, checkAdminCode, escapeHtml, formatMoney, monthLabel, tenantLink } from '@/lib/rent';
 import { EMAIL_FROM } from '@/lib/email';
+import { MAX_RENT_DAY, rentDayPhrase } from '@/lib/date';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -43,7 +44,10 @@ const createSchema = z.object({
   phone: z.string().trim().max(30).optional(),
   unit_id: z.string().refine((id) => units.some((u) => u.slug === id), 'Unknown unit'),
   monthly_rent: z.number().positive().max(1_000_000),
-  first_rent_date: z.string().regex(/^\d{4}-\d{2}-01$/, 'First rent date must be the 1st of a month'),
+  first_rent_date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'First rent date must be a date')
+    .refine((d) => Number(d.slice(8, 10)) >= 1 && Number(d.slice(8, 10)) <= MAX_RENT_DAY, `Rent day must be between 1 and ${MAX_RENT_DAY}`),
   months: z.number().int().min(1).max(36),
   language: z.enum(['en', 'es']).default('en'),
   notes: z.string().trim().max(1000).optional(),
@@ -63,7 +67,7 @@ export async function POST(request: NextRequest) {
 
   const today = new Date().toISOString().slice(0, 10);
   if (body.first_rent_date <= today) {
-    return NextResponse.json({ error: 'The first automatic charge must be on an upcoming 1st of the month.' }, { status: 400 });
+    return NextResponse.json({ error: 'The first automatic charge must be on an upcoming date.' }, { status: 400 });
   }
 
   const unit = units.find((u) => u.slug === body.unit_id)!;
@@ -97,8 +101,8 @@ export async function POST(request: NextRequest) {
           <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
             <h2 style="color:#8d4a3f;">${es ? `¡Bienvenido/a, ${escapeHtml(body.first_name)}!` : `Welcome, ${escapeHtml(body.first_name)}!`}</h2>
             <p>${es
-              ? `Tu renta de <strong>${rent}</strong> por <strong>${escapeHtml(unit.name)}</strong> se cobrará automáticamente el día 1 de cada mes, de ${from} a ${to} (${body.months} ${body.months === 1 ? 'mes' : 'meses'}).`
-              : `Your rent of <strong>${rent}</strong> for <strong>${escapeHtml(unit.name)}</strong> will be charged automatically on the 1st of each month, from ${from} through ${to} (${body.months} month${body.months === 1 ? '' : 's'}).`}</p>
+              ? `Tu renta de <strong>${rent}</strong> por <strong>${escapeHtml(unit.name)}</strong> se cobrará automáticamente ${rentDayPhrase(body.first_rent_date, 'es')}, de ${from} a ${to} (${body.months} ${body.months === 1 ? 'mes' : 'meses'}).`
+              : `Your rent of <strong>${rent}</strong> for <strong>${escapeHtml(unit.name)}</strong> will be charged automatically ${rentDayPhrase(body.first_rent_date)}, from ${from} through ${to} (${body.months} month${body.months === 1 ? '' : 's'}).`}</p>
             <p>${es ? 'Solo necesitas guardar una tarjeta una vez:' : 'You just need to save a card once:'}</p>
             <p style="margin:24px 0;"><a href="${link}" style="background:#8d4a3f;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">
               ${es ? 'Configurar pago automático' : 'Set up autopay'}</a></p>

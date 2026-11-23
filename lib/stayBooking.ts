@@ -7,8 +7,8 @@ import { hasOverlappingStay } from '@/lib/supabase-helpers';
 /** Units that can be booked by the night. */
 export const SHORT_TERM_UNITS = units.filter((u) => !u.annualOnly);
 
-/** Longest stay that can be booked and paid online. */
-export const MAX_STAY_NIGHTS = 90;
+/** Longest stay that can be booked by the night. 30+ nights is a monthly lease (LeaseApplicationForm's minimum). */
+export const MAX_STAY_NIGHTS = 29;
 /** How far ahead a stay can start. */
 export const MAX_DAYS_AHEAD = 365;
 

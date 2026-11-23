@@ -29,3 +29,15 @@ export function oaxacaToday(): string {
 
 /** Days after a stay's check-out that stay blocked for cleaning. */
 export const CLEANING_BUFFER_DAYS = 2;
+
+/** Latest day of the month rent can be charged on (every month has it). */
+export const MAX_RENT_DAY = 28;
+
+/** "on the 15th of each month" / "el día 15 de cada mes", from a YYYY-MM-DD (or Date) rent date. */
+export function rentDayPhrase(date: string | Date, language: 'en' | 'es' = 'en'): string {
+  const iso = typeof date === 'string' ? date : date.toISOString();
+  const day = Number(iso.slice(8, 10));
+  if (language === 'es') return `el día ${day} de cada mes`;
+  const suffix = day % 10 === 1 && day !== 11 ? 'st' : day % 10 === 2 && day !== 12 ? 'nd' : day % 10 === 3 && day !== 13 ? 'rd' : 'th';
+  return `on the ${day}${suffix} of each month`;
+}

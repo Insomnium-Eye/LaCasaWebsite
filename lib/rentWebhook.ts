@@ -1,6 +1,7 @@
 import type Stripe from 'stripe';
 import { Resend } from 'resend';
 import { getSql } from '@/lib/db';
+import { rentDayPhrase } from '@/lib/date';
 import { ADMIN_EMAIL, Tenant, escapeHtml, firstChargeAt, formatMoney, leaseEndAt, monthLabel } from '@/lib/rent';
 import { EMAIL_FROM } from '@/lib/email';
 
@@ -23,7 +24,7 @@ const leaseRange = (t: Tenant) =>
 
 /**
  * checkout.session.completed (mode=setup, kind=rent_setup): the tenant saved a card,
- * so create the subscription that charges rent on the 1st of each month for the lease.
+ * so create the subscription that charges rent on the agreed day of each month for the lease.
  */
 export async function handleRentSetupCompleted(stripe: Stripe, session: Stripe.Checkout.Session) {
   const tenantId = session.metadata?.tenantId;
@@ -51,7 +52,7 @@ export async function handleRentSetupCompleted(stripe: Stripe, session: Stripe.C
       ADMIN_EMAIL,
       `⚠️ Rent autopay not started: ${tenantName(tenant)}`,
       `<p>${escapeHtml(tenantName(tenant))} saved a card, but the first rent date (${monthLabel(tenant.first_rent_date)}) has already passed,
-       so no subscription was created. Add the tenant again with a new start month.</p>`,
+       so no subscription was created. Add the tenant again with a new first rent date.</p>`,
     );
     return;
   }
@@ -112,16 +113,16 @@ export async function handleRentSetupCompleted(stripe: Stripe, session: Stripe.C
     `🏠 Rent autopay set up: ${tenantName(tenant)} — ${unit}`,
     `<h2 style="color:#8d4a3f;">Rent autopay is active</h2>
      <p><strong>${escapeHtml(tenantName(tenant))}</strong> (${escapeHtml(tenant.email)}) saved a card for <strong>${escapeHtml(unit)}</strong>.</p>
-     <p>${rent} will be charged on the 1st of each month, ${leaseRange({ ...tenant, language: 'en' })} (${tenant.months} payments).</p>`,
+     <p>${rent} will be charged ${rentDayPhrase(tenant.first_rent_date)}, ${leaseRange({ ...tenant, language: 'en' })} (${tenant.months} payments).</p>`,
   );
   await sendEmail(
     tenant.email,
     es ? '✓ Pago automático de renta activado — La Casa Oaxaca' : '✓ Rent autopay is set up — La Casa Oaxaca',
     es
       ? `<h2 style="color:#8d4a3f;">¡Listo, ${escapeHtml(tenant.first_name)}!</h2>
-         <p>Se cobrarán ${rent} el día 1 de cada mes por ${escapeHtml(unit)}, ${leaseRange(tenant)} (${tenant.months} pagos).</p>`
+         <p>Se cobrarán ${rent} ${rentDayPhrase(tenant.first_rent_date, 'es')} por ${escapeHtml(unit)}, ${leaseRange(tenant)} (${tenant.months} pagos).</p>`
       : `<h2 style="color:#8d4a3f;">You're all set, ${escapeHtml(tenant.first_name)}!</h2>
-         <p>${rent} will be charged on the 1st of each month for ${escapeHtml(unit)}, ${leaseRange(tenant)} (${tenant.months} payments).</p>`,
+         <p>${rent} will be charged ${rentDayPhrase(tenant.first_rent_date)} for ${escapeHtml(unit)}, ${leaseRange(tenant)} (${tenant.months} payments).</p>`,
   );
 }
 

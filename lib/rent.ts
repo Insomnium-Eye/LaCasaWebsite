@@ -44,19 +44,19 @@ export interface Tenant {
   created_at: Date;
 }
 
-// Rent is charged at 09:00 Oaxaca time (fixed UTC-6 since 2022) on the 1st of each month.
+// Rent is charged at 09:00 Oaxaca time (fixed UTC-6 since 2022) on the agreed day of each month (1–28).
 const CHARGE_HOUR_UTC = 15;
 
-/** 'YYYY-MM-01' or a Date (as returned by postgres for DATE columns) → [year, monthIndex]. */
-const yearMonth = (date: string | Date): [number, number] => {
+/** 'YYYY-MM-DD' or a Date (as returned by postgres for DATE columns) → [year, monthIndex, day]. */
+const dateParts = (date: string | Date): [number, number, number] => {
   const iso = typeof date === 'string' ? date : date.toISOString();
-  return [Number(iso.slice(0, 4)), Number(iso.slice(5, 7)) - 1];
+  return [Number(iso.slice(0, 4)), Number(iso.slice(5, 7)) - 1, Number(iso.slice(8, 10))];
 };
 
 /** Unix timestamp (seconds) of the first rent charge. */
 export const firstChargeAt = (firstRentDate: string | Date): number => {
-  const [y, m] = yearMonth(firstRentDate);
-  return Date.UTC(y, m, 1, CHARGE_HOUR_UTC) / 1000;
+  const [y, m, d] = dateParts(firstRentDate);
+  return Date.UTC(y, m, d, CHARGE_HOUR_UTC) / 1000;
 };
 
 /**
@@ -64,13 +64,13 @@ export const firstChargeAt = (firstRentDate: string | Date): number => {
  * (months + 1)th charge would have happened, so it never runs.
  */
 export const leaseEndAt = (firstRentDate: string | Date, months: number): number => {
-  const [y, m] = yearMonth(firstRentDate);
-  return Date.UTC(y, m + months, 1, CHARGE_HOUR_UTC) / 1000;
+  const [y, m, d] = dateParts(firstRentDate);
+  return Date.UTC(y, m + months, d, CHARGE_HOUR_UTC) / 1000;
 };
 
 /** Human label for the month containing a date, e.g. "December 2026". */
 export const monthLabel = (date: string | Date, language: 'en' | 'es' = 'en', offsetMonths = 0): string => {
-  const [y, m] = yearMonth(date);
+  const [y, m] = dateParts(date);
   return new Date(Date.UTC(y, m + offsetMonths, 1, 12)).toLocaleDateString(language === 'es' ? 'es-MX' : 'en-US', {
     month: 'long',
     year: 'numeric',

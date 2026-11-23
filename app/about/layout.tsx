@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://www.oaxaca-rental.com/about" },
   openGraph: {
     title: "About La Casa Oaxaca",
-    description: "Private garden retreat in San Felipe del Agua, Oaxaca. 15 min from downtown. Direct leasing.",
+    description: "Private garden retreat in San Felipe del Agua, Oaxaca. 15 min from downtown. Book direct.",
     url: "https://www.oaxaca-rental.com/about",
   },
 };

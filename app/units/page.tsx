@@ -11,7 +11,7 @@ import { useLanguage } from "../../contexts/LanguageContext";
 import BackgroundSlideshow from "../../components/BackgroundSlideshow";
 
 export default function UnitsPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
   const [applyUnit, setApplyUnit] = useState<Unit | null>(null);
   const entireHome = units.find((unit) => unit.annualOnly);
@@ -30,11 +30,11 @@ export default function UnitsPage() {
           <div className="flex flex-wrap gap-3">
             <div className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-800/60 px-4 py-2 text-sm text-slate-300">
               <span className="h-2 w-2 rounded-full bg-terracotta" />
-              Short-term available via Airbnb — nightly rates vary by demand
+              {language === 'es' ? 'Estancias por noche: reserva directa o en Airbnb' : 'Nightly stays: book directly or on Airbnb'}
             </div>
             <div className="inline-flex items-center gap-2 rounded-full border border-amber-700/60 bg-amber-900/25 px-4 py-2 text-sm text-amber-300">
               <span className="h-2 w-2 rounded-full bg-amber-400" />
-              Long-term leases available — fixed monthly rate
+              {language === 'es' ? 'Un mes o más: arrendamiento mensual, tarifa fija' : 'A month or more: monthly lease, fixed rate'}
             </div>
           </div>
         </div>

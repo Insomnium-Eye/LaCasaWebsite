@@ -20,7 +20,7 @@ export const translations = {
       description: "La Casa Oaxaca is perfectly placed to explore one of Mexico's most culturally rich cities and its surrounding wonders — from ancient ruins to candlelit festivals.",
     },
     home: {
-      directBooking: "Long-Term Rental",
+      directBooking: "Nightly Stays & Leases",
       title: "La Casa Oaxaca — Private bungalows and a garden retreat in San Felipe del Agua.",
       description: "Live in a calm, authentic setting with private verandas, fruit orchard views, and modern comforts.",
       bookNow: "Inquire Now",
@@ -92,7 +92,7 @@ export const translations = {
       description: "La Casa blends Oaxacan adobe-inspired design, private gardens, and modern comfort. Each unit offers a quiet, intimate atmosphere framed by landscaped grounds and fruit trees.",
       highlightsTitle: "Why tenants choose us",
       highlights: [
-        "Direct leasing with personalized service.",
+        "Book directly with personalized service.",
         "Private parking, contactless digital locks, and mosquito-protected sleeping areas with bed nets surrounding every bed.",
         "Authentic garden living with nearby cultural attractions.",
         "Exclusive access to mountain hikes only available to locals and our residents."
@@ -109,8 +109,8 @@ export const translations = {
     },
     amenities: {
       heading: "Amenities",
-      title: "Comfort and convenience for your long-term home.",
-      description: "Enjoy thoughtfully selected features designed for privacy, relaxation, and a comfortable year-round living experience.",
+      title: "Comfort and convenience, for a few nights or a whole year.",
+      description: "Enjoy thoughtfully selected features designed for privacy, relaxation, and comfort, whether you stay a weekend or settle in for months.",
       items: [
         "Mature fruit orchards with mango, guava, avocado and lemon",
         "Stargazing bathtub with retractable roof",
@@ -127,7 +127,7 @@ export const translations = {
     contact: {
       heading: "Contact",
       title: "Get in touch with La Casa.",
-      description: "Send us your message or lease inquiry. You can also reach out directly via WhatsApp or email.",
+      description: "Send us your question about a stay or a lease. You can also reach out directly via WhatsApp or email.",
       formName: "Name",
       formNamePlaceholder: "Your name",
       formEmail: "Email",
@@ -150,7 +150,7 @@ export const translations = {
       heading: "FAQs",
       title: "Common questions from prospective tenants.",
       items: [
-        { question: "What rental terms are available?", answer: "We offer flexible options: short-term nightly stays via Airbnb, or direct monthly leases ranging from 1 month to 12 months. Longer terms receive better rates." },
+        { question: "Can I stay for just a few nights?", answer: "The bungalows and the room are booked by the night (directly on this website or on Airbnb). For stays of a month or more, a monthly lease of 1 to 12 months applies, with better rates for longer terms. The entire home is only available on a 12-month lease." },
         { question: "What is required to move in?", answer: "Upon approval, a deposit of 1 month + ½ month's rent is required (1.5× your monthly rate). Rent is then due on the 1st of every month." },
         { question: "What utilities are included?", answer: "Each unit has its own mini-fridge and electric grill. Please contact us for details on what utilities are included in your specific lease." },
         { question: "Are there mosquito protections?", answer: "Yes. Each unit has mosquito bed nets surrounding every bed, and our water storage is treated with Mosquito Dunks BCI for year-round prevention." }
@@ -302,8 +302,8 @@ export const translations = {
     },
     units: {
       heading: "Available units",
-      title: "Private bungalows and a room for long-term lease.",
-      description: "Choose the unit that fits your lifestyle. Short-term via Airbnb, or monthly lease from 1 to 12 months. Send us an inquiry and we'll get back to you.",
+      title: "Private bungalows and a room, by the night or by the month.",
+      description: "Book by the night, directly here or on Airbnb. Staying a month or more? Lease by the month, for 1 to 12 months. The entire home is available on a 12-month lease.",
       capacityLabel: "Capacity:",
       guestsLabel: "occupants",
       checkAvailability: "Inquire",
@@ -635,7 +635,7 @@ export const translations = {
       description: "La Casa Oaxaca está perfectamente ubicada para explorar una de las ciudades más ricas culturalmente de México y sus maravillas alrededor — desde ruinas antiguas hasta festivales con velas.",
     },
     home: {
-      directBooking: "Arrendamiento",
+      directBooking: "Estancias y Arrendamientos",
       title: "La Casa Oaxaca — Bungalows privados y un retiro de jardín en San Felipe del Agua.",
       description: "Vive en un ambiente tranquilo y auténtico con terrazas privadas, vistas a huertos frutales y comodidades modernas.",
       bookNow: "Consultar Ahora",
@@ -707,7 +707,7 @@ export const translations = {
       description: "La Casa fusiona diseño inspirado en adobe oaxaqueño, jardines privados y comodidad moderna. Cada unidad ofrece un ambiente tranquilo e íntimo enmarcado por áreas ajardinadas y árboles frutales.",
       highlightsTitle: "Por qué los inquilinos nos eligen",
       highlights: [
-        "Arrendamiento directo con servicio personalizado.",
+        "Reserva directa con servicio personalizado.",
         "Estacionamiento privado, cerraduras digitales sin contacto y áreas de descanso protegidas con mosquiteros alrededor de cada cama.",
         "Vida auténtica en el jardín con atracciones culturales cercanas.",
         "Acceso exclusivo a caminatas en la montaña, disponibles solo para locales y nuestros residentes."
@@ -724,8 +724,8 @@ export const translations = {
     },
     amenities: {
       heading: "Comodidades",
-      title: "Comodidad y conveniencia para tu hogar a largo plazo.",
-      description: "Disfruta de servicios cuidadosamente seleccionados para privacidad, relajación y una experiencia de vida cómoda durante todo el año.",
+      title: "Comodidad y conveniencia, por unas noches o por todo un año.",
+      description: "Disfruta de servicios cuidadosamente seleccionados para privacidad, relajación y comodidad, ya sea que te quedes un fin de semana o varios meses.",
       items: [
         "Huertos maduros con mango, guayaba, aguacate y limón",
         "Tina para observar las estrellas con techo retráctil",
@@ -742,7 +742,7 @@ export const translations = {
     contact: {
       heading: "Contacto",
       title: "Ponte en contacto con La Casa.",
-      description: "Envíanos tu mensaje o consulta de arrendamiento. También puedes contactarnos directamente por WhatsApp o correo electrónico.",
+      description: "Envíanos tu pregunta sobre una estancia o un arrendamiento. También puedes contactarnos directamente por WhatsApp o correo electrónico.",
       formName: "Nombre",
       formNamePlaceholder: "Tu nombre",
       formEmail: "Correo electrónico",
@@ -765,7 +765,7 @@ export const translations = {
       heading: "Preguntas Frecuentes",
       title: "Preguntas frecuentes de posibles inquilinos.",
       items: [
-        { question: "¿Qué opciones de arrendamiento están disponibles?", answer: "Ofrecemos opciones flexibles: estadías nocturnas de corto plazo vía Airbnb, o arrendamientos mensuales directos de 1 a 12 meses. Los plazos más largos tienen mejores tarifas." },
+        { question: "¿Puedo quedarme solo unas noches?", answer: "Los bungalows y la habitación están se reservan por noche (directamente en este sitio o en Airbnb). Para estancias de un mes o más aplica un arrendamiento mensual de 1 a 12 meses, con mejores tarifas para plazos más largos. La casa completa solo se renta con contrato de 12 meses." },
         { question: "¿Qué se requiere para mudarse?", answer: "Al ser aprobado, se requiere un depósito de 1 mes + ½ mes de renta (1.5× tu renta mensual). La renta se paga el 1º de cada mes a partir de entonces." },
         { question: "¿Qué servicios están incluidos?", answer: "Cada unidad cuenta con minirefrigerador y parrilla eléctrica. Contáctanos para conocer los detalles de qué servicios están incluidos en tu contrato." },
         { question: "¿Hay protección contra mosquitos?", answer: "Sí. Cada unidad tiene mosquiteros alrededor de cada cama, y el almacenamiento de agua se trata con Mosquito Dunks BCI para prevención todo el año." }
@@ -920,8 +920,8 @@ export const translations = {
     },
     units: {
       heading: "Unidades disponibles",
-      title: "Bungalows privados y habitación para arrendamiento a largo plazo.",
-      description: "Elige la unidad que se adapte a tu estilo de vida. Corto plazo vía Airbnb, o arrendamiento mensual de 1 a 12 meses. Envíanos una consulta y te responderemos.",
+      title: "Bungalows privados y una habitación, por noche o por mes.",
+      description: "Reserva por noche, directamente aquí o en Airbnb. ¿Te quedas un mes o más? Renta por mes, de 1 a 12 meses. La casa completa se renta con contrato de 12 meses.",
       capacityLabel: "Capacidad:",
       guestsLabel: "ocupantes",
       checkAvailability: "Consultar",

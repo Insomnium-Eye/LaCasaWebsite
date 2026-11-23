@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Available Units",
   description:
-    "Browse private bungalows and rooms for rent in San Felipe del Agua, Oaxaca. Short-term nightly stays via Airbnb or direct monthly leases from 1 to 12 months. Three units available: Sun of My Heart, Magic Moon, and Blessed Land.",
+    "Browse private bungalows and rooms for rent in San Felipe del Agua, Oaxaca. Nightly stays booked direct or via Airbnb, or monthly leases from 1 to 12 months. Three units available: Sun of My Heart, Magic Moon, and Blessed Land.",
   alternates: { canonical: "https://www.oaxaca-rental.com/units" },
   openGraph: {
     title: "Available Units | La Casa Oaxaca",

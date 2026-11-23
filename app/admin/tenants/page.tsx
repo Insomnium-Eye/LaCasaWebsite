@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { units } from '@/data/units';
+import { MAX_RENT_DAY, addDays, oaxacaToday, rentDayPhrase } from '@/lib/date';
 
 type TenantRow = {
   id: string;
@@ -33,13 +34,11 @@ const STATUS: Record<TenantRow['status'], { label: string; className: string }> 
 const input = 'w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-amber-600 transition-colors bg-white';
 const label = 'block text-sm font-semibold text-gray-700 mb-1';
 
-/** 'YYYY-MM-01' for the next `count` upcoming 1sts of the month (never today). */
-function upcomingFirsts(count: number): string[] {
+/** 'YYYY-MM-01' of next month: the default first rent date. */
+function nextFirst(): string {
   const now = new Date();
-  return Array.from({ length: count }, (_, i) => {
-    const d = new Date(now.getFullYear(), now.getMonth() + 1 + i, 1);
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`;
-  });
+  const d = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`;
 }
 
 const monthName = (iso: string, offset = 0) => {
@@ -69,10 +68,10 @@ export default function TenantsAdminPage() {
   const [tenants, setTenants] = useState<TenantRow[]>([]);
   const [listError, setListError] = useState('');
 
-  const firsts = useMemo(() => upcomingFirsts(18), []);
+  const tomorrow = useMemo(() => addDays(oaxacaToday(), 1), []);
   const [form, setForm] = useState({
     first_name: '', last_name: '', email: '', phone: '', language: 'en' as 'en' | 'es',
-    unit_id: '', monthly_rent: '', first_rent_date: firsts[0], months: '6', notes: '',
+    unit_id: '', monthly_rent: '', first_rent_date: nextFirst(), months: '6', notes: '',
   });
   const set = (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [field]: e.target.value }));
@@ -164,7 +163,7 @@ export default function TenantsAdminPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Tenants & Rent Autopay</h1>
           <p className="text-gray-500 text-sm mt-1">
-            Add a tenant, send them their link, and rent is charged automatically on the 1st of each month.
+            Add a tenant, send them their link, and rent is charged automatically on the agreed day of each month.
           </p>
         </div>
 
@@ -211,9 +210,8 @@ export default function TenantsAdminPage() {
             </div>
             <div>
               <label className={label}>First automatic charge <span className="text-red-500">*</span></label>
-              <select className={input} value={form.first_rent_date} onChange={set('first_rent_date')}>
-                {firsts.map((d) => <option key={d} value={d}>1 {monthName(d)}</option>)}
-              </select>
+              <input className={input} type="date" required min={tomorrow} value={form.first_rent_date} onChange={set('first_rent_date')} />
+              <p className="text-xs text-gray-500 mt-1">Charged on this day every month. Pick a day from 1 to {MAX_RENT_DAY}.</p>
             </div>
             <div>
               <label className={label}>Number of months <span className="text-red-500">*</span></label>
@@ -237,7 +235,7 @@ export default function TenantsAdminPage() {
 
           {rent > 0 && months > 0 && (
             <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-900">
-              <strong>{months}</strong> charge{months === 1 ? '' : 's'} of <strong>{money(rent)}</strong> on the 1st of each month,{' '}
+              <strong>{months}</strong> charge{months === 1 ? '' : 's'} of <strong>{money(rent)}</strong> {rentDayPhrase(form.first_rent_date)},{' '}
               {monthName(form.first_rent_date)} → {monthName(form.first_rent_date, months - 1)}
               {' '}(total {money(rent * months)}). Charges stop automatically after the last month.
             </div>

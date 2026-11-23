@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSql } from '@/lib/db';
 import { getStripe } from '@/lib/stripe';
+import { rentDayPhrase } from '@/lib/date';
 import { Tenant, firstChargeAt, formatMoney, monthLabel, tenantLink, verifyTenantToken } from '@/lib/rent';
 
 /**
@@ -75,8 +76,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       custom_text: {
         submit: {
           message: es
-            ? `Tu tarjeta se cargará automáticamente ${rent} el día 1 de cada mes por ${unit}, de ${from} a ${to} (${tenant.months} pagos). No se cobra nada hoy.`
-            : `Your card will be charged ${rent} automatically on the 1st of each month for ${unit}, from ${from} through ${to} (${tenant.months} payments). Nothing is charged today.`,
+            ? `Tu tarjeta se cargará automáticamente ${rent} ${rentDayPhrase(tenant.first_rent_date, 'es')} por ${unit}, de ${from} a ${to} (${tenant.months} pagos). No se cobra nada hoy.`
+            : `Your card will be charged ${rent} automatically ${rentDayPhrase(tenant.first_rent_date)} for ${unit}, from ${from} through ${to} (${tenant.months} payments). Nothing is charged today.`,
         },
       },
       // Read back by the Stripe webhook, which then creates the rent subscription.

@@ -11,13 +11,15 @@ export const metadata: Metadata = {
     template: "%s | La Casa Oaxaca",
   },
   description:
-    "Private bungalows and rooms for rent in San Felipe del Agua, Oaxaca. Short-term nightly stays via Airbnb or direct monthly leases from 1–12 months. Garden setting, contactless entry, fruit orchard, 15 min from downtown Oaxaca.",
+    "Private bungalows and rooms for rent in San Felipe del Agua, Oaxaca. Nightly stays booked direct or via Airbnb, or monthly leases from 1–12 months. Garden setting, contactless entry, fruit orchard, 15 min from downtown Oaxaca.",
   keywords: [
     "Oaxaca rental",
     "bungalow rental Oaxaca",
     "San Felipe del Agua rental",
     "long term rental Oaxaca",
     "monthly rental Oaxaca",
+    "vacation rental Oaxaca",
+    "nightly stay Oaxaca",
     "Oaxaca bungalow",
     "rent Oaxaca Mexico",
     "Oaxaca accommodation",
@@ -45,7 +47,7 @@ export const metadata: Metadata = {
     siteName: "La Casa Oaxaca",
     title: "La Casa Oaxaca | Private Bungalow Rentals in San Felipe del Agua",
     description:
-      "Private bungalows and rooms for rent in San Felipe del Agua, Oaxaca. Short-term or monthly lease. Garden, orchard, contactless entry.",
+      "Private bungalows and rooms for rent in San Felipe del Agua, Oaxaca. Nightly stays or monthly leases. Garden, orchard, contactless entry.",
     images: [
       {
         url: "/imgs/OaxacaPicture_1.jpg",
@@ -59,7 +61,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "La Casa Oaxaca | Private Bungalow Rentals",
     description:
-      "Private bungalows in San Felipe del Agua, Oaxaca. Short-term or monthly lease. Book direct.",
+      "Private bungalows in San Felipe del Agua, Oaxaca. Nightly stays or monthly leases. Book direct.",
     images: ["/imgs/OaxacaPicture_1.jpg"],
   },
   icons: {
@@ -87,7 +89,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               "@type": "LodgingBusiness",
               name: "La Casa Oaxaca",
               description:
-                "Private bungalows and rooms for rent in San Felipe del Agua, Oaxaca. Short-term nightly stays or direct monthly leases from 1 to 12 months.",
+                "Private bungalows and rooms for rent in San Felipe del Agua, Oaxaca. Nightly stays or monthly leases from 1 to 12 months.",
               url: siteUrl,
               image: `${siteUrl}/imgs/OaxacaPicture_1.jpg`,
               priceRange: "$40–$125 USD/night · $470–$1,350 USD/month",

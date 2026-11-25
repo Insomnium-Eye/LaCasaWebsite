@@ -281,7 +281,7 @@ Go through this before and after every commit. AI assistants working on this rep
 | `/contact` | `app/contact/page.tsx` | Contact form |
 | `/rides` | `app/rides/page.tsx` | Rides: local destinations with card payment (same as `/transport`), Puerto Escondido transfers and beach packages. `/tours` redirects here. |
 | `/transport` | `app/transport/page.tsx` | Private transport: destinations, prices, pay by card |
-| `/transport/success` | `app/transport/success/page.tsx` | Shown after a transport payment |
+| `/transport/success` | `app/transport/success/page.tsx` | Shown after a transport payment. Abandoned payments return to `/rides?payment=cancelled` (portal bookings return to the portal) |
 | `/stay/confirmed` | `app/stay/confirmed/page.tsx` | Shown after paying for a direct stay |
 | `/book` | `app/book/page.tsx` | Long-term lease inquiry |
 | `/book/confirmation` | `app/book/confirmation/page.tsx` | Shown after an inquiry |
@@ -388,7 +388,7 @@ Go through this before and after every commit. AI assistants working on this rep
 | `features/MaintenanceRequestForm.tsx` | Portal tab: report an issue (with photo) |
 | `features/LeaveReviewForm.tsx` | Portal tab: review (unlocks after checkout) |
 | `features/ProfileForm.tsx` | Portal tab: User Profile (guests) and Admin Password (admin) |
-| `PhoneInput.tsx` | Phone field with a country dial-code picker, defaulting to the visitor's country (by IP). Used by the lease form and the "Book directly" pop-up |
+| `PhoneInput.tsx` | Phone field with a country dial-code picker, defaulting to the visitor's country (by IP). Used by the lease form, the "Book directly" pop-up and the transport booking pop-up |
 | **Unused:** `BookingModal.tsx`, `EscrowModal.tsx`, `DateRangePicker.tsx`, `DisclaimerModal.tsx`, `Navigation.tsx`, `features/IDVerificationForm.tsx` | Not imported anywhere (see [To-dos](#to-dos)) |
 
 ### Libraries (`lib/`)

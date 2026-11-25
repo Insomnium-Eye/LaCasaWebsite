@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
         language: body.language,
       },
       success_url: `${origin}/transport/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}${guest.reservationId ? '/portal?tab=transport&' : '/transport?'}payment=cancelled`,
+      cancel_url: `${origin}${guest.reservationId ? '/portal?tab=transport&payment=cancelled' : '/rides?payment=cancelled#destinations'}`,
     });
 
     return NextResponse.json({ success: true, url: checkout.url });

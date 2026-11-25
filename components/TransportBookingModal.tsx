@@ -6,6 +6,7 @@ import useUsdToMxn from '@/hooks/useUsdToMxn';
 import DateInput from '@/components/DateInput';
 import { MAX_PASSENGERS, TransportDestination, formatMxnWithUsd, oneWayPriceMxn, tripPriceMxn } from '@/lib/transportPricing';
 import { startTransportCheckout } from '@/lib/transportCheckout';
+import PhoneInput from '@/components/PhoneInput';
 
 interface Props {
   destination: TransportDestination | null;
@@ -64,7 +65,8 @@ export default function TransportBookingModal({ destination, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm" onClick={() => !loading && onClose()}>
-      <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
+      {/* text-slate-900: the /rides page behind this is dark with white text, which form fields would otherwise inherit */}
+      <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white text-slate-900 shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <div className="sticky top-0 flex items-center justify-between bg-gradient-to-r from-garden to-[#3c5a35] p-6 text-white">
           <div>
             <h2 className="text-2xl font-bold">{destination.emoji} {destination.name[es ? 'es' : 'en']}</h2>
@@ -87,7 +89,7 @@ export default function TransportBookingModal({ destination, onClose }: Props) {
             </div>
             <div>
               <label className="mb-1.5 block text-sm font-semibold text-slate-900">{es ? 'Teléfono / WhatsApp' : 'Phone / WhatsApp'} <span className="text-red-600">*</span></label>
-              <input type="tel" value={form.phone} onChange={(e) => set('phone', e.target.value)} required disabled={loading} className={inputClass} placeholder="+52 951 123 4567" />
+              <PhoneInput value={form.phone} onChange={(v) => set('phone', v)} variant="modal" required disabled={loading} />
             </div>
             <div className="sm:col-span-2">
               <label className="mb-1.5 block text-sm font-semibold text-slate-900">{es ? 'Fecha y hora de recogida' : 'Pickup date & time'} <span className="text-red-600">*</span></label>

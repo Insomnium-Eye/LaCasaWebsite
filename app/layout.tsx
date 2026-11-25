@@ -2,7 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import ClientLayout from "../components/ClientLayout";
 
-const siteUrl = "https://www.oaxaca-rental.com";
+const siteUrl = "https://oaxaca-rental.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

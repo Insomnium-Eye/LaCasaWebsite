@@ -527,6 +527,8 @@ Migrations: `001` booking webhook fields · `002` booking count · `003` tenants
 
 ### Broken in production
 
+- [ ] **Point `www.oaxaca-rental.com` at Vercel.** It still points to the old GitHub Pages servers and doesn't load. In Vercel, add `www.oaxaca-rental.com` under Settings → Domains (set to redirect to `oaxaca-rental.com`), then change its DNS record at your domain registrar to what Vercel shows (usually a CNAME to `cname.vercel-dns.com`). The site, sitemap and canonical tags all use `https://oaxaca-rental.com`.
+
 - [ ] **Run `db/migrations/008_add_reviews_and_transport_requests.sql` in Supabase.** Until then, the tables are missing from the live database:
   - `reviews` and `review_images`: **Leave a Review** (`/api/reviews`) and `/admin/reviews` fail.
   - `transport_requests`: paid portal transport trips aren't recorded against the guest's reservation (the Stripe webhook logs the error; payment and emails still work).

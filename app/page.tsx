@@ -11,6 +11,9 @@ import ContactModal from "../components/ContactModal";
 import LeaseApplicationModal from "../components/LeaseApplicationModal";
 import UnitCard from "../components/UnitCard";
 import EntireHomeCard from "../components/EntireHomeCard";
+import BlogPostCard from "../components/blog/BlogPostCard";
+import BlogLatestModal from "../components/blog/BlogLatestModal";
+import { getLatestPost } from "../lib/blog";
 import { useLanguage } from "../contexts/LanguageContext";
 
 export default function HomePage() {
@@ -19,8 +22,11 @@ export default function HomePage() {
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [galleryIndex, setGalleryIndex] = useState(0);
   const [contactOpen, setContactOpen] = useState(false);
-  const { t } = useLanguage();
+  const [blogOpen, setBlogOpen] = useState(false);
+  const { t, language } = useLanguage();
+  const es = language === "es";
   const entireHome = units.find((unit) => unit.annualOnly);
+  const latestPost = getLatestPost();
 
   const features = [
     {
@@ -60,6 +66,15 @@ export default function HomePage() {
             <Link href="/rides" className="hidden rounded-full border border-slate-600 px-5 py-2 text-sm font-semibold text-slate-300 transition hover:border-slate-400 hover:text-white sm:inline-flex">
               {t("nav.tours")}
             </Link>
+            {latestPost && (
+              <button
+                type="button"
+                onClick={() => setBlogOpen(true)}
+                className="hidden rounded-full border border-slate-600 px-5 py-2 text-sm font-semibold text-slate-300 transition hover:border-slate-400 hover:text-white sm:inline-flex"
+              >
+                Blog
+              </button>
+            )}
             </div>
         </div>
       </header>
@@ -169,6 +184,23 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Latest blog post — opens in a pop-up; also the way in on phones, where the header button is hidden */}
+      {latestPost && (
+        <section className="mt-20">
+          <div className="flex items-end justify-between gap-4">
+            <h2 className="text-2xl font-semibold text-white [text-shadow:0_1px_4px_rgba(0,0,0,0.8)]">
+              {es ? "Del blog" : "From the blog"}
+            </h2>
+            <Link href="/blog" className="text-sm font-semibold text-terracotta hover:text-[#a95b48]">
+              {es ? "Todas las publicaciones →" : "All posts →"}
+            </Link>
+          </div>
+          <div className="mt-6">
+            <BlogPostCard post={latestPost} variant="dark" eyebrow={es ? "Lo más reciente" : "Latest post"} onOpen={() => setBlogOpen(true)} />
+          </div>
+        </section>
+      )}
+
       <ThingsToDoSection />
       <UnitModal unit={selectedUnit} onClose={() => setSelectedUnit(null)} />
       {galleryOpen && (
@@ -178,6 +210,7 @@ export default function HomePage() {
         />
       )}
       <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} />
+      <BlogLatestModal open={blogOpen} onClose={() => setBlogOpen(false)} />
       {applyUnit && <LeaseApplicationModal unit={applyUnit} onClose={() => setApplyUnit(null)} />}
       </div>
       {/* Sticky "buy instead" link — sits above the language toggle in the bottom-right corner */}

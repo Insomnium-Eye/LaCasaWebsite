@@ -24,6 +24,7 @@ The site does four jobs:
 - [Getting started](#getting-started)
 - [Environment variables](#environment-variables)
 - [Deployment](#deployment)
+- [Publishing a blog post](#publishing-a-blog-post)
 - [Engineering rules](#engineering-rules)
 - [Commit checklist](#commit-checklist)
 - [Project map](#project-map)
@@ -163,6 +164,17 @@ Anything prefixed `NEXT_PUBLIC_` can end up in the browser. **Secrets must never
 
 ---
 
+## Publishing a blog post
+
+The blog is updated weekly. Every post is an entry in [`data/blog.ts`](data/blog.ts); the home page pop-up, `/blog`, the archive and previous/next links all update from it automatically.
+
+1. **Photos:** resize to 2000 px on the long edge, strip all metadata (phone photos contain GPS), and save in `public/imgs/blog/<slug>/` with descriptive filenames. Use only photos you took or have permission to use.
+2. **Post:** add an entry to `BLOG_POSTS` in `data/blog.ts` with a new `slug`, the publication `date` (`YYYY-MM-DD`), and English and Spanish text, alt text and captions. Text supports `**bold**` and `[links](/rides?book=…)` only.
+3. **Sitemap:** add `/blog/<slug>` to `public/sitemap.xml`.
+4. **Check and publish:** follow the [Commit checklist](#commit-checklist). The newest date becomes the home page's latest post.
+
+Never change a published post's `slug`: it's the post's permanent address.
+
 ## Deployment
 
 - **Every push to `main` deploys.** It runs [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml), which pulls Vercel's Production environment variables, builds, and deploys to Vercel.
@@ -272,7 +284,7 @@ Go through this before and after every commit. AI assistants working on this rep
 
 | Route | File | What it is |
 |---|---|---|
-| `/` | `app/page.tsx` | Home page: hero slideshow, unit cards with live availability, entire home, things to do, gallery, contact, lease application |
+| `/` | `app/page.tsx` | Home page: hero slideshow, unit cards with live availability, entire home, latest blog post (header "Blog" button and a "From the blog" card, both opening a pop-up), things to do, gallery, contact, lease application |
 | `/about` | `app/about/page.tsx` | About the property |
 | `/amenities` | `app/amenities/page.tsx` | Amenities |
 | `/units` | `app/units/page.tsx` | All units, with details pop-up, availability and lease application |
@@ -287,6 +299,8 @@ Go through this before and after every commit. AI assistants working on this rep
 | `/book/confirmation` | `app/book/confirmation/page.tsx` | Shown after an inquiry |
 | `/booking` | `app/booking/page.tsx` | Old booking form; not linked anywhere (see [To-dos](#to-dos)) |
 | `/portal` | `app/portal/page.tsx` | Guest portal (login, then tabs) |
+| `/blog` | `app/blog/page.tsx` | Blog: newest post featured, all older posts, and an archive by year and month |
+| `/blog/[slug]` | `app/blog/[slug]/page.tsx` | One post, with its date and previous/next links (each shown only when that post exists). Built ahead of time; unknown slugs are a 404 |
 | `/rent/status` | `app/rent/status/page.tsx` | Result page for tenants' rent autopay links |
 | `/approve/[id]/[token]`, `/reject/[id]/[token]` | `app/approve/…`, `app/reject/…` | One-click confirm or deny of a booking request, from the admin email (signed link) |
 | `/admin/booking/[id]` | `app/admin/booking/[id]/page.tsx` | Admin view of a booking request, with confirm/deny |
@@ -388,6 +402,12 @@ Go through this before and after every commit. AI assistants working on this rep
 | `features/MaintenanceRequestForm.tsx` | Portal tab: report an issue (with photo) |
 | `features/LeaveReviewForm.tsx` | Portal tab: review (unlocks after checkout) |
 | `features/ProfileForm.tsx` | Portal tab: User Profile (guests) and Admin Password (admin) |
+| `blog/BlogPostContent.tsx` | Renders a full post (date, title, intro, photos, body, booking box, previous/next). Used by the post page and the home pop-up |
+| `blog/BlogPostCard.tsx` | Post teaser card (photo, date, title, intro), light or dark |
+| `blog/BlogLatestModal.tsx` | Home page pop-up with the latest post |
+| `blog/BlogIndex.tsx`, `blog/BlogArchive.tsx`, `blog/BlogPageShell.tsx` | The /blog page, the archive list, and the light reading layout for blog pages |
+| `blog/BlogPostNav.tsx` | Previous/next post links |
+| `blog/InlineText.tsx` | Safe **bold** and [link](/path) rendering for post text: no raw HTML, same-site or https links only |
 | `PhoneInput.tsx` | Phone field with a country dial-code picker, defaulting to the visitor's country (by IP). Used by the lease form, the "Book directly" pop-up and the transport booking pop-up |
 | **Unused:** `BookingModal.tsx`, `EscrowModal.tsx`, `DateRangePicker.tsx`, `DisclaimerModal.tsx`, `Navigation.tsx`, `features/IDVerificationForm.tsx` | Not imported anywhere (see [To-dos](#to-dos)) |
 
@@ -414,6 +434,7 @@ Go through this before and after every commit. AI assistants working on this rep
 | `email.ts` | `ADMIN_EMAIL` (the business inbox for all admin notifications) and `EMAIL_FROM` (the sender) |
 | `rent.ts` | Rent schedule maths, tenant link tokens, admin-code check, `escapeHtml` and `emailRow` for emails, money formatting |
 | `rentWebhook.ts` | Stripe rent events: create subscription, record invoices, lease end |
+| `blog.ts` | Blog helpers: posts newest first, latest post, previous/next, archive, date formatting |
 | `currency.ts` | MXN/USD price formatting |
 | `date.ts` | Date formatting; stay-date maths (`addDays`, `nightsBetween`, `oaxacaToday`, cleaning buffer) |
 | `translations.ts` | All English and Spanish site text |
@@ -432,12 +453,14 @@ Go through this before and after every commit. AI assistants working on this rep
 | `hooks/useUsdToMxn.ts` | Daily-cached USD→MXN exchange rate |
 | `hooks/useGeoDialCode.ts` | Guesses the visitor's phone country code |
 | `contexts/LanguageContext.tsx` | EN/ES language state and `t()` translation function |
+| `data/blog.ts` | **Every blog post** (bilingual text, photos, date). Adding an entry publishes a post |
 | `data/units.ts` | **Single source of truth** for units: names, rates, capacity, Airbnb links, lease tiers |
 | `data/gallery.ts` | Gallery images and categories |
 | `data/attractions.ts` | Things to do near the property |
 | `data/countryCodes.ts` | Phone country codes |
 | `types/guest-portal.ts` | Portal session, reservation, request and section types |
 | `types/booking.ts` | Booking, unit and availability types |
+| `types/blog.ts` | Blog post, image and content-block types |
 
 ### Other files
 

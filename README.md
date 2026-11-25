@@ -388,7 +388,8 @@ Go through this before and after every commit. AI assistants working on this rep
 | `features/MaintenanceRequestForm.tsx` | Portal tab: report an issue (with photo) |
 | `features/LeaveReviewForm.tsx` | Portal tab: review (unlocks after checkout) |
 | `features/ProfileForm.tsx` | Portal tab: User Profile (guests) and Admin Password (admin) |
-| **Unused:** `BookingModal.tsx`, `EscrowModal.tsx`, `DateRangePicker.tsx`, `DisclaimerModal.tsx`, `Navigation.tsx`, `PhoneInput.tsx`, `features/IDVerificationForm.tsx` | Not imported anywhere (see [To-dos](#to-dos)) |
+| `PhoneInput.tsx` | Phone field with a country dial-code picker, defaulting to the visitor's country (by IP). Used by the lease form and the "Book directly" pop-up |
+| **Unused:** `BookingModal.tsx`, `EscrowModal.tsx`, `DateRangePicker.tsx`, `DisclaimerModal.tsx`, `Navigation.tsx`, `features/IDVerificationForm.tsx` | Not imported anywhere (see [To-dos](#to-dos)) |
 
 ### Libraries (`lib/`)
 
@@ -490,7 +491,7 @@ Migrations: `001` booking webhook fields · `002` booking count · `003` tenants
 
 ### Cleanup (rule 3)
 
-- [ ] **Delete unused components:** `BookingModal`, `EscrowModal`, `DateRangePicker`, `DisclaimerModal`, `Navigation`, `PhoneInput`, `features/IDVerificationForm`.
+- [ ] **Delete unused components:** `BookingModal`, `EscrowModal`, `DateRangePicker`, `DisclaimerModal`, `Navigation`, `features/IDVerificationForm`.
 - [ ] **Delete unused libraries:** `depositCalculator`, `depositPolicy`, `transportationConfig`. Also remove the `@supabase/supabase-js` dependency, which nothing uses.
 - [ ] **Delete the unused `/api/requests/*` endpoints**: cleaning, cancellation, extend-stay, maintenance, transport, destinations.
 - [ ] **Remove or rebuild the `/booking` page**, and decide whether `/api/book` should stay.

@@ -1,11 +1,10 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Unit, units } from '../data/units';
 import { useLanguage } from '../contexts/LanguageContext';
 import useUsdToMxn from '../hooks/useUsdToMxn';
-import { COUNTRIES, countryFlag } from '../data/countryCodes';
-import useGeoDialCode from '../hooks/useGeoDialCode';
+import PhoneInput from './PhoneInput';
 
 interface Props {
   defaultUnit?: Unit | null;
@@ -41,13 +40,11 @@ export default function LeaseApplicationForm({ defaultUnit, onSuccess, dark }: P
   const { language } = useLanguage();
   const { rate } = useUsdToMxn();
   const es = language === 'es';
-  const { dialCode: geoDialCode, ready: geoReady } = useGeoDialCode();
 
   const [form, setForm] = useState({
     name: '',
     email: '',
     phone: '',
-    phoneDialCode: '+52',
     unitSlug: defaultUnit?.slug ?? units[0].slug,
     checkIn: '',
     checkOut: '',
@@ -58,10 +55,6 @@ export default function LeaseApplicationForm({ defaultUnit, onSuccess, dark }: P
 
   const checkInRef = useRef<HTMLInputElement>(null);
   const checkOutRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (geoReady) setForm(prev => ({ ...prev, phoneDialCode: geoDialCode }));
-  }, [geoReady, geoDialCode]);
 
   const selectedUnit = units.find((u) => u.slug === form.unitSlug) ?? units[0];
   const liveUsd = rate > 0 ? Math.floor(selectedUnit.monthlyRateMXN / rate) : null;
@@ -108,7 +101,7 @@ export default function LeaseApplicationForm({ defaultUnit, onSuccess, dark }: P
         body: JSON.stringify({
           name: form.name,
           email: form.email,
-          phone: form.phone ? `${form.phoneDialCode} ${form.phone}` : '',
+          phone: form.phone,
           unitName: selectedUnit.name,
           checkIn: form.checkIn,
           checkOut: form.checkOut,
@@ -225,35 +218,7 @@ export default function LeaseApplicationForm({ defaultUnit, onSuccess, dark }: P
           {es ? 'Teléfono' : 'Phone'}
           {optionalBadge(dark, es)}
         </label>
-        <div className={`mt-2 flex w-full rounded-2xl border overflow-hidden transition ${
-          dark
-            ? 'border-slate-600 bg-slate-800 focus-within:border-terracotta focus-within:ring-2 focus-within:ring-terracotta/20'
-            : 'border-slate-300 bg-slate-50 focus-within:border-garden focus-within:ring-2 focus-within:ring-garden/20'
-        }`}>
-          <select
-            value={form.phoneDialCode}
-            onChange={(e) => set('phoneDialCode', e.target.value)}
-            className={`flex-shrink-0 border-r px-3 py-3 text-xs outline-none cursor-pointer ${
-              dark ? 'bg-slate-700 border-slate-600 text-white' : 'bg-slate-100 border-slate-300 text-slate-900'
-            }`}
-          >
-            {COUNTRIES.map((c) => (
-              <option key={c.iso} value={c.dialCode}>
-                {countryFlag(c.iso)} {c.dialCode}
-              </option>
-            ))}
-          </select>
-          <input
-            type="tel"
-            value={form.phone}
-            onChange={(e) => set('phone', e.target.value.replace(/\D/g, '').slice(0, 12))}
-            inputMode="numeric"
-            placeholder="555 555 5555"
-            className={`min-w-0 flex-1 bg-transparent px-3 py-3 text-sm outline-none ${
-              dark ? 'text-white placeholder-slate-400' : 'text-slate-900'
-            }`}
-          />
-        </div>
+        <PhoneInput value={form.phone} onChange={(v) => set('phone', v)} variant={dark ? 'dark' : 'light'} className="mt-2" />
       </div>
 
       {/* Length of stay */}

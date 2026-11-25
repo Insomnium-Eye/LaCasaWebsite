@@ -9,6 +9,7 @@ import useUsdToMxn from '@/hooks/useUsdToMxn';
 import DateInput from '@/components/DateInput';
 import { addDays, nightsBetween, oaxacaToday } from '@/lib/date';
 import { formatMoney } from '@/lib/nightlyRates';
+import PhoneInput from './PhoneInput';
 
 const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 // Loaded once, the first time a booking reaches the payment step.
@@ -169,7 +170,7 @@ export default function StayBookingModal({ unit, onClose }: { unit: Unit; onClos
               </div>
               <div>
                 <label className="mb-1.5 block text-sm font-semibold">{es ? 'Teléfono / WhatsApp' : 'Phone / WhatsApp'} <span className="text-red-600">*</span></label>
-                <input type="tel" value={form.phone} onChange={(e) => set('phone', e.target.value)} required minLength={5} maxLength={30} disabled={submitting} className={inputClass} placeholder="+1 555 123 4567" />
+                <PhoneInput value={form.phone} onChange={(v) => set('phone', v)} variant="modal" required disabled={submitting} />
               </div>
               <div className="sm:col-span-2">
                 <label className="mb-1.5 block text-sm font-semibold">{es ? 'Nombre completo' : 'Full name'} <span className="text-red-600">*</span></label>

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import useUsdToMxn from '@/hooks/useUsdToMxn';
-import { TRANSPORT_DESTINATIONS, TransportDestination, oneWayPriceMxn, tripPriceMxn } from '@/lib/transportPricing';
+import { TRANSPORT_DESTINATIONS, TransportDestination, getDestination, oneWayPriceMxn, tripPriceMxn } from '@/lib/transportPricing';
 import TransportQuoteModal from './TransportQuoteModal';
 import TransportBookingModal from './TransportBookingModal';
 
@@ -21,17 +21,22 @@ export default function TransportationServices({ embedded = false }: { embedded?
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
   const [cancelled, setCancelled] = useState(false);
 
-  // Stripe sends the visitor back with ?payment=cancelled if they abandon checkout.
   useEffect(() => {
-    setCancelled(new URLSearchParams(window.location.search).get('payment') === 'cancelled');
+    const params = new URLSearchParams(window.location.search);
+    // Stripe sends the visitor back with ?payment=cancelled if they abandon checkout.
+    setCancelled(params.get('payment') === 'cancelled');
+    // ?book=<destination id> (e.g. from a blog post) opens that destination's booking pop-up.
+    const linked = getDestination(params.get('book') ?? '');
+    if (linked) setBookingDest(linked);
   }, []);
 
   const mxn = (amount: number) => `$${amount.toLocaleString(es ? 'es-MX' : 'en-US')} MXN`;
   const usd = (amount: number) => (rate > 0 ? `≈ $${Math.floor(amount / rate).toLocaleString('en-US')} USD` : '');
 
   const PriceBlock = ({ dest, compact }: { dest: TransportDestination; compact?: boolean }) => {
-    const oneWay = oneWayPriceMxn(dest);
-    const roundTrip = tripPriceMxn(dest, true);
+    // Listed prices are the 1–2 passenger fares; the booking pop-up adjusts for group size.
+    const oneWay = oneWayPriceMxn(dest, 1);
+    const roundTrip = tripPriceMxn(dest, true, 1);
     return (
       <div className={compact ? '' : 'space-y-1'}>
         <p className={`font-bold text-garden ${compact ? '' : 'text-2xl'}`}>
@@ -62,8 +67,8 @@ export default function TransportationServices({ embedded = false }: { embedded?
           )}
           <p className="text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
             {es
-              ? 'Traslados privados y confiables desde La Casa Oaxaca en San Felipe del Agua a los destinos más populares de Oaxaca. Precios en pesos mexicanos para un sedán estándar, servicio puerta a puerta. Reserva y paga en línea con tarjeta de débito o crédito.'
-              : "Reliable private transfers from La Casa Oaxaca in San Felipe del Agua to Oaxaca's most popular destinations. Prices are in Mexican pesos for a standard sedan with door-to-door service. Book and pay online with any debit or credit card."}
+              ? 'Traslados privados y confiables desde La Casa Oaxaca en San Felipe del Agua a los destinos más populares de Oaxaca. Precios en pesos mexicanos para un sedán estándar, servicio puerta a puerta. Los precios mostrados son para 1–2 pasajeros; de 3–4 pasajeros +16%, de 5–6 pasajeros +30%. Reserva y paga en línea con tarjeta de débito o crédito.'
+              : "Reliable private transfers from La Casa Oaxaca in San Felipe del Agua to Oaxaca's most popular destinations. Prices are in Mexican pesos for a standard sedan with door-to-door service. Prices shown are for 1–2 passengers; 3–4 passengers +16%, 5–6 passengers +30%. Book and pay online with any debit or credit card."}
           </p>
         </div>
 

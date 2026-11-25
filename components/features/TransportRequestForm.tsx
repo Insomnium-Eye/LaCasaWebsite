@@ -49,8 +49,8 @@ const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: Transport
   const maxDatetime = session.checkOut.slice(0, 10) + 'T23:59';
 
   const selectedDest = getDestination(destinationId);
-  const oneWayMxn = selectedDest ? oneWayPriceMxn(selectedDest) : 0;
-  const totalMxn = selectedDest ? tripPriceMxn(selectedDest, roundTrip) : 0;
+  const oneWayMxn = selectedDest ? oneWayPriceMxn(selectedDest, passengers) : 0;
+  const totalMxn = selectedDest ? tripPriceMxn(selectedDest, roundTrip, passengers) : 0;
   const formatPrice = (mxn: number) => formatMxnWithUsd(mxn, language, rate);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -93,7 +93,7 @@ const TransportRequestForm = ({ session, prefill, onPrefillConsumed }: Transport
             <option value="">{t('portal.transportRequest.selectDestination')}</option>
             {TRANSPORT_DESTINATIONS.map((dest) => (
               <option key={dest.id} value={dest.id}>
-                {dest.emoji} {dest.name[language === 'es' ? 'es' : 'en']} — {formatPrice(oneWayPriceMxn(dest))} · {dest.duration[language === 'es' ? 'es' : 'en']}
+                {dest.emoji} {dest.name[language === 'es' ? 'es' : 'en']} — {formatPrice(oneWayPriceMxn(dest, passengers))} · {dest.duration[language === 'es' ? 'es' : 'en']}
               </option>
             ))}
           </select>

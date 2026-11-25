@@ -14,7 +14,21 @@ export const PRICE_PER_KM_MXN = AIRPORT_PRICE_MXN / AIRPORT_DISTANCE_KM;
 /** Round trips are charged as two one-way legs with 10% off. */
 export const ROUND_TRIP_DISCOUNT = 0.1;
 
-export const MAX_PASSENGERS = 7;
+export const MAX_PASSENGERS = 6;
+
+/**
+ * The price steps up for every two passengers, at a discount rather than a
+ * full extra fare. The multipliers match the Puerto Escondido rates on /rides
+ * (5,000 → 5,800 → 6,500 MXN, i.e. +16% and +30%).
+ */
+export const PASSENGER_TIERS = [
+  { min: 1, max: 2, multiplier: 1.0 },
+  { min: 3, max: 4, multiplier: 1.16 },
+  { min: 5, max: MAX_PASSENGERS, multiplier: 1.3 },
+] as const;
+
+export const passengerTier = (passengers: number) =>
+  PASSENGER_TIERS.find((t) => passengers >= t.min && passengers <= t.max) ?? PASSENGER_TIERS[PASSENGER_TIERS.length - 1];
 
 export interface TransportDestination {
   id: string;
@@ -100,6 +114,18 @@ export const TRANSPORT_DESTINATIONS: TransportDestination[] = [
     duration: { en: '50–75 min', es: '50–75 min' },
   },
   {
+    id: 'llano_grande',
+    emoji: '🏔️',
+    // Road distance measured on OpenStreetMap routing from San Felipe del Agua (68.4 km, Nov 2026).
+    distanceKm: 68,
+    name: { en: 'Llano Grande (Sierra Norte)', es: 'Llano Grande (Sierra Norte)' },
+    description: {
+      en: 'Mountain village with pine forests, streams, trails and cabins with fireplaces.',
+      es: 'Pueblo de montaña con bosque de pinos, arroyos, senderos y cabañas con chimenea.',
+    },
+    duration: { en: 'About 2 hrs', es: 'Aprox. 2 hrs' },
+  },
+  {
     id: 'hierve_el_agua',
     emoji: '💧',
     distanceKm: 75,
@@ -114,13 +140,21 @@ export const getDestination = (id: string) =>
 
 const roundUpToTen = (mxn: number) => Math.ceil(mxn / 10) * 10;
 
-/** One-way price in MXN, rounded up to the nearest 10 pesos. */
-export const oneWayPriceMxn = (dest: TransportDestination) =>
-  dest.id === 'airport' ? AIRPORT_PRICE_MXN : roundUpToTen(dest.distanceKm * PRICE_PER_KM_MXN);
+/** One-way price in MXN for 1–2 passengers (the distance-based base fare). */
+const baseOneWayMxn = (dest: TransportDestination) =>
+  dest.id === 'airport' ? AIRPORT_PRICE_MXN : dest.distanceKm * PRICE_PER_KM_MXN;
+
+/**
+ * One-way price in MXN for a group size, rounded up to the nearest 10 pesos.
+ * `passengers` is required on purpose, so no caller can quietly charge the
+ * 1–2 passenger price for a bigger group. Pass 1 to show the starting price.
+ */
+export const oneWayPriceMxn = (dest: TransportDestination, passengers: number) =>
+  roundUpToTen(baseOneWayMxn(dest) * passengerTier(passengers).multiplier);
 
 /** Total trip price in MXN. */
-export const tripPriceMxn = (dest: TransportDestination, roundTrip: boolean) => {
-  const oneWay = oneWayPriceMxn(dest);
+export const tripPriceMxn = (dest: TransportDestination, roundTrip: boolean, passengers: number) => {
+  const oneWay = oneWayPriceMxn(dest, passengers);
   return roundTrip ? roundUpToTen(oneWay * 2 * (1 - ROUND_TRIP_DISCOUNT)) : oneWay;
 };
 

@@ -102,7 +102,7 @@ Airbnb / Vrbo ◀──sync──▶ Hospitable ──API──▶ lib/hospitabl
 All card handling happens on **Stripe-hosted pages**. Card numbers never reach our servers or database.
 
 - **Direct stays.** See [Nightly prices and direct bookings](#nightly-prices-and-direct-bookings). The payment form is Stripe's own, embedded in the pop-up (Embedded Checkout), so card numbers still never reach our servers.
-- **Transport trips.** `/api/transport/checkout` works out the price **on the server** from `lib/transportPricing.ts`, then opens a Stripe Checkout session. When the webhook confirms payment, the trip is recorded and confirmation emails go out.
+- **Transport trips.** `/api/transport/checkout` works out the price **on the server** from `lib/transportPricing.ts`, then opens a Stripe Checkout session. Fares are distance-based (the 15 km airport run at 500 MXN sets the per-km rate) and step up by group size: 1–2 passengers pay the base fare, 3–4 pay +16%, 5–6 pay +30% (6 is the maximum) (the same steps as the Puerto Escondido rates). Round trips are two legs with 10% off. When the webhook confirms payment, the trip is recorded and confirmation emails go out.
 - **Tenant rent.** The admin adds a tenant at `/admin/tenants`, and the tenant receives a permanent signed link. That link opens Stripe Checkout in "setup" mode to save a card. The webhook then creates a subscription that charges on the first rent date's day of the month (1–28, chosen when adding the tenant) at 09:00 Oaxaca time, and cancels itself after the lease's last month. The same link later opens Stripe's billing portal so the tenant can update their card.
 - **Webhook.** `/api/stripe/webhook` verifies Stripe's signature on every event. It must be subscribed to `checkout.session.completed`, `invoice.paid`, `invoice.payment_failed` and `customer.subscription.deleted`.
 
@@ -279,7 +279,7 @@ Go through this before and after every commit. AI assistants working on this rep
 | `/gallery` | `app/gallery/page.tsx` | Filterable photo gallery |
 | `/faq` | `app/faq/page.tsx` | Frequently asked questions |
 | `/contact` | `app/contact/page.tsx` | Contact form |
-| `/rides` | `app/rides/page.tsx` | Rides: local destinations with card payment (same as `/transport`), Puerto Escondido transfers and beach packages. `/tours` redirects here. |
+| `/rides` | `app/rides/page.tsx` | Rides: local destinations with card payment (same as `/transport`), Puerto Escondido transfers and beach packages. `/tours` redirects here. `/rides?book=<destination id>` (e.g. `?book=llano_grande`) opens that destination's booking pop-up directly. |
 | `/transport` | `app/transport/page.tsx` | Private transport: destinations, prices, pay by card |
 | `/transport/success` | `app/transport/success/page.tsx` | Shown after a transport payment. Abandoned payments return to `/rides?payment=cancelled` (portal bookings return to the portal) |
 | `/stay/confirmed` | `app/stay/confirmed/page.tsx` | Shown after paying for a direct stay |
@@ -448,7 +448,7 @@ Go through this before and after every commit. AI assistants working on this rep
 | `vercel.json` | Cron schedules |
 | `.env.example` | Environment variable names with placeholder values |
 | `CLAUDE.md` | Instructions for AI assistants (points to the commit checklist) |
-| `public/` | Images, `robots.txt`, `sitemap.xml` |
+| `public/` | Images, `robots.txt`, `sitemap.xml`. Blog photos live in `public/imgs/blog/<post>/`, resized to 2000 px with metadata (including GPS) stripped |
 | `*.md` (other root docs), `deploy.sh`, `CNAME` | Older scaffold-era docs and GitHub Pages leftovers (see [To-dos](#to-dos)) |
 
 ---
@@ -490,6 +490,8 @@ Migrations: `001` booking webhook fields · `002` booking count · `003` tenants
 - [ ] **Verify oaxaca-rental.com in Resend and set `EMAIL_FROM`.** The `onboarding@resend.dev` test sender only delivers to the Resend account owner, so guest emails, and admin emails to the business inbox, may not arrive until then.
 
 ### Cleanup (rule 3)
+
+- [ ] **Remove the original Llano Grande photos** (`public/imgs/Llano Grande/`, about 240 MB) from the repo. They contain GPS coordinates and are publicly downloadable; the blog uses the resized, metadata-free copies in `public/imgs/blog/llano-grande/`. Keep the originals somewhere private.
 
 - [ ] **Delete unused components:** `BookingModal`, `EscrowModal`, `DateRangePicker`, `DisclaimerModal`, `Navigation`, `features/IDVerificationForm`.
 - [ ] **Delete unused libraries:** `depositCalculator`, `depositPolicy`, `transportationConfig`. Also remove the `@supabase/supabase-js` dependency, which nothing uses.

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import useUsdToMxn from '@/hooks/useUsdToMxn';
 import DateInput from '@/components/DateInput';
-import { MAX_PASSENGERS, TransportDestination, formatMxnWithUsd, oneWayPriceMxn, tripPriceMxn } from '@/lib/transportPricing';
+import { MAX_PASSENGERS, TransportDestination, formatMxnWithUsd, oneWayPriceMxn, passengerTier, tripPriceMxn } from '@/lib/transportPricing';
 import { startTransportCheckout } from '@/lib/transportCheckout';
 import PhoneInput from '@/components/PhoneInput';
 
@@ -36,8 +36,9 @@ export default function TransportBookingModal({ destination, onClose }: Props) {
   const set = <K extends keyof typeof form>(key: K, value: (typeof form)[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }));
 
-  const oneWayMxn = oneWayPriceMxn(destination);
-  const totalMxn = tripPriceMxn(destination, form.roundTrip);
+  const oneWayMxn = oneWayPriceMxn(destination, form.passengers);
+  const totalMxn = tripPriceMxn(destination, form.roundTrip, form.passengers);
+  const tier = passengerTier(form.passengers);
   const formatPrice = (mxn: number) => formatMxnWithUsd(mxn, language, rate);
   const minDatetime = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
 
@@ -135,6 +136,10 @@ export default function TransportBookingModal({ destination, onClose }: Props) {
           </div>
 
           <div className="space-y-1 rounded-lg border border-garden/30 bg-[#f0f4f1] p-4">
+            <div className="flex justify-between text-sm text-slate-700">
+              <span>{es ? `Tarifa para ${tier.min}–${tier.max} pasajeros` : `Fare for ${tier.min}–${tier.max} passengers`}</span>
+              <span>{tier.multiplier === 1 ? (es ? 'Tarifa base' : 'Base fare') : `+${Math.round((tier.multiplier - 1) * 100)}%`}</span>
+            </div>
             {form.roundTrip && (
               <>
                 <div className="flex justify-between text-sm text-slate-700">

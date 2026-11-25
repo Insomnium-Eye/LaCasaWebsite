@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
     guest = { name: body.name, email: body.email, phone: body.phone, reservationId: '' };
   }
 
-  const priceMxn = tripPriceMxn(destination, body.roundTrip);
+  const priceMxn = tripPriceMxn(destination, body.roundTrip, body.passengers);
   const tripLabel = body.roundTrip ? 'Round trip' : 'One way';
   const origin = new URL(request.url).origin;
 
